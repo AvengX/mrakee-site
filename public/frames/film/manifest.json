@@ -1,0 +1,39 @@
+{
+  "count": 334,
+  "fps": 12,
+  "width": 1400,
+  "height": 788,
+  "pattern": "frames/film/%04d.webp",
+  "chapters": [
+    {
+      "label": "The object",
+      "in": 0.0,
+      "out": 0.1592
+    },
+    {
+      "label": "It wakes",
+      "in": 0.1471,
+      "out": 0.3243
+    },
+    {
+      "label": "Retail",
+      "in": 0.3123,
+      "out": 0.4895
+    },
+    {
+      "label": "Quick service",
+      "in": 0.4775,
+      "out": 0.6547
+    },
+    {
+      "label": "Transport",
+      "in": 0.6426,
+      "out": 0.8198
+    },
+    {
+      "label": "Scale",
+      "in": 0.8078,
+      "out": 1.0
+    }
+  ]
+}

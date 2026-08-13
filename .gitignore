@@ -1,0 +1,22 @@
+node_modules
+dist
+dist-ssr
+
+# Build intermediates from film-src/build_film.py
+film-src/_tmp
+
+# The source MP4s stay out of the repo — they live in Downloads and only
+# the derived WebP frames (public/frames/) are needed to serve the site.
+film-src/*.mp4
+
+*.local
+.env
+.env.*
+!.env.example
+
+.DS_Store
+*.log
+npm-debug.log*
+.vscode/*
+!.vscode/extensions.json
+.idea
