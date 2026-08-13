@@ -103,9 +103,19 @@ export default function FilmStage() {
 
       paint(0); // first paint before any scrolling happens
 
+      // Watching the stage itself rather than the window covers both cases:
+      // a genuine resize, AND the first moment the element actually has a
+      // size (draw() refuses to paint into a zero-sized canvas, so without
+      // this the hero could stay blank until the visitor scrolled).
+      const ro = new ResizeObserver(() => paint(state.p));
+      ro.observe(canvas.current);
+
       const onResize = () => paint(state.p);
       window.addEventListener("resize", onResize);
-      return () => window.removeEventListener("resize", onResize);
+      return () => {
+        ro.disconnect();
+        window.removeEventListener("resize", onResize);
+      };
     }, root);
 
     return () => ctx.revert();
