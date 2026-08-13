@@ -30,10 +30,11 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      # NOTE: no `enablement: true` here. The default GITHUB_TOKEN cannot
+      # switch Pages on for a repo that has never had it configured, and the
+      # step hard-fails when it tries. Pages must be set to the "GitHub
+      # Actions" source once in Settings -> Pages; after that this works.
       - uses: actions/configure-pages@v5
-        with:
-          # turns Pages on for the repo, so there is no manual settings step
-          enablement: true
 
       # vite.config.js sets base:'./' so the build already works from the
       # /<repo>/ subpath a project Pages site is served from.
