@@ -31,6 +31,9 @@ jobs:
       - run: npm run build
 
       - uses: actions/configure-pages@v5
+        with:
+          # turns Pages on for the repo, so there is no manual settings step
+          enablement: true
 
       # vite.config.js sets base:'./' so the build already works from the
       # /<repo>/ subpath a project Pages site is served from.
