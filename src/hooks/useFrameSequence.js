@@ -152,6 +152,13 @@ export function useFrameSequence(name) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const cw = Math.round(canvas.clientWidth * dpr);
     const ch = Math.round(canvas.clientHeight * dpr);
+
+    // If the element has no layout size yet, bail rather than sizing the
+    // drawing buffer to 0x0. A zeroed buffer renders nothing and only
+    // recovers on a later draw — which, if the visitor never scrolls,
+    // never comes, leaving a blank hero.
+    if (cw === 0 || ch === 0) return;
+
     if (canvas.width !== cw || canvas.height !== ch) {
       canvas.width = cw;
       canvas.height = ch;

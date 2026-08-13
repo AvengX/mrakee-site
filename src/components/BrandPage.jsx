@@ -6,40 +6,53 @@ import Logo from "./Logo";
    architecture (solutions → industries → products → services). All copy
    below is original to Mrakee. -------------------------------------- */
 
+/* The full solution set carried over from the acquired APAC business. */
 const SOLUTIONS = [
   { i: "◧", t: "Interactive Kiosk", d: "Self-serve touchpoints that let customers browse, order and pay — and hand you the interaction data afterwards." },
-  { i: "◈", t: "Wayfinding", d: "Floor-aware directories for malls, hospitals and campuses. Search a shop, get a route on the screen and on your phone." },
+  { i: "◈", t: "Wayfinder", d: "Floor-aware directories for malls, hospitals and campuses. Search a destination, get a route on the screen and on your phone." },
   { i: "▦", t: "Video Walls", d: "Tiled arrays driven as a single canvas, from a four-panel lobby feature to a full atrium façade." },
-  { i: "▤", t: "Digital Menu Boards", d: "Dayparted menus that flip breakfast to lunch on schedule, and grey out an item the moment stock runs dry.", gold: true },
-  { i: "✈", t: "Flight & Transit Displays", d: "FIDS and PIDS driven off live operational feeds, with the failover behaviour terminals actually require." },
-  { i: "☰", t: "Queue Management", d: "Ticketing, calling and live wait times — routing people to the right counter instead of the longest line." },
+  { i: "▤", t: "Digital Menu Board", d: "Dayparted menus that flip breakfast to lunch on schedule, and grey out an item the moment stock runs dry.", gold: true },
+  { i: "✈", t: "FIDS", d: "Flight information displays driven off live operational feeds, with the failover behaviour terminals actually require." },
+  { i: "▭", t: "PIDS", d: "Platform and train passenger information, synchronised across a line and readable the length of a platform." },
+  { i: "⬛", t: "Biometric Immigration", d: "Automated border-control gates pairing document reading with facial matching under government security requirements.", gold: true },
+  { i: "◉", t: "Virtual Concierge — Transport", d: "Remote-assist stations putting a live specialist on screen anywhere in a terminal, staffed centrally." },
+  { i: "◎", t: "Virtual Concierge — Mall & Hotel", d: "The same remote-assist model for malls, hotels and offices, where staffing every desk in person doesn't add up." },
+  { i: "⬓", t: "Interactive Retail", d: "Endless-aisle browsing on the shop floor, tying in-store screens to the full catalogue and live stock." },
   { i: "◐", t: "Smart Fitting Room", d: "In-room screens that read the garment tag and offer sizes, colours and pairings without a trip back to the floor.", gold: true },
-  { i: "◉", t: "Virtual Concierge", d: "Remote-assist stations putting a live specialist on screen wherever staffing one in person doesn't add up." },
-  { i: "⬒", t: "Self Check-In", d: "Hotel and clinic arrival kiosks handling ID, payment and key issue, with a staffed path always one tap away." },
+  { i: "☰", t: "Queue Management", d: "Ticketing, calling and live wait times — routing people to the right counter instead of the longest line." },
+  { i: "▥", t: "Meeting Room Manager", d: "Door-side panels showing occupancy and next booking, with book-now for the room you're standing in front of." },
+  { i: "⌕", t: "Smart Product Finder", d: "Search a product and get its aisle, bay and shelf — cutting the most common question staff get asked." },
+  { i: "▯", t: "Digital Standee", d: "Free-standing portrait displays for promotions and campaigns, moved and re-tasked without an installer.", gold: true },
+  { i: "⬒", t: "Hotel Self Check-In / Out", d: "Arrival and departure kiosks handling ID, payment and key issue, with a staffed path always one tap away." },
+  { i: "☺", t: "Feedback System", d: "One-tap satisfaction capture at the point of experience, reported by site, hour and staff shift." },
 ];
 
+/* The 13 industries served by the acquired business. */
 const INDUSTRIES = [
   "Retail", "Quick Service Restaurants", "Transportation", "Banking & Finance",
-  "Education", "Healthcare", "Hotel & Hospitality", "Corporate Communications",
-  "Grocery", "Automotive", "Government", "Out-of-Home Media",
+  "Education", "DOOH & Outdoor", "Corporate Communications", "Grocery",
+  "Automotive", "Hotel & Casino", "Government", "Entertainment", "Healthcare",
 ];
 
 const PILLARS = [
-  { t: "Software", d: "The content platform: scheduling, playlists, templating and estate-wide rollout control.", items: ["Content Manager", "Rule-based dayparting", "Template & brand locking", "Proof-of-play reporting"] },
-  { t: "Hardware", d: "Displays, media players and enclosures specified for the environment they'll live in.", items: ["Commercial panels", "Media players", "Kiosk enclosures", "Shelf-edge displays"] },
+  { t: "Software", d: "The content platform: scheduling, playlists, templating and estate-wide rollout control.", items: ["Content Manager", "Player", "Rule-based dayparting", "Proof-of-play reporting"] },
+  { t: "Hardware", d: "Displays, media players and enclosures specified for the environment they'll live in.", items: ["Media Players", "LINQ Shelf Edge displays", "Commercial panels", "Kiosk enclosures"] },
   { t: "Managed SaaS", d: "We host, monitor and patch it, so your team ships content instead of babysitting infrastructure.", items: ["Hosted platform", "Health monitoring", "Staged rollouts", "Support & SLA"] },
 ];
 
-/* The stats band is hidden for the client demo because it had no real
-   figures in it, and a row of dashes reads as unfinished.
-   To bring it back: put real values in STATS and flip SHOW_STATS to true. */
-const SHOW_STATS = false;
+/* Real figures, carried over from the acquired business.
+   NOTE: the source site is internally inconsistent — its homepage claims
+   4.0M signs / 1,200+ staff / 30 offices / 26 languages while its About
+   page says 3.1M / 1,000+ / 28 / 23. These are the homepage (headline)
+   numbers. Confirm which set is current before any press use. */
+const SHOW_STATS = true;
 
 const STATS = [
-  { n: "—", l: "Screens deployed" },
-  { n: "—", l: "Markets served" },
-  { n: "—", l: "Years in operation" },
-  { n: "—", l: "Uptime SLA" },
+  { n: "4.0M", l: "Digital signs" },
+  { n: "1,200+", l: "Employees worldwide" },
+  { n: "100+", l: "Countries represented" },
+  { n: "30", l: "Offices" },
+  { n: "26", l: "Languages" },
 ];
 
 export default function BrandPage() {
@@ -125,10 +138,15 @@ export default function BrandPage() {
       {SHOW_STATS && (
         <section className="band band--dark">
           <div className="band__inner">
-            <Reveal className="band__head" style={{ textAlign: "center" }}>
+            <Reveal className="band__head" style={{ textAlign: "center", margin: "0 auto 3rem" }}>
               <h2 style={{ margin: "0 auto", textAlign: "center" }}>
-                Measured where it matters.
+                Thirty years of it.
               </h2>
+              <p className="lede" style={{ textAlign: "center", margin: "1.25rem auto 0" }}>
+                Mrakee Technologies carries forward a three-decade digital
+                signage business — its platform, its installed base and the
+                teams who run it across Asia-Pacific.
+              </p>
             </Reveal>
             <Reveal className="stats" stagger>
               {STATS.map((s) => (
@@ -217,10 +235,15 @@ export default function BrandPage() {
             </ul>
           </div>
           <div>
-            <h4>Contact</h4>
+            <h4>APAC Headquarters</h4>
             <ul>
-              <li>Singapore</li>
-              {/* TODO: confirm the real address before this goes public */}
+              <li>Keck Seng Tower</li>
+              <li>133 Cecil Street, #04-02</li>
+              <li>Singapore 069535</li>
+              <li><a href="tel:+6565094235">+65 6509 4235</a></li>
+              {/* TODO: the acquired business used sales@stratacache-apac.com.
+                  Confirm the Mrakee address that replaces it — this one is
+                  assumed, not verified. */}
               <li><a href="mailto:sales@mrakee.com">sales@mrakee.com</a></li>
             </ul>
           </div>
