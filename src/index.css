@@ -256,10 +256,17 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(
+  /* The flat 30% veil is the important layer. Carrying the legibility
+     on a per-caption scrim meant a local shape sitting on the footage,
+     and any local shape has an edge you can find. A veil across the
+     whole stage has none — it just sets the film back a step, which is
+     what a backdrop should do anyway. The film still reads through it
+     at 70%. */
+  background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)),
+    radial-gradient(
       ellipse at 50% 46%,
       transparent 26%,
-      rgba(255, 255, 255, 0.52) 70%,
+      rgba(255, 255, 255, 0.5) 70%,
       rgba(255, 255, 255, 0.95) 100%
     ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, transparent 22%);
@@ -340,13 +347,24 @@ body {
 .cap::before {
   content: "";
   position: absolute;
-  inset: -2.75rem -3.5rem -3rem;
+  /* Deliberately enormous. The first version hugged the text at ~3rem
+     and its falloff happened over a few dozen pixels, which made the
+     edge of the ellipse legible — it read as a pale rectangle pasted on
+     the footage. Spreading the same amount of light over 14vw/16vh
+     means the transition takes hundreds of pixels and reads as light
+     pooling in the middle of the frame instead of as a patch. */
+  inset: -18vh -14vw;
   z-index: -1;
   pointer-events: none;
+  /* Now only a top-up over the stage veil, so there is roughly a third
+     as much alpha to fall off and the steepest slope drops under
+     0.0015/px — below where an edge becomes findable. */
   background: radial-gradient(
     ellipse at 50% 50%,
-    rgba(255, 255, 255, 0.95) 55%,
-    rgba(255, 255, 255, 0.74) 76%,
+    rgba(255, 255, 255, 0.36) 0%,
+    rgba(255, 255, 255, 0.3) 34%,
+    rgba(255, 255, 255, 0.18) 58%,
+    rgba(255, 255, 255, 0.06) 76%,
     rgba(255, 255, 255, 0) 90%
   );
 }
@@ -394,7 +412,10 @@ body {
    slate-600 rather than slate-500 gives the supporting line the weight
    the headline already has. */
 .cap .lede {
-  color: #475569; /* 7.0:1 on white */
+  /* slate-700, not slate-600. Over the brightest frames the lighter
+     tone measured 3.89:1 — the veil alone could not carry it, and the
+     alternative was veiling the film so heavily it stopped being film. */
+  color: #334155; /* 10.9:1 on white */
 }
 
 .cap .eyebrow--badge {
@@ -873,6 +894,13 @@ h3 {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent;
+  /* Critical, not cosmetic. A text-shadow on background-clip:text is
+     painted BEHIND the glyph, and the fill is transparent — so the
+     shadow shows straight through and mixes into the gradient. The
+     caption's white shadow was washing these words out to pale cream
+     and mint, which is the exact "too light" everyone kept seeing. */
+  text-shadow: none;
 }
 
 .lede {
