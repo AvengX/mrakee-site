@@ -167,16 +167,13 @@ export function useFrameSequence(name) {
     if (!ctx) return;
     ctx.clearRect(0, 0, cw, ch);
 
-    // Adaptive fit. On a landscape viewport the frame's aspect is close to
-    // the stage's, so contain-fit shows the whole composition with only a
-    // sliver of letterbox. On a portrait phone contain-fit would shrink a
-    // 16:9 frame to a thin strip marooned in a tall stage, so cover-fit and
-    // crop the sides instead — the subject is centred in every chapter.
-    const stageAspect = cw / ch;
-    const cover = stageAspect < 1.3;
-    const s = cover
-      ? Math.max(cw / src.width, ch / src.height)
-      : Math.min(cw / src.width, ch / src.height);
+    // Cover-fit, always: fill the stage edge to edge and crop whatever
+    // does not fit, centred. Contain-fit was tried first and left visible
+    // gutters on any viewport wider than the frame's 16:9 — which is most
+    // laptops — and a letterboxed film reads as a video embed rather than
+    // as the page itself. The subject is centred in every chapter, so
+    // what gets cropped is always background.
+    const s = Math.max(cw / src.width, ch / src.height);
     const w = src.width * s;
     const h = src.height * s;
     ctx.drawImage(src, (cw - w) / 2, (ch - h) / 2, w, h);

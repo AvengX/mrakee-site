@@ -1,14 +1,18 @@
 import Reveal from "./Reveal";
+import SplitWords from "./SplitWords";
+import Counter from "./Counter";
 import Logo from "./Logo";
+import { usePointerGlow } from "../hooks/usePointerGlow";
 
 /* --- Content model -------------------------------------------------
    Structure mirrors a digital-signage company's information
    architecture (solutions → industries → products → services). All copy
    below is original to Mrakee. -------------------------------------- */
 
-/* The full solution set carried over from the acquired APAC business. */
+/* The full solution set carried over from the acquired APAC business.
+   The first entry runs double-width as the section's lead card. */
 const SOLUTIONS = [
-  { i: "◧", t: "Interactive Kiosk", d: "Self-serve touchpoints that let customers browse, order and pay — and hand you the interaction data afterwards." },
+  { i: "◧", t: "Interactive Kiosk", d: "Self-serve touchpoints that let customers browse, order and pay — and hand you the interaction data afterwards.", feature: true },
   { i: "◈", t: "Wayfinder", d: "Floor-aware directories for malls, hospitals and campuses. Search a destination, get a route on the screen and on your phone." },
   { i: "▦", t: "Video Walls", d: "Tiled arrays driven as a single canvas, from a four-panel lobby feature to a full atrium façade." },
   { i: "▤", t: "Digital Menu Board", d: "Dayparted menus that flip breakfast to lunch on schedule, and grey out an item the moment stock runs dry.", gold: true },
@@ -40,6 +44,12 @@ const PILLARS = [
   { t: "Managed SaaS", d: "We host, monitor and patch it, so your team ships content instead of babysitting infrastructure.", items: ["Hosted platform", "Health monitoring", "Staged rollouts", "Support & SLA"] },
 ];
 
+const SERVICES = [
+  { t: "Technical Consulting", d: "Site surveys, network and power planning, integration with your POS, PMS or operations feed, and a rollout plan that survives contact with a live store." },
+  { t: "Creative Services", d: "Motion, layout and templating built for the viewing distance and dwell time of the actual space — not a desktop mockup." },
+  { t: "Support & Maintenance", d: "Monitoring, spares logistics and on-site response, with escalation paths agreed before you need them." },
+];
+
 /* Real figures, carried over from the acquired business.
    NOTE: the source site is internally inconsistent — its homepage claims
    4.0M signs / 1,200+ staff / 30 offices / 26 languages while its About
@@ -56,14 +66,22 @@ const STATS = [
 ];
 
 export default function BrandPage() {
+  /* One delegated pointer listener per section, not one per card. It
+     goes on the section wrapper rather than on <Reveal>, which owns its
+     own ref for the entrance animation. */
+  const solutionsSurface = usePointerGlow(".card");
+  const productsSurface = usePointerGlow(".pillar");
+
   return (
     <div className="brand">
-      {/* ---------------- SOLUTIONS ---------------- */}
+      {/* ---------------- SOLUTIONS ----------------
+          Lead card + grid. The first solution carries the section
+          instead of a second paragraph doing it. */}
       <section className="band" id="solutions">
-        <div className="band__inner">
+        <div className="band__inner" ref={solutionsSurface}>
           <Reveal className="band__head">
             <p className="eyebrow">Solutions</p>
-            <h2>One platform, every touchpoint.</h2>
+            <SplitWords words={["One", "platform,", { t: "every", grad: true }, { t: "touchpoint.", grad: true }]} />
             <p className="lede">
               Each of these runs on the same content engine and the same
               management console — so a shopping centre can run wayfinding,
@@ -73,7 +91,10 @@ export default function BrandPage() {
 
           <Reveal className="grid grid--3" stagger>
             {SOLUTIONS.map((s) => (
-              <article className="card" key={s.t}>
+              <article
+                className={`card${s.feature ? " card--feature" : ""}`}
+                key={s.t}
+              >
                 <div className={`card__icon${s.gold ? " card__icon--gold" : ""}`}>
                   {s.i}
                 </div>
@@ -85,12 +106,14 @@ export default function BrandPage() {
         </div>
       </section>
 
-      {/* ---------------- INDUSTRIES ---------------- */}
+      {/* ---------------- INDUSTRIES ----------------
+          Text + visual: the heading holds its position while the chip
+          field scrolls past it. */}
       <section className="band band--alt" id="industries">
-        <div className="band__inner">
+        <div className="band__inner band__split">
           <Reveal className="band__head">
             <p className="eyebrow">Industries</p>
-            <h2>Different floors, different rules.</h2>
+            <SplitWords words={["Different", "floors,", "different", "rules."]} />
             <p className="lede">
               A drive-thru menu board and an immigration hall have almost
               nothing in common except the need to never go dark. We specify
@@ -98,7 +121,7 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <Reveal className="pills" stagger>
+          <Reveal className="pills" stagger y={18}>
             {INDUSTRIES.map((n) => (
               <span className="pill" key={n}>{n}</span>
             ))}
@@ -107,11 +130,11 @@ export default function BrandPage() {
       </section>
 
       {/* ---------------- PRODUCTS ---------------- */}
-      <section className="band" id="products">
-        <div className="band__inner">
+      <section className="band band--rule" id="products">
+        <div className="band__inner" ref={productsSurface}>
           <Reveal className="band__head">
             <p className="eyebrow">Products</p>
-            <h2>Software, hardware, or the whole thing managed.</h2>
+            <SplitWords words={["Software,", "hardware,", "or", "the", { t: "whole", grad: true }, { t: "thing", grad: true }, { t: "managed.", grad: true }]} />
             <p className="lede">
               Take the parts you need. Most teams start with one site fully
               managed, then bring it in-house as they scale.
@@ -119,14 +142,13 @@ export default function BrandPage() {
           </Reveal>
 
           <Reveal className="split" stagger>
-            {PILLARS.map((p) => (
+            {PILLARS.map((p, i) => (
               <div className="pillar" key={p.t}>
-                <h3 style={{ fontSize: "1.5rem", letterSpacing: "-0.02em" }}>{p.t}</h3>
-                <p style={{ marginTop: ".7rem", color: "var(--ink-soft)", lineHeight: 1.6 }}>
-                  {p.d}
-                </p>
+                <span className="pillar__no">{String(i + 1).padStart(2, "0")}</span>
+                <h3>{p.t}</h3>
+                <p>{p.d}</p>
                 <ul>
-                  {p.items.map((i) => <li key={i}>{i}</li>)}
+                  {p.items.map((it) => <li key={it}>{it}</li>)}
                 </ul>
               </div>
             ))}
@@ -134,73 +156,76 @@ export default function BrandPage() {
         </div>
       </section>
 
-      {/* ---------------- STATS (dark contrast band) ---------------- */}
+      {/* ---------------- STATS ----------------
+          Was a dark plate; now a lit panel, so the page never breaks
+          out of its own light. */}
       {SHOW_STATS && (
-        <section className="band band--dark">
+        <section className="band band--aurora">
           <div className="band__inner">
-            <Reveal className="band__head" style={{ textAlign: "center", margin: "0 auto 3rem" }}>
-              <h2 style={{ margin: "0 auto", textAlign: "center" }}>
-                Thirty years of it.
-              </h2>
-              <p className="lede" style={{ textAlign: "center", margin: "1.25rem auto 0" }}>
-                Mrakee Technologies carries forward a three-decade digital
-                signage business — its platform, its installed base and the
-                teams who run it across Asia-Pacific.
-              </p>
-            </Reveal>
-            <Reveal className="stats" stagger>
-              {STATS.map((s) => (
-                <div key={s.l}>
-                  <div className="stat__num">{s.n}</div>
-                  <div className="stat__label">{s.l}</div>
-                </div>
-              ))}
+            <Reveal className="aurora">
+              <div style={{ maxWidth: "60ch", margin: "0 auto 3.2rem", textAlign: "center" }}>
+                <SplitWords
+                  words={["Thirty", { t: "years", grad: true }, "of", "it."]}
+                  style={{ margin: "0 auto", textAlign: "center" }}
+                />
+                <p className="lede" style={{ textAlign: "center", margin: "1.25rem auto 0" }}>
+                  Mrakee Technologies carries forward a three-decade digital
+                  signage business — its platform, its installed base and the
+                  teams who run it across Asia-Pacific.
+                </p>
+              </div>
+              <div className="stats">
+                {STATS.map((s) => (
+                  <div className="stat" key={s.l}>
+                    <Counter value={s.n} />
+                    <div className="stat__label">{s.l}</div>
+                  </div>
+                ))}
+              </div>
             </Reveal>
           </div>
         </section>
       )}
 
-      {/* ---------------- SERVICES ---------------- */}
-      <section className="band" id="services">
+      {/* ---------------- SERVICES ----------------
+          Numbered steps on a line, not a third card grid. */}
+      <section className="band band--rule" id="services">
         <div className="band__inner">
           <Reveal className="band__head">
             <p className="eyebrow">Professional Services</p>
-            <h2>The screen is the easy part.</h2>
+            <SplitWords words={["The", "screen", "is", "the", { t: "easy", grad: true }, { t: "part.", grad: true }]} />
+            <p className="lede">
+              Specification, content and the years after go-live are where a
+              signage estate is actually won or lost.
+            </p>
           </Reveal>
-          <Reveal className="grid grid--3" stagger>
-            <article className="card">
-              <div className="card__icon card__icon--gold">◇</div>
-              <h3>Technical Consulting</h3>
-              <p>Site surveys, network and power planning, integration with your POS, PMS or operations feed, and a rollout plan that survives contact with a live store.</p>
-            </article>
-            <article className="card">
-              <div className="card__icon">✎</div>
-              <h3>Creative Services</h3>
-              <p>Motion, layout and templating built for the viewing distance and dwell time of the actual space — not a desktop mockup.</p>
-            </article>
-            <article className="card">
-              <div className="card__icon card__icon--gold">⟳</div>
-              <h3>Support & Maintenance</h3>
-              <p>Monitoring, spares logistics and on-site response, with escalation paths agreed before you need them.</p>
-            </article>
+
+          <Reveal className="steps" stagger>
+            {SERVICES.map((s, i) => (
+              <div className="step" key={s.t}>
+                <div className="step__no">{String(i + 1).padStart(2, "0")}</div>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+              </div>
+            ))}
           </Reveal>
         </div>
       </section>
 
       {/* ---------------- CTA ---------------- */}
-      <section className="band band--alt" id="contact">
+      <section className="band" id="contact">
         <div className="band__inner">
           <Reveal className="cta">
-            <p className="eyebrow" style={{ justifyContent: "center" }}>Get started</p>
-            <h2 style={{ margin: "0 auto", textAlign: "center" }}>
-              Tell us about the space.
-            </h2>
-            <p className="lede" style={{ textAlign: "center" }}>
+            <p className="eyebrow">Get started</p>
+            <SplitWords words={["Tell", "us", "about", { t: "the", grad: true }, { t: "space.", grad: true }]} />
+            <p className="lede">
               Send us the floor plan and the problem. We'll come back with a
               specification, a rollout shape and a number.
             </p>
             <div className="cta__actions">
-              <a className="btn btn--primary" href="mailto:sales@mrakee.com">Book a demo</a>
+              <a className="btn btn--primary" href="mailto:sales@mrakee.com">
+                Book a demo <span className="arrow" aria-hidden="true">→</span>
+              </a>
               <a className="btn btn--ghost" href="#solutions">See solutions</a>
             </div>
           </Reveal>
