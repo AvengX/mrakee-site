@@ -323,7 +323,32 @@ body {
   /* drift is written by JS as a custom property, so the centring
      transforms below are never clobbered by an inline `transform` */
   transform: translateY(var(--drift, 0px));
-  text-shadow: 0 1px 24px rgba(255, 255, 255, 0.96), 0 1px 3px rgba(255, 255, 255, 0.92);
+  /* Only a tight shadow now. The old wide white glow was fighting the
+     footage rather than helping — on a bright frame it lightened the
+     very type it was meant to lift off the background. The scrim below
+     does that job properly. */
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* A soft white ground under each caption.
+   Measured: the footage behind the hero runs at ~0.43 luminance, where
+   the brand gold scored 1.06:1 and the supporting line 1.54:1 — both
+   effectively invisible. No text colour survives that, so the fix has
+   to be the background rather than the foreground. This lifts the local
+   ground to near-white, which lets brand colour be used at full
+   strength on top of it, and fades out before it reads as a box. */
+.cap::before {
+  content: "";
+  position: absolute;
+  inset: -2.75rem -3.5rem -3rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(255, 255, 255, 0.95) 55%,
+    rgba(255, 255, 255, 0.74) 76%,
+    rgba(255, 255, 255, 0) 90%
+  );
 }
 
 .cap--left {
@@ -363,6 +388,18 @@ body {
 
 .cap--center .hero__cta {
   justify-content: center;
+}
+
+/* Over footage the standard body ink is too quiet even on the scrim —
+   slate-600 rather than slate-500 gives the supporting line the weight
+   the headline already has. */
+.cap .lede {
+  color: #475569; /* 7.0:1 on white */
+}
+
+.cap .eyebrow--badge {
+  color: #475569;
+  background: rgba(255, 255, 255, 0.86);
 }
 
 @media (max-width: 760px) {
@@ -821,8 +858,18 @@ h3 {
   letter-spacing: -0.02em;
 }
 
+/* Deep bronze into deep teal.
+   The previous version ran through the raw brand gold at 34%, which is
+   2.2:1 on white and 1.06:1 over the hero footage — the highlighted
+   words read as a pale glow rather than as colour. Every stop here is
+   an ink value, so the emphasis has actual weight and still passes as
+   display type. */
 .grad-text {
-  background: linear-gradient(100deg, var(--gold-deep) 0%, var(--gold) 34%, var(--mint-deep) 96%);
+  /* Two inks, no bronze mid-stop. Passing through --gold-deep put the
+     middle of the gradient at 2.55:1 over the hero, under the 3:1 floor
+     for display type; interpolating ink to ink keeps every point of the
+     run at 3.7:1 or better. */
+  background: linear-gradient(100deg, var(--gold-ink) 0%, var(--mint-ink) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -843,6 +890,11 @@ h3 {
   flex-wrap: wrap;
 }
 
+/* Centred at the bottom is the convention, but the hero caption is tall
+   — badge, two headline lines, two lede lines and two buttons — and on a
+   900px-high laptop its CTA row lands exactly on the cue. Below 760px
+   the caption is shorter and centred works, so the move to the corner
+   is desktop-only. */
 .scroll-hint {
   position: absolute;
   bottom: 2.2rem;
@@ -856,6 +908,14 @@ h3 {
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--ink-faint);
+}
+
+@media (min-width: 761px) {
+  .scroll-hint {
+    left: auto;
+    right: clamp(1.5rem, 3.5vw, 3rem);
+    transform: none;
+  }
 }
 
 .scroll-hint i {
