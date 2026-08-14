@@ -34,7 +34,12 @@ CHAPTERS = [
     ("Woman_touching",              "Retail",        3.0, 5.0),
     ("Staff_member",                "Quick service", 0.5, 5.0),
     ("Travellers_walking",          "Transport",     0.5, 5.0),
-    ("Camera_reveals_shopping",     "Scale",         4.5, 5.4),
+    # Replaced the shopping-atrium clip 2026-08-15. This one starts at
+    # 4.6s so the chapter builds kiosk -> DOOH columns -> wide terminal,
+    # which is the "thousand screens, one dashboard" beat the caption is
+    # making. The atrium clip is still in the source folder if it is
+    # ever wanted back: keyword "Camera_reveals_shopping", 4.5, 5.4.
+    ("MRakee_Technologies_terminal", "Scale",        4.6, 5.4),
 ]
 
 

@@ -1,5 +1,5 @@
 {
-  "count": 334,
+  "count": 333,
   "fps": 12,
   "width": 1400,
   "height": 788,
@@ -8,31 +8,31 @@
     {
       "label": "The object",
       "in": 0.0,
-      "out": 0.1592
+      "out": 0.1596
     },
     {
       "label": "It wakes",
-      "in": 0.1471,
-      "out": 0.3243
+      "in": 0.1476,
+      "out": 0.3253
     },
     {
       "label": "Retail",
-      "in": 0.3123,
-      "out": 0.4895
+      "in": 0.3133,
+      "out": 0.491
     },
     {
       "label": "Quick service",
-      "in": 0.4775,
-      "out": 0.6547
+      "in": 0.4789,
+      "out": 0.6566
     },
     {
       "label": "Transport",
-      "in": 0.6426,
-      "out": 0.8198
+      "in": 0.6446,
+      "out": 0.8223
     },
     {
       "label": "Scale",
-      "in": 0.8078,
+      "in": 0.8102,
       "out": 1.0
     }
   ]
