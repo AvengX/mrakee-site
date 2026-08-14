@@ -20,9 +20,10 @@ gsap.registerPlugin(ScrollTrigger);
 const CAPTIONS = [
   {
     in: -0.06, out: 0.13, align: "center",
-    eyebrow: "In the wild",
-    title: <>The same panel, <span className="grad-text">installed</span>.</>,
-    body: "Six environments, one platform — from a shopfront window to an airport concourse.",
+    eyebrow: "Digital Signage · Kiosks · Singapore",
+    title: <>Screens that <span className="grad-text">do more</span> than show.</>,
+    body: "Displays, kiosks and the software behind them — deployed as one estate, managed from one place.",
+    hero: true,
   },
   {
     in: 0.175, out: 0.30, align: "left",

@@ -221,147 +221,14 @@ body {
     display: none;
   }
 }
-
-/* ================================================================
-   PIXEL FORGE — the signature sequence
-   The runway's height IS the timeline. 700vh gives the six phases
-   roughly a screen and a half each, which is slow enough to read the
-   transformation and fast enough not to feel like work.
-   ================================================================ */
-.forge {
-  position: relative;
-  height: 700vh;
-}
-
-.forge__stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.forge__canvas {
-  position: absolute;
-  inset: 0;
-  display: block;
-  /* the canvas is transparent — the page's own atmosphere is the
-     product's environment, so it is lit by the same room as everything
-     else rather than sitting in a dropped-in box */
-  background: transparent;
-}
-
-/* Cool key light behind the object. Sits under the canvas, over the
-   page, and gives the white space a centre of gravity for the whole
-   sequence to happen in. */
-.forge__key {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: min(1200px, 105vw);
-  height: min(1200px, 105vw);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(99, 91, 255, 0.11),
-    rgba(6, 182, 212, 0.06) 40%,
-    transparent 64%
-  );
-}
-
-/* The captions sit further out than the film's, because the product
-   occupies the middle of the frame for most of the sequence. */
-.forge .cap {
-  z-index: 2;
-}
-
-@media (max-width: 1100px) {
-  .forge .cap--left,
-  .forge .cap--right {
-    width: min(32ch, 34vw);
-  }
-}
-
-/* On a phone there is no side lane to put copy in, so the composition
-   flips: the camera aims low to push the product into the top of the
-   frame (see `lift` in Scene) and the captions take the bottom, on a
-   scrim so they stay readable if the product reaches down into them. */
-@media (max-width: 760px) {
-  .forge .cap {
-    top: auto;
-    bottom: 4.5vh;
-    margin-top: 0;
-    width: min(92vw, 40ch);
-  }
-
-  .forge .cap::before {
-    content: "";
-    position: absolute;
-    inset: -2rem -1.25rem -2.5rem;
-    z-index: -1;
-    border-radius: 24px;
-    background: radial-gradient(
-      ellipse at 50% 55%,
-      rgba(255, 255, 255, 0.94) 40%,
-      rgba(255, 255, 255, 0) 75%
-    );
-  }
-
-  .forge .cap h1 {
-    font-size: clamp(2.1rem, 9vw, 2.9rem);
-  }
-
-  .forge .cap h2 {
-    font-size: clamp(1.7rem, 7.4vw, 2.3rem);
-  }
-
-  .forge .cap .lede {
-    font-size: 0.95rem;
-    margin-top: 0.9rem;
-  }
-
-  .forge .scroll-hint {
-    display: none; /* the caption is sitting where it used to be */
-  }
-}
-
-/* ---- No-WebGL fallback ------------------------------------------ */
-.forge__fallback {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-}
-
-.forge__panel {
-  display: grid;
-  grid-template-columns: repeat(18, 1fr);
-  gap: 2px;
-  width: min(230px, 44vw);
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid var(--line-strong);
-  background: linear-gradient(180deg, #ffffff, #f1f5f9);
-  box-shadow: var(--shadow-lg);
-}
-
-.forge__panel span {
-  display: block;
-  aspect-ratio: 1;
-  border-radius: 1px;
-}
-
 /* ================================================================
    THE SCROLL FILM
    .film is tall; the stage inside it sticks. That height IS the
    animation's timeline — taller means slower scrubbing.
    ================================================================ */
-/* Shortened from 640vh when the pixel forge took over the opening —
-   the film is now the second act, not the whole first one. The caption
-   windows are fractions of this height, so they re-time themselves. */
 .film {
   position: relative;
-  height: 440vh;
+  height: 640vh;
 }
 
 .film__stage {

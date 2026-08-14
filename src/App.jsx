@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import Aura from "./components/Aura";
 import Nav from "./components/Nav";
-import PixelForge from "./components/PixelForge";
 import FilmStage from "./components/FilmStage";
 import BrandPage from "./components/BrandPage";
 import { initSmoothScroll } from "./lib/smoothScroll";
@@ -26,9 +25,7 @@ export default function App() {
       <Aura />
       <Nav />
       <main className="overlay">
-        {/* Pixels become the product — the opening act. */}
-        <PixelForge />
-        {/* Then the film shows that product where it actually lives... */}
+        {/* The scroll film is the opening act... */}
         <FilmStage />
         {/* ...and the brand page continues the same story below it. */}
         <BrandPage />
