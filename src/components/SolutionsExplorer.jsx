@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+
 /* ================================================================
    SOLUTIONS — index + panel
 
@@ -21,10 +22,19 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const frameSrc = (n) => `frames/film/${String(n).padStart(4, "0")}.webp`;
 
+/* Bespoke art per solution, once it exists: drop 01.jpg … 17.jpg into
+   public/solutions/ in the same order as the SOLUTIONS array and each
+   one takes over automatically. Until then every panel falls back to a
+   still from the film, so the section is never broken and the handoff
+   needs no code change. See film-src/SOLUTION_PROMPTS.md. */
+const artSrc = (i) => `solutions/${String(i + 1).padStart(2, "0")}.jpg`;
+
 export default function SolutionsExplorer({ solutions }) {
   const [active, setActive] = useState(0);
   const tabsRef = useRef([]);
   const [focusIndex, setFocusIndex] = useState(null);
+  // indices whose bespoke image has been confirmed loadable
+  const [hasArt, setHasArt] = useState(() => new Set());
 
   // Move DOM focus only when the visitor is actually driving with the
   // keyboard — doing it on every state change would steal focus from a
@@ -34,6 +44,28 @@ export default function SolutionsExplorer({ solutions }) {
     tabsRef.current[focusIndex]?.focus();
     setFocusIndex(null);
   }, [focusIndex]);
+
+  /* Probe the bespoke image for whichever solution is on screen and only
+     swap it in once it has actually decoded.
+     Doing it the other way round — render the bespoke path and fall back
+     on error — does not work here: the panel image is lazy, so a missing
+     file is never requested, never errors, and the panel just sits blank.
+     Probing off-DOM also means no broken-image flash on the way past. */
+  useEffect(() => {
+    if (hasArt.has(active)) return;
+    let alive = true;
+    const probe = new Image();
+    probe.onload = () => {
+      if (alive && probe.naturalWidth > 1) {
+        setHasArt((s) => new Set(s).add(active));
+      }
+    };
+    probe.src = artSrc(active);
+    return () => {
+      alive = false;
+      probe.onload = null;
+    };
+  }, [active, hasArt]);
 
   const onKeyDown = useCallback(
     (e) => {
@@ -93,7 +125,8 @@ export default function SolutionsExplorer({ solutions }) {
         <div className="sx__panelInner" key={active}>
           <div className="sx__media">
             <img
-              src={frameSrc(current.frame)}
+              key={active}
+              src={hasArt.has(active) ? artSrc(active) : frameSrc(current.frame)}
               alt=""
               width="1400"
               height="788"
