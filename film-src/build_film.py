@@ -1,8 +1,11 @@
 """
-Build the scroll film from the six Google Flow clips.
+Build the scroll film from the Google Flow clips.
 
   crop out the Veo watermark -> scale -> trim to the best segment
-  -> 12fps PNG -> crossfade chapters -> WebP sequence + manifest
+  -> 24fps PNG -> crossfade chapters -> WebP sequence + manifest
+
+Currently one chapter: the hero commercial, run complete. The other five
+are parked in CHAPTERS below rather than deleted.
 
 Frames land in public/frames/film/. Memory-safe: frames are streamed one at
 a time rather than held as a list of decoded images.
@@ -17,7 +20,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTDIR = os.path.join(ROOT, "public", "frames", "film")
 TMP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_tmp")
 
-FPS = 12
+# 24 matches the source. At 12 a 10s clip is only 120 frames, and spread
+# over 5+ screens of scroll that is a visible step between frames on every
+# small movement — which reads as the film being rushed rather than coarse.
+# Doubling the frames halves the step without changing how far you scroll.
+FPS = 24
 WIDTH = 1400
 HEIGHT = 788        # forced, so the 1080p and 720p sources land identically
 XFADE = 5           # frames of crossfade between chapters (~0.4s)
@@ -36,16 +43,20 @@ CHAPTERS = [
     # film, which is why every caption below it had to be re-timed.
     # Previous: ("Self-service_kiosk_orbiting", "The object", 0.0, 4.5)
     ("MRakee_commercial_hero",      "The object",    0.0, 10.0),
-    ("Light_glowing",               "It wakes",      0.8, 5.0),
-    ("Woman_touching",              "Retail",        3.0, 5.0),
-    ("Staff_member",                "Quick service", 0.5, 5.0),
-    ("Travellers_walking",          "Transport",     0.5, 5.0),
+    # Parked 2026-08-15 — the hero commercial runs alone for now so it
+    # gets the whole runway and a proper pace. Uncomment to bring the
+    # other chapters back; the caption windows for them are in git at
+    # a229ad8 and will need re-timing again from the printed fractions.
+    # ("Light_glowing",               "It wakes",      0.8, 5.0),
+    # ("Woman_touching",              "Retail",        3.0, 5.0),
+    # ("Staff_member",                "Quick service", 0.5, 5.0),
+    # ("Travellers_walking",          "Transport",     0.5, 5.0),
     # Replaced the shopping-atrium clip 2026-08-15. This one starts at
     # 4.6s so the chapter builds kiosk -> DOOH columns -> wide terminal,
     # which is the "thousand screens, one dashboard" beat the caption is
     # making. The atrium clip is still in the source folder if it is
     # ever wanted back: keyword "Camera_reveals_shopping", 4.5, 5.4.
-    ("MRakee_Technologies_terminal", "Scale",        4.6, 5.4),
+    # ("MRakee_Technologies_terminal", "Scale",        4.6, 5.4),
 ]
 
 

@@ -6,15 +6,17 @@ import { useFrameSequence } from "../hooks/useFrameSequence";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * The scroll film: 399 WebP frames scrubbed by scroll position on a sticky
- * canvas, with captions timed to the chapter boundaries.
+ * The scroll film: 239 WebP frames scrubbed by scroll position on a sticky
+ * canvas.
  *
- * `in`/`out` below are scroll fractions printed by film-src/build_film.py.
- * Re-run it after ANY change to the clips and copy the numbers across —
- * chapter one is the full 10s commercial and takes up 30% of the film on
- * its own, so these are nothing like an even six-way split:
- *   object 0.00-0.30 · wakes 0.29-0.44 · retail 0.43-0.58
- *   qsr 0.57-0.71 · transport 0.70-0.85 · scale 0.84-1.00
+ * One chapter now — the hero commercial, complete, spanning 0.00-1.00.
+ * At 24fps over a 640vh runway that is ~2.3vh of scroll per frame, so a
+ * full screen of scrolling advances under two seconds of footage. The
+ * other five chapters are parked in film-src/build_film.py; if they come
+ * back, re-run it and copy the printed fractions into the `in`/`out`
+ * values below, because they will all move.
+ *
+ * `in`/`out` are scroll fractions, not seconds.
  *
  * The opening caption uses a NEGATIVE `in` on purpose — a caption with
  * in=0.00 is invisible at exactly scroll 0, which is where the page loads.
@@ -28,32 +30,25 @@ const CAPTIONS = [
     body: "Displays, kiosks and the software behind them — deployed as one estate, managed from one place.",
     hero: true,
   },
+  // The three below are placed against what the commercial is actually
+  // showing at that moment — storefront windows around 0.3, the menu
+  // board around 0.7, the branded kiosks at the close. The Retail and
+  // Transport captions were retired with the footage they described;
+  // they are in git at a229ad8 if those chapters come back.
   {
-    in: 0.305, out: 0.425, align: "left",
+    in: 0.26, out: 0.44, align: "left",
     eyebrow: "Built to be seen",
     title: <>Readable at noon.<br />Bright at midnight.</>,
     body: "High-nit bonded panels that hold their colour in a shopfront window and dim themselves for an overnight lobby.",
   },
   {
-    in: 0.443, out: 0.563, align: "right",
-    eyebrow: "Retail",
-    title: <>The shelf that<br />answers back.</>,
-    body: "Let a shopper find a size, compare a fit and check stock without waiting for the one free staff member on the floor.",
-  },
-  {
-    in: 0.581, out: 0.702, align: "left",
+    in: 0.62, out: 0.8, align: "right",
     eyebrow: "Quick service",
     title: <>Menus that move<br />with the day.</>,
     body: "Breakfast flips to lunch on schedule. An item greys out the moment stock runs dry. No one climbs a ladder.",
   },
   {
-    in: 0.72, out: 0.84, align: "right",
-    eyebrow: "Transport",
-    title: <>Never dark,<br />never wrong.</>,
-    body: "Live operational feeds driving concourse-length display walls, with the failover behaviour terminals actually require.",
-  },
-  {
-    in: 0.858, out: 1.08, align: "center",
+    in: 0.86, out: 1.08, align: "center",
     eyebrow: "At scale",
     title: <>One estate.<br />One dashboard.</>,
     body: "A thousand screens across a dozen sites, provisioned and monitored from a single pane of glass.",
