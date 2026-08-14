@@ -40,27 +40,45 @@ export default function Logo({ size = 36, showWordmark = true }) {
       ) : (
         <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
           <defs>
-            <linearGradient id="mk-gold" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#f0cc77" />
-              <stop offset="55%" stopColor="#d4a339" />
-              <stop offset="100%" stopColor="#b1801f" />
+            {/* the real mark's gold is a metallic sweep, not a flat
+                fill — bright along the top-left, deepening to bronze */}
+            <linearGradient id="mk-gold" x1="0.1" y1="0" x2="0.85" y2="1">
+              <stop offset="0%" stopColor="#f3d488" />
+              <stop offset="38%" stopColor="#d4a339" />
+              <stop offset="72%" stopColor="#c08f28" />
+              <stop offset="100%" stopColor="#9d6f16" />
             </linearGradient>
-            <linearGradient id="mk-teal" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#58c3c9" />
-              <stop offset="100%" stopColor="#0f7d84" />
+            <linearGradient id="mk-red" x1="0" y1="0" x2="0.4" y2="1">
+              <stop offset="0%" stopColor="#d8232f" />
+              <stop offset="100%" stopColor="#9c111c" />
+            </linearGradient>
+            <linearGradient id="mk-teal" x1="0.15" y1="0" x2="0.9" y2="1">
+              <stop offset="0%" stopColor="#2ab3ba" />
+              <stop offset="100%" stopColor="#0e7178" />
             </linearGradient>
           </defs>
-          {/* the crimson edge sitting behind the M's left leg, as in the
-              real mark — the one place red belongs on this site */}
-          <path d="M26 32 L26 88 L34 88 L34 46 Z" fill="#c41e2a" />
+
+          {/* The M is a folded gold ribbon: a stem down the left, a
+              valley, then a sweep up and out to a point on the right.
+              The crimson is the underside of that fold showing through
+              behind the left leg. */}
+          <path d="M27 36 L38 52 L38 86 L27 86 Z" fill="url(#mk-red)" />
           <path
-            d="M14 88 V16 L26 16 L50 58 L74 16 L86 16 L86 30 L74 30 L54 66 L46 66 L26 32 L26 88 Z"
+            d="M16 86 L16 25 Q16 18 24 18 L31 18 L52 56 L76 17 L88 22 L74 33 L56 67 L48 67 L27 35 L27 86 Z"
             fill="url(#mk-gold)"
           />
-          <path d="M60 40 H86 L78 52 H74 V88 H62 V52 Z" fill="url(#mk-teal)" />
-          <rect className="logo__px" x="80" y="24" width="7" height="7" rx="1.4" fill="#c41e2a" />
-          <rect className="logo__px" x="88" y="15" width="6" height="6" rx="1.2" fill="#d4a339" />
-          <rect className="logo__px" x="82" y="8" width="5" height="5" rx="1" fill="#e6bd5f" />
+
+          {/* the teal 'r' rising beside it */}
+          <path
+            d="M62 86 L62 50 Q62 42 71 42 L90 42 L81 56 L74 56 L74 86 Z"
+            fill="url(#mk-teal)"
+          />
+
+          {/* three pixels breaking away from the tip — kept clear of the
+              ribbon so they still read as separate at 36px */}
+          <rect className="logo__px" x="82" y="2" width="10" height="10" rx="1.5" fill="#d9a63c" />
+          <rect className="logo__px" x="71" y="9" width="7" height="7" rx="1.5" fill="#c41e2a" />
+          <rect className="logo__px" x="90" y="14" width="7" height="7" rx="1.5" fill="#d9a63c" />
         </svg>
       )}
 
