@@ -19,7 +19,8 @@ gsap.registerPlugin(ScrollTrigger);
  */
 const CAPTIONS = [
   {
-    in: -0.06, out: 0.13, align: "center",
+    // Solid at rest, starts going the moment you scroll, gone by ~32vh.
+    in: -0.05, out: 0.06, fade: 0.03, align: "center",
     eyebrow: "Digital Signage · Kiosks · Singapore",
     title: <>Screens that <span className="grad-text">do more</span> than show.</>,
     body: "Displays, kiosks and the software behind them — deployed as one estate, managed from one place.",
@@ -63,6 +64,11 @@ function opacityAt(p, from, to, fade = 0.045) {
   return Math.min(1, (p - from) / fade, (to - p) / fade);
 }
 
+/* The film is 640vh, so one unit of `p` is about 540vh of scrolling —
+   a window of 0.13 is most of a screen and a half before the text is
+   gone. The hero needs to answer the scroll much sooner than the
+   chapter captions, which the visitor is reading at a steadier pace. */
+
 export default function FilmStage() {
   const root = useRef();
   const canvas = useRef();
@@ -79,7 +85,7 @@ export default function FilmStage() {
         capRefs.current.forEach((el, i) => {
           if (!el) return;
           const c = CAPTIONS[i];
-          const o = opacityAt(p, c.in, c.out);
+          const o = opacityAt(p, c.in, c.out, c.fade);
           el.style.opacity = o;
           // drift up slightly as it fades through its window, and come
           // out of a light blur as it arrives. Written as custom
@@ -106,7 +112,11 @@ export default function FilmStage() {
           trigger: root.current,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.6,
+          // 0.6 was fine before momentum scrolling existed. Lenis already
+          // takes ~1s to resolve a wheel tick, and stacking a 0.6s scrub
+          // on top of that is what made the hero feel like it was fading
+          // a beat after you asked it to.
+          scrub: 0.3,
         },
         onUpdate: () => paint(state.p),
       });
