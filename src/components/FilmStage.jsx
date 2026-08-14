@@ -20,10 +20,9 @@ gsap.registerPlugin(ScrollTrigger);
 const CAPTIONS = [
   {
     in: -0.06, out: 0.13, align: "center",
-    eyebrow: "Digital Signage · Kiosks · Singapore",
-    title: <>Screens that <span className="grad-text">do more</span> than show.</>,
-    body: "Displays, kiosks and the software behind them — deployed as one estate, managed from one place.",
-    hero: true,
+    eyebrow: "In the wild",
+    title: <>The same panel, <span className="grad-text">installed</span>.</>,
+    body: "Six environments, one platform — from a shopfront window to an airport concourse.",
   },
   {
     in: 0.175, out: 0.30, align: "left",
@@ -67,7 +66,8 @@ export default function FilmStage() {
   const root = useRef();
   const canvas = useRef();
   const capRefs = useRef([]);
-  const { ready, draw } = useFrameSequence("film");
+  const hint = useRef();
+  const { ready, draw, progressLoaded } = useFrameSequence("film");
 
   useLayoutEffect(() => {
     if (!ready) return;
@@ -80,12 +80,21 @@ export default function FilmStage() {
           const c = CAPTIONS[i];
           const o = opacityAt(p, c.in, c.out);
           el.style.opacity = o;
-          // drift up slightly as it fades through its window. Written as a
-          // custom property so the centring transforms in CSS survive.
+          // drift up slightly as it fades through its window, and come
+          // out of a light blur as it arrives. Written as custom
+          // properties so the centring transforms in CSS survive.
           const t = (p - c.in) / (c.out - c.in);
           el.style.setProperty("--drift", `${(0.5 - t) * 26}px`);
+          el.style.filter = o > 0.995 ? "none" : `blur(${(1 - o) * 5}px)`;
           el.style.visibility = o <= 0.001 ? "hidden" : "visible";
         });
+
+        // the scroll cue is only true while you have not scrolled
+        if (hint.current) {
+          const fade = Math.max(0, 1 - p * 22);
+          hint.current.style.opacity = fade;
+          hint.current.style.visibility = fade <= 0.01 ? "hidden" : "visible";
+        }
       };
 
       const state = { p: 0 };
@@ -124,8 +133,10 @@ export default function FilmStage() {
   return (
     <section className="film" id="film" ref={root}>
       <div className="film__stage">
+        {/* cool key light behind the subject, under the frame */}
+        <div className="film__key" aria-hidden="true" />
         <canvas ref={canvas} className="film__canvas" />
-        <div className="film__mask" />
+        <div className="film__mask" aria-hidden="true" />
 
         {CAPTIONS.map((c, i) => (
           <div
@@ -134,20 +145,35 @@ export default function FilmStage() {
             className={`cap cap--${c.align}`}
             style={{ opacity: 0, visibility: "hidden" }}
           >
-            <p className="eyebrow">{c.eyebrow}</p>
+            <p className={`eyebrow${c.hero ? " eyebrow--badge" : ""}`}>{c.eyebrow}</p>
             {c.hero ? <h1>{c.title}</h1> : <h2>{c.title}</h2>}
             <p className="lede">{c.body}</p>
             {c.hero && (
               <div className="hero__cta">
-                <a className="btn btn--primary" href="#contact">Book a demo</a>
+                <a className="btn btn--primary" href="#contact">
+                  Book a demo <span className="arrow" aria-hidden="true">→</span>
+                </a>
                 <a className="btn btn--ghost" href="#solutions">Explore solutions</a>
               </div>
             )}
           </div>
         ))}
 
-        {!ready && <div className="film__loading">Loading film…</div>}
-        <p className="scroll-hint">Scroll</p>
+        {!ready && (
+          <div className="film__loading">
+            <div className="film__bar">
+              {/* scaleX rather than width: a transform composites, a width
+                  reflows the stage on every progress update */}
+              <i style={{ transform: `scaleX(${Math.max(0.04, progressLoaded)})` }} />
+            </div>
+            Loading film
+          </div>
+        )}
+
+        <p className="scroll-hint" ref={hint}>
+          <i aria-hidden="true" />
+          Scroll
+        </p>
       </div>
     </section>
   );
