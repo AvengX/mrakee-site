@@ -422,7 +422,7 @@ body {
 
 .cap .eyebrow--badge {
   color: #475569;
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 @media (max-width: 760px) {
@@ -458,7 +458,7 @@ body {
   padding: 0.55rem 0.6rem 0.55rem 1.1rem;
   border-radius: 18px;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   transform: translateX(-50%);
@@ -467,7 +467,7 @@ body {
 }
 
 .nav--solid {
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.95);
   border-color: var(--line);
   box-shadow: var(--shadow-md);
   padding-top: 0.42rem;
@@ -485,6 +485,31 @@ body {
 
 .logo svg {
   overflow: visible;
+}
+
+/* Crops the supplied stacked lockup down to just the M mark, so the
+   wordmark can be live text beside it instead of six unreadable pixels
+   baked into a 36px image. Tune these three against the real file. */
+.logo {
+  --logo-zoom: 1.62;
+  --logo-x: -30%;
+  --logo-y: -11%;
+}
+
+.logo__markBox {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.logo__markBox img {
+  position: absolute;
+  top: var(--logo-y);
+  left: var(--logo-x);
+  width: calc(100% * var(--logo-zoom));
+  height: auto;
+  user-select: none;
 }
 
 /* the three breakaway pixels drift a little further out on hover —
@@ -595,7 +620,7 @@ body {
   height: 44px;
   border-radius: 12px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.93);
   cursor: pointer;
   padding: 0;
   place-items: center;
@@ -640,7 +665,7 @@ body {
   padding: 0.6rem;
   border-radius: 20px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   box-shadow: var(--shadow-lg);
@@ -777,7 +802,7 @@ body {
 }
 
 .btn--ghost {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.96);
   color: var(--ink);
   border: 1px solid var(--line-strong);
   box-shadow: var(--shadow-sm);
@@ -844,7 +869,7 @@ body {
   padding: 0.42rem 0.9rem 0.42rem 0.7rem;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.93);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: var(--shadow-sm);
@@ -1205,7 +1230,7 @@ h3 {
 .sx__panel {
   border-radius: var(--r);
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
   box-shadow: var(--shadow-md);
   overflow: hidden;
 }
@@ -1258,7 +1283,7 @@ h3 {
   padding: 0.32rem 0.7rem;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   font-size: 0.68rem;
@@ -1342,7 +1367,7 @@ h3 {
   position: relative;
   padding: 0.7rem 1.25rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.95);
   border: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
   font-size: 0.92rem;
@@ -1442,7 +1467,7 @@ h3 {
   overflow: hidden;
   border-radius: var(--r);
   padding: 2.2rem 1.9rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.74));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
   border: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
   transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease),
@@ -1595,7 +1620,7 @@ h3 {
   border: 1px solid var(--line);
   background: radial-gradient(90% 120% at 12% 0%, rgba(99, 91, 255, 0.09), transparent 55%),
     radial-gradient(80% 120% at 92% 100%, rgba(212, 163, 57, 0.11), transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.82));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.94));
   box-shadow: var(--shadow-md);
 }
 
@@ -1690,7 +1715,7 @@ a.contact__info:hover {
   height: 42px;
   border-radius: 12px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.96);
   color: var(--mint-ink);
   box-shadow: var(--shadow-sm);
   transition: transform 0.4s var(--ease), color 0.3s var(--ease-soft);
@@ -1771,7 +1796,7 @@ a.contact__info:hover .contact__infoIcon {
   padding: 0.7rem 0.85rem;
   border-radius: var(--r-sm);
   border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.97);
   color: var(--ink);
   font: inherit;
   font-size: 0.92rem;
