@@ -256,20 +256,21 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* The flat 30% veil is the important layer. Carrying the legibility
-     on a per-caption scrim meant a local shape sitting on the footage,
-     and any local shape has an edge you can find. A veil across the
-     whole stage has none — it just sets the film back a step, which is
-     what a backdrop should do anyway. The film still reads through it
-     at 70%. */
-  background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)),
+  /* Three white layers stack here, and it is easy to end up milky. The
+     flat veil is only 14% — enough to sit the film back from the page
+     without bleaching it, since the headings are near-black ink and do
+     not need help. The heavier lifting happens under the captions,
+     where it is actually required. The radial starts later and peaks
+     lower than it used to for the same reason; the 92% at the very edge
+     is the vignette that melts the frame into the page. */
+  background: linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
     radial-gradient(
       ellipse at 50% 46%,
-      transparent 26%,
-      rgba(255, 255, 255, 0.5) 70%,
-      rgba(255, 255, 255, 0.95) 100%
+      transparent 34%,
+      rgba(255, 255, 255, 0.4) 72%,
+      rgba(255, 255, 255, 0.92) 100%
     ),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, transparent 22%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, transparent 22%);
 }
 
 /* Cool key light behind the subject — the "very subtle radial gradient
@@ -353,18 +354,19 @@ body {
      the footage. Spreading the same amount of light over 14vw/16vh
      means the transition takes hundreds of pixels and reads as light
      pooling in the middle of the frame instead of as a patch. */
-  inset: -18vh -14vw;
+  inset: -20vh -16vw;
   z-index: -1;
   pointer-events: none;
-  /* Now only a top-up over the stage veil, so there is roughly a third
-     as much alpha to fall off and the steepest slope drops under
-     0.0015/px — below where an edge becomes findable. */
+  /* This now carries more of the legibility than the stage veil does,
+     since the veil dropped to 14% to stop bleaching the footage.
+     Spreading the extra alpha over 16vw/20vh keeps the steepest slope
+     under 0.0015/px — below where an edge becomes findable. */
   background: radial-gradient(
     ellipse at 50% 50%,
-    rgba(255, 255, 255, 0.36) 0%,
-    rgba(255, 255, 255, 0.3) 34%,
-    rgba(255, 255, 255, 0.18) 58%,
-    rgba(255, 255, 255, 0.06) 76%,
+    rgba(255, 255, 255, 0.44) 0%,
+    rgba(255, 255, 255, 0.38) 34%,
+    rgba(255, 255, 255, 0.22) 58%,
+    rgba(255, 255, 255, 0.08) 76%,
     rgba(255, 255, 255, 0) 90%
   );
 }
