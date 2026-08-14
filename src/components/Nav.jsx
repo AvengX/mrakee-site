@@ -1,39 +1,123 @@
-import { useRef, useLayoutEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
 
-gsap.registerPlugin(ScrollTrigger);
+const LINKS = [
+  { href: "#solutions", label: "Solutions", hint: "17 touchpoints" },
+  { href: "#industries", label: "Industries", hint: "13 sectors" },
+  { href: "#products", label: "Products", hint: "Software · Hardware" },
+  { href: "#services", label: "Services", hint: "Plan · Build · Run" },
+];
 
-/** Sticky nav. Transparent over the 3D film, frosted once you scroll past it. */
+/**
+ * Floating glass nav. Barely there over the film, frosted and lifted once
+ * you scroll past it, with the current section marked underneath.
+ *
+ * The scroll state is read from a plain listener rather than a
+ * ScrollTrigger: it is one boolean, it has to survive Lenis driving the
+ * scroll, and ScrollTrigger.refresh() on a 640vh sticky film is not
+ * something to invite for a background swap.
+ */
 export default function Nav() {
-  const nav = useRef();
+  const [solid, setSolid] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("");
+  const wrap = useRef(null);
 
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        start: "top -80", // 80px down the page
-        onUpdate: (self) =>
-          nav.current.classList.toggle("nav--solid", self.scroll() > 80),
-      });
-    });
-    return () => ctx.revert();
+  useEffect(() => {
+    const onScroll = () => setSolid(window.scrollY > 80);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* Which section is being read. rootMargin pulls the detection band up
+     to just under the nav and down to the middle of the screen, so a
+     section counts as "current" when it fills the reading area — not the
+     instant one pixel of it appears. */
+  useEffect(() => {
+    const targets = LINKS.map((l) => document.querySelector(l.href)).filter(Boolean);
+    if (!targets.length) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActive(`#${e.target.id}`);
+        });
+      },
+      { rootMargin: "-88px 0px -55% 0px", threshold: 0 }
+    );
+    targets.forEach((t) => io.observe(t));
+    return () => io.disconnect();
+  }, []);
+
+  /* Dismiss the mobile sheet on Escape or an outside click. */
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    const onDown = (e) => {
+      if (!wrap.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [open]);
+
   return (
-    <nav className="nav" ref={nav}>
-      <Logo />
-      <ul className="nav__links">
-        <li><a href="#solutions">Solutions</a></li>
-        <li><a href="#industries">Industries</a></li>
-        <li><a href="#products">Products</a></li>
-        <li><a href="#services">Services</a></li>
-        <li>
-          <a className="btn btn--mint" href="#contact" style={{ color: "#06312a" }}>
+    <div ref={wrap}>
+      <nav className={`nav${solid ? " nav--solid" : ""}`}>
+        <Logo />
+
+        <ul className="nav__links">
+          {LINKS.map((l) => (
+            <li key={l.href}>
+              <a href={l.href} className={active === l.href ? "is-active" : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div className="nav__cta">
+          <a className="btn btn--primary btn--sm" href="#contact">
             Talk to us
           </a>
-        </li>
-      </ul>
-    </nav>
+          <button
+            type="button"
+            className="nav__toggle"
+            aria-expanded={open}
+            aria-controls="nav-sheet"
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <i />
+            <i />
+            <i />
+          </button>
+        </div>
+      </nav>
+
+      <div
+        id="nav-sheet"
+        className={`sheet${open ? " sheet--open" : ""}`}
+        inert={!open}
+      >
+        <ul>
+          {LINKS.map((l) => (
+            <li key={l.href}>
+              <a href={l.href} onClick={() => setOpen(false)}>
+                {l.label}
+                <span>{l.hint}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a className="btn btn--primary" href="#contact" onClick={() => setOpen(false)}>
+          Talk to us
+        </a>
+      </div>
+    </div>
   );
 }
