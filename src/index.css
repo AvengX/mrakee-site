@@ -6,17 +6,23 @@
      1. ATMOSPHERE  a fixed, almost-invisible field of cool gradient
                     light (indigo / cyan / violet) + fine grain. It is
                     what makes white feel like depth rather than paper.
-     2. BRAND       gold + mint from the logo. These carry identity:
-                    accents, icons, the primary CTA, headline highlights.
+     2. BRAND       gold + teal, sampled from the logo artwork. These
+                    carry identity: accents, icons, the primary CTA,
+                    headline highlights.
      3. SURFACE     translucent white cards floating over the
                     atmosphere, held apart by soft layered shadow.
 
    The cool set NEVER becomes the brand — it only ever lights the room.
 
-   Contrast note: gold #d4a339 and mint #6fc8b6 score 2.2:1 and 1.9:1 as
+   The teal replaced an earlier "mint" #6fc8b6, which was paler and
+   greener than anything actually in the logo. The mark also carries a
+   crimson accent; it is deliberately not in this palette, because red
+   in a UI reads as an error state no matter what the logo does with it.
+
+   Contrast note: gold #d4a339 and teal #189aa2 score 2.2:1 and 3.0:1 as
    text on white, so each accent exists twice — a darkened *ink* variant
    for anything you read, and the true brand colour for fills only.
-   Rule: colour text with --gold-ink / --mint-ink, never --gold / --mint.
+   Rule: colour text with --gold-ink / --teal-ink, never --gold / --teal.
    ================================================================ */
 
 :root {
@@ -24,13 +30,13 @@
   --gold: #d4a339;
   --gold-lite: #f0cc77;
   --gold-deep: #b1801f;
-  --mint: #6fc8b6;
-  --mint-lite: #a5ded2;
-  --mint-deep: #2f9d88;
+  --teal: #189aa2;
+  --teal-lite: #58c3c9;
+  --teal-deep: #0f7d84;
 
   /* ---- Brand (text-safe ink) ---- */
   --gold-ink: #8a6410; /* 5.0:1 on white */
-  --mint-ink: #1f7a69; /* 4.9:1 on white */
+  --teal-ink: #0d757c; /* 5.45:1 on white */
 
   /* ---- Cool atmosphere — backgrounds and glow only ---- */
   --indigo: #635bff; /* 4.7:1 — safe as text if ever needed */
@@ -316,7 +322,7 @@ body {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--gold), var(--mint));
+  background: linear-gradient(90deg, var(--gold), var(--teal));
   transform-origin: left;
   transition: transform 0.4s var(--ease-soft);
 }
@@ -532,7 +538,7 @@ body {
   font-size: 1.02rem;
   font-weight: 700;
   letter-spacing: 0.14em;
-  color: var(--mint-ink);
+  color: var(--teal-ink);
 }
 
 .logo__sub {
@@ -545,7 +551,7 @@ body {
 }
 
 .footer .logo__name {
-  color: var(--mint-ink);
+  color: var(--teal-ink);
 }
 
 .nav__links {
@@ -604,7 +610,7 @@ body {
   height: 2px;
   border-radius: 2px;
   transform: translateX(-50%);
-  background: linear-gradient(90deg, var(--gold), var(--mint));
+  background: linear-gradient(90deg, var(--gold), var(--teal));
 }
 
 .nav__cta {
@@ -851,7 +857,7 @@ body {
   letter-spacing: 0.24em;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--mint-ink);
+  color: var(--teal-ink);
   margin-bottom: 1.05rem;
 }
 
@@ -860,7 +866,7 @@ body {
   width: 24px;
   height: 2px;
   border-radius: 2px;
-  background: linear-gradient(90deg, var(--gold), var(--mint));
+  background: linear-gradient(90deg, var(--gold), var(--teal));
 }
 
 /* pill variant, for badges that sit alone above a headline */
@@ -882,8 +888,8 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--mint-deep);
-  box-shadow: 0 0 0 3px rgba(111, 200, 182, 0.22);
+  background: var(--teal-deep);
+  box-shadow: 0 0 0 3px rgba(24, 154, 162, 0.22);
 }
 
 h1 {
@@ -917,7 +923,7 @@ h3 {
      middle of the gradient at 2.55:1 over the hero, under the 3:1 floor
      for display type; interpolating ink to ink keeps every point of the
      run at 3.7:1 or better. */
-  background: linear-gradient(100deg, var(--gold-ink) 0%, var(--mint-ink) 100%);
+  background: linear-gradient(100deg, var(--gold-ink) 0%, var(--teal-ink) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -992,7 +998,7 @@ h3 {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--mint-deep);
+  background: var(--teal-deep);
   animation: fall 2.6s var(--ease-soft) infinite;
 }
 
@@ -1180,7 +1186,7 @@ h3 {
   width: 2px;
   height: 0;
   border-radius: 2px;
-  background: linear-gradient(180deg, var(--gold), var(--mint));
+  background: linear-gradient(180deg, var(--gold), var(--teal));
   transform: translateY(-50%);
   transition: height 0.42s var(--ease);
 }
@@ -1219,7 +1225,7 @@ h3 {
 }
 
 .sx__item.is-active .sx__num {
-  color: var(--mint-ink);
+  color: var(--teal-ink);
 }
 
 .sx__name {
@@ -1320,7 +1326,7 @@ h3 {
   margin-top: 1.35rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--mint-ink);
+  color: var(--teal-ink);
   text-decoration: none;
 }
 
@@ -1380,9 +1386,9 @@ h3 {
 
 .pill:hover {
   transform: translateY(-3px);
-  color: var(--mint-ink);
-  border-color: rgba(47, 157, 136, 0.4);
-  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 12px 26px rgba(47, 157, 136, 0.16);
+  color: var(--teal-ink);
+  border-color: rgba(15, 125, 132, 0.4);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 12px 26px rgba(15, 125, 132, 0.16);
 }
 
 /* ================================================================
@@ -1438,7 +1444,7 @@ h3 {
   letter-spacing: -0.045em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  background: linear-gradient(140deg, var(--gold-deep), var(--gold) 42%, var(--mint-deep));
+  background: linear-gradient(140deg, var(--gold-deep), var(--gold) 42%, var(--teal-deep));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -1481,7 +1487,7 @@ h3 {
   position: absolute;
   inset: 0 0 auto 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--gold), var(--mint));
+  background: linear-gradient(90deg, var(--gold), var(--teal));
   transform: scaleX(0.24);
   transform-origin: left;
   transition: transform 0.7s var(--ease);
@@ -1716,7 +1722,7 @@ a.contact__info:hover {
   border-radius: 12px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.96);
-  color: var(--mint-ink);
+  color: var(--teal-ink);
   box-shadow: var(--shadow-sm);
   transition: transform 0.4s var(--ease), color 0.3s var(--ease-soft);
 }
@@ -1903,9 +1909,9 @@ a.contact__info:hover .contact__infoIcon {
   height: 52px;
   margin: 0 auto 1.15rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--mint-lite), var(--mint));
+  background: linear-gradient(135deg, var(--teal-lite), var(--teal));
   color: #06312a;
-  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 10px 24px rgba(111, 200, 182, 0.32);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 10px 24px rgba(24, 154, 162, 0.32);
 }
 
 .contact__done h3 {
@@ -1922,7 +1928,7 @@ a.contact__info:hover .contact__infoIcon {
 }
 
 .contact__done a {
-  color: var(--mint-ink);
+  color: var(--teal-ink);
 }
 
 /* ================================================================
@@ -1986,7 +1992,7 @@ a.contact__info:hover .contact__infoIcon {
 }
 
 .footer a:hover {
-  color: var(--mint-ink);
+  color: var(--teal-ink);
 }
 
 .footer__bottom {

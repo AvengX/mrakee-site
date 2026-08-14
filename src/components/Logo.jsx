@@ -45,17 +45,20 @@ export default function Logo({ size = 36, showWordmark = true }) {
               <stop offset="55%" stopColor="#d4a339" />
               <stop offset="100%" stopColor="#b1801f" />
             </linearGradient>
-            <linearGradient id="mk-mint" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#8ad8c8" />
-              <stop offset="100%" stopColor="#5cbba8" />
+            <linearGradient id="mk-teal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#58c3c9" />
+              <stop offset="100%" stopColor="#0f7d84" />
             </linearGradient>
           </defs>
+          {/* the crimson edge sitting behind the M's left leg, as in the
+              real mark — the one place red belongs on this site */}
+          <path d="M26 32 L26 88 L34 88 L34 46 Z" fill="#c41e2a" />
           <path
             d="M14 88 V16 L26 16 L50 58 L74 16 L86 16 L86 30 L74 30 L54 66 L46 66 L26 32 L26 88 Z"
             fill="url(#mk-gold)"
           />
-          <path d="M60 40 H86 L78 52 H74 V88 H62 V52 Z" fill="url(#mk-mint)" />
-          <rect className="logo__px" x="80" y="24" width="7" height="7" rx="1.4" fill="#d4a339" />
+          <path d="M60 40 H86 L78 52 H74 V88 H62 V52 Z" fill="url(#mk-teal)" />
+          <rect className="logo__px" x="80" y="24" width="7" height="7" rx="1.4" fill="#c41e2a" />
           <rect className="logo__px" x="88" y="15" width="6" height="6" rx="1.2" fill="#d4a339" />
           <rect className="logo__px" x="82" y="8" width="5" height="5" rx="1" fill="#e6bd5f" />
         </svg>
