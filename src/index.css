@@ -19,24 +19,26 @@
    crimson accent; it is deliberately not in this palette, because red
    in a UI reads as an error state no matter what the logo does with it.
 
-   Contrast note: gold #d4a339 and teal #189aa2 score 2.2:1 and 3.0:1 as
-   text on white, so each accent exists twice — a darkened *ink* variant
-   for anything you read, and the true brand colour for fills only.
+   Every colour here is sampled from public/logo.png rather than matched
+   by eye. Contrast note: the brand gold #dd9e2c and teal #06a0a2 score
+   2.3:1 and 3.2:1 as text on white, so each accent exists twice — a
+   darkened *ink* variant for anything you read, and the true brand
+   colour for fills only.
    Rule: colour text with --gold-ink / --teal-ink, never --gold / --teal.
    ================================================================ */
 
 :root {
   /* ---- Brand (fills) ---- */
-  --gold: #d4a339;
-  --gold-lite: #f0cc77;
-  --gold-deep: #b1801f;
-  --teal: #189aa2;
-  --teal-lite: #58c3c9;
-  --teal-deep: #0f7d84;
+  --gold: #dd9e2c; /* sampled from the artwork */
+  --gold-lite: #fed271; /* sampled highlight */
+  --gold-deep: #c5880b; /* 3.0:1 — fills and large type only */
+  --teal: #06a0a2; /* sampled from the artwork */
+  --teal-lite: #3fc2c4;
+  --teal-deep: #017e80; /* 4.89:1 on white */
 
   /* ---- Brand (text-safe ink) ---- */
-  --gold-ink: #8a6410; /* 5.0:1 on white */
-  --teal-ink: #0d757c; /* 5.45:1 on white */
+  --gold-ink: #8b6009; /* 5.56:1 on white */
+  --teal-ink: #0a6e70; /* 6.04:1 on white */
 
   /* ---- Cool atmosphere — backgrounds and glow only ---- */
   --indigo: #635bff; /* 4.7:1 — safe as text if ever needed */
@@ -493,28 +495,21 @@ body {
   overflow: visible;
 }
 
-/* Crops the supplied stacked lockup down to just the M mark, so the
-   wordmark can be live text beside it instead of six unreadable pixels
-   baked into a 36px image. Tune these three against the real file. */
-.logo {
-  --logo-zoom: 1.62;
-  --logo-x: -30%;
-  --logo-y: -11%;
-}
-
+/* public/logo.png is already cut to the M mark alone, on transparency,
+   so there is nothing to crop in CSS. The wordmark beside it stays live
+   text: at a 36px nav height the artwork's own wordmark would be about
+   six pixels of type, and live text also stays selectable, searchable
+   and crisp at any size. */
 .logo__markBox {
-  position: relative;
   display: block;
   flex-shrink: 0;
-  overflow: hidden;
 }
 
 .logo__markBox img {
-  position: absolute;
-  top: var(--logo-y);
-  left: var(--logo-x);
-  width: calc(100% * var(--logo-zoom));
-  height: auto;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   user-select: none;
 }
 

@@ -29,7 +29,8 @@ export default function Logo({ size = 36, showWordmark = true }) {
   return (
     <a href="#top" className="logo" aria-label="Mrakee Technologies — home">
       {artwork ? (
-        <span className="logo__markBox" style={{ height: size, width: size * 1.06 }}>
+        // the artwork is 480x372, so the box keeps a 1.29:1 ratio
+        <span className="logo__markBox" style={{ height: size, width: Math.round(size * 1.29) }}>
           <img
             src="logo.png"
             alt=""
