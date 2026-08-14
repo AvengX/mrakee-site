@@ -5,6 +5,7 @@ import Counter from "./Counter";
 import Logo from "./Logo";
 import ContactCard from "./ContactCard";
 import ContactForm from "./ContactForm";
+import SolutionsExplorer from "./SolutionsExplorer";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 
 /* --- Content model -------------------------------------------------
@@ -13,25 +14,29 @@ import { usePointerGlow } from "../hooks/usePointerGlow";
    below is original to Mrakee. -------------------------------------- */
 
 /* The full solution set carried over from the acquired APAC business.
-   The first entry runs double-width as the section's lead card. */
+   `frame` is the still shown alongside each one, picked from the film's
+   own frames by chapter so the environment matches the solution —
+   retail solutions get retail footage, transport gets the concourse.
+   Chapter ranges: object 0-53 · wakes 49-108 · retail 104-163 ·
+   qsr 159-218 · transport 214-273 · scale 269-333. */
 const SOLUTIONS = [
-  { i: "◧", t: "Interactive Kiosk", d: "Self-serve touchpoints that let customers browse, order and pay — and hand you the interaction data afterwards.", feature: true },
-  { i: "◈", t: "Wayfinder", d: "Floor-aware directories for malls, hospitals and campuses. Search a destination, get a route on the screen and on your phone." },
-  { i: "▦", t: "Video Walls", d: "Tiled arrays driven as a single canvas, from a four-panel lobby feature to a full atrium façade." },
-  { i: "▤", t: "Digital Menu Board", d: "Dayparted menus that flip breakfast to lunch on schedule, and grey out an item the moment stock runs dry.", gold: true },
-  { i: "✈", t: "FIDS", d: "Flight information displays driven off live operational feeds, with the failover behaviour terminals actually require." },
-  { i: "▭", t: "PIDS", d: "Platform and train passenger information, synchronised across a line and readable the length of a platform." },
-  { i: "⬛", t: "Biometric Immigration", d: "Automated border-control gates pairing document reading with facial matching under government security requirements.", gold: true },
-  { i: "◉", t: "Virtual Concierge — Transport", d: "Remote-assist stations putting a live specialist on screen anywhere in a terminal, staffed centrally." },
-  { i: "◎", t: "Virtual Concierge — Mall & Hotel", d: "The same remote-assist model for malls, hotels and offices, where staffing every desk in person doesn't add up." },
-  { i: "⬓", t: "Interactive Retail", d: "Endless-aisle browsing on the shop floor, tying in-store screens to the full catalogue and live stock." },
-  { i: "◐", t: "Smart Fitting Room", d: "In-room screens that read the garment tag and offer sizes, colours and pairings without a trip back to the floor.", gold: true },
-  { i: "☰", t: "Queue Management", d: "Ticketing, calling and live wait times — routing people to the right counter instead of the longest line." },
-  { i: "▥", t: "Meeting Room Manager", d: "Door-side panels showing occupancy and next booking, with book-now for the room you're standing in front of." },
-  { i: "⌕", t: "Smart Product Finder", d: "Search a product and get its aisle, bay and shelf — cutting the most common question staff get asked." },
-  { i: "▯", t: "Digital Standee", d: "Free-standing portrait displays for promotions and campaigns, moved and re-tasked without an installer.", gold: true },
-  { i: "⬒", t: "Hotel Self Check-In / Out", d: "Arrival and departure kiosks handling ID, payment and key issue, with a staffed path always one tap away." },
-  { i: "☺", t: "Feedback System", d: "One-tap satisfaction capture at the point of experience, reported by site, hour and staff shift." },
+  { t: "Interactive Kiosk", frame: 38, d: "Self-serve touchpoints that let customers browse, order and pay — and hand you the interaction data afterwards." },
+  { t: "Wayfinder", frame: 240, d: "Floor-aware directories for malls, hospitals and campuses. Search a destination, get a route on the screen and on your phone." },
+  { t: "Video Walls", frame: 300, d: "Tiled arrays driven as a single canvas, from a four-panel lobby feature to a full atrium façade." },
+  { t: "Digital Menu Board", frame: 178, d: "Dayparted menus that flip breakfast to lunch on schedule, and grey out an item the moment stock runs dry." },
+  { t: "FIDS", frame: 222, d: "Flight information displays driven off live operational feeds, with the failover behaviour terminals actually require." },
+  { t: "PIDS", frame: 258, d: "Platform and train passenger information, synchronised across a line and readable the length of a platform." },
+  { t: "Biometric Immigration", frame: 268, d: "Automated border-control gates pairing document reading with facial matching under government security requirements." },
+  { t: "Virtual Concierge — Transport", frame: 232, d: "Remote-assist stations putting a live specialist on screen anywhere in a terminal, staffed centrally." },
+  { t: "Virtual Concierge — Mall & Hotel", frame: 150, d: "The same remote-assist model for malls, hotels and offices, where staffing every desk in person doesn't add up." },
+  { t: "Interactive Retail", frame: 118, d: "Endless-aisle browsing on the shop floor, tying in-store screens to the full catalogue and live stock." },
+  { t: "Smart Fitting Room", frame: 134, d: "In-room screens that read the garment tag and offer sizes, colours and pairings without a trip back to the floor." },
+  { t: "Queue Management", frame: 200, d: "Ticketing, calling and live wait times — routing people to the right counter instead of the longest line." },
+  { t: "Meeting Room Manager", frame: 20, d: "Door-side panels showing occupancy and next booking, with book-now for the room you're standing in front of." },
+  { t: "Smart Product Finder", frame: 112, d: "Search a product and get its aisle, bay and shelf — cutting the most common question staff get asked." },
+  { t: "Digital Standee", frame: 72, d: "Free-standing portrait displays for promotions and campaigns, moved and re-tasked without an installer." },
+  { t: "Hotel Self Check-In / Out", frame: 92, d: "Arrival and departure kiosks handling ID, payment and key issue, with a staffed path always one tap away." },
+  { t: "Feedback System", frame: 60, d: "One-tap satisfaction capture at the point of experience, reported by site, hour and staff shift." },
 ];
 
 /* The 13 industries served by the acquired business. */
@@ -95,7 +100,6 @@ export default function BrandPage() {
   /* One delegated pointer listener per section, not one per card. It
      goes on the section wrapper rather than on <Reveal>, which owns its
      own ref for the entrance animation. */
-  const solutionsSurface = usePointerGlow(".card");
   const productsSurface = usePointerGlow(".pillar");
 
   return (
@@ -104,7 +108,7 @@ export default function BrandPage() {
           Lead card + grid. The first solution carries the section
           instead of a second paragraph doing it. */}
       <section className="band" id="solutions">
-        <div className="band__inner" ref={solutionsSurface}>
+        <div className="band__inner">
           <Reveal className="band__head">
             <p className="eyebrow">Solutions</p>
             <SplitWords words={["One", "platform,", { t: "every", grad: true }, { t: "touchpoint.", grad: true }]} />
@@ -115,19 +119,8 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <Reveal className="grid grid--3" stagger>
-            {SOLUTIONS.map((s) => (
-              <article
-                className={`card${s.feature ? " card--feature" : ""}`}
-                key={s.t}
-              >
-                <div className={`card__icon${s.gold ? " card__icon--gold" : ""}`}>
-                  {s.i}
-                </div>
-                <h3>{s.t}</h3>
-                <p>{s.d}</p>
-              </article>
-            ))}
+          <Reveal>
+            <SolutionsExplorer solutions={SOLUTIONS} />
           </Reveal>
         </div>
       </section>
