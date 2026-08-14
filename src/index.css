@@ -264,21 +264,15 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Three white layers stack here, and it is easy to end up milky. The
-     flat veil is only 14% — enough to sit the film back from the page
-     without bleaching it, since the headings are near-black ink and do
-     not need help. The heavier lifting happens under the captions,
-     where it is actually required. The radial starts later and peaks
-     lower than it used to for the same reason; the 92% at the very edge
-     is the vignette that melts the frame into the page. */
-  background: linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-    radial-gradient(
-      ellipse at 50% 46%,
-      transparent 34%,
-      rgba(255, 255, 255, 0.4) 72%,
-      rgba(255, 255, 255, 0.92) 100%
-    ),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, transparent 22%);
+  /* Nothing. The footage plays at full strength.
+     Every white layer that used to live here — a flat veil, a vignette
+     and a top wash — existed to make the captions readable, and the
+     price was a milky film. That cost is paid in the type instead now:
+     the caption colours below are dark enough to hold on raw footage,
+     which is the right place for it. The frame is cover-fit and
+     full-bleed, so there is no letterbox edge needing a vignette to
+     soften it either. */
+  background: none;
 }
 
 /* Cool key light behind the subject — the "very subtle radial gradient
@@ -362,21 +356,13 @@ body {
      the footage. Spreading the same amount of light over 14vw/16vh
      means the transition takes hundreds of pixels and reads as light
      pooling in the middle of the frame instead of as a patch. */
-  inset: -20vh -16vw;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
-  /* This now carries more of the legibility than the stage veil does,
-     since the veil dropped to 14% to stop bleaching the footage.
-     Spreading the extra alpha over 16vw/20vh keeps the steepest slope
-     under 0.0015/px — below where an edge becomes findable. */
-  background: radial-gradient(
-    ellipse at 50% 50%,
-    rgba(255, 255, 255, 0.44) 0%,
-    rgba(255, 255, 255, 0.38) 34%,
-    rgba(255, 255, 255, 0.22) 58%,
-    rgba(255, 255, 255, 0.08) 76%,
-    rgba(255, 255, 255, 0) 90%
-  );
+  /* Gone too. Any scrim is a shape on top of the video, and every
+     version of it was either visible as a patch or heavy enough to
+     bleach the frame. */
+  background: none;
 }
 
 .cap--left {
@@ -422,10 +408,11 @@ body {
    slate-600 rather than slate-500 gives the supporting line the weight
    the headline already has. */
 .cap .lede {
-  /* slate-700, not slate-600. Over the brightest frames the lighter
-     tone measured 3.89:1 — the veil alone could not carry it, and the
-     alternative was veiling the film so heavily it stopped being film. */
-  color: #334155; /* 10.9:1 on white */
+  /* slate-800. With the veils gone the supporting line sits on raw
+     footage, where slate-700 measured 3.6:1 over the retail chapter.
+     This is the price of an unveiled film, and it is the right one to
+     pay — darker type costs nothing, a white wash costs the video. */
+  color: #1e293b; /* 14.6:1 on white */
 }
 
 .cap .eyebrow--badge {
@@ -466,7 +453,11 @@ body {
   padding: 0.55rem 0.6rem 0.55rem 1.1rem;
   border-radius: 18px;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.72);
+  /* The film used to have a white wash across its top which this bar
+     borrowed contrast from. With that gone the bar has to be its own
+     surface — and it is a bar, not a layer over the footage, so making
+     it more solid costs no video. */
+  background: rgba(255, 255, 255, 0.86);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   transform: translateX(-50%);
@@ -561,7 +552,9 @@ body {
   display: inline-flex;
   padding: 0.52rem 0.85rem;
   border-radius: 11px;
-  color: var(--ink-soft);
+  /* darker than --ink-soft: these sit over the film with no wash under
+     them now, where --ink-soft measured 4.4:1 */
+  color: #475569;
   text-decoration: none;
   font-size: 0.88rem;
   font-weight: 500;
