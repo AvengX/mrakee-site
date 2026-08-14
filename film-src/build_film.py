@@ -29,7 +29,13 @@ CROP = "crop=iw*0.88:iw*0.88*9/16:0:(ih-iw*0.88*9/16)/2"
 
 # (keyword, label, start, duration) — segments chosen from the QC sheets
 CHAPTERS = [
-    ("Self-service_kiosk_orbiting", "The object",    0.0, 4.5),
+    # The hero chapter, replaced 2026-08-15 and run in full rather than
+    # trimmed — it is a finished commercial with its own arc (kiosk ->
+    # storefronts -> menu board -> branded kiosk) and cutting it to 4.5s
+    # would throw away the payoff. At 10s it is nearly a third of the
+    # film, which is why every caption below it had to be re-timed.
+    # Previous: ("Self-service_kiosk_orbiting", "The object", 0.0, 4.5)
+    ("MRakee_commercial_hero",      "The object",    0.0, 10.0),
     ("Light_glowing",               "It wakes",      0.8, 5.0),
     ("Woman_touching",              "Retail",        3.0, 5.0),
     ("Staff_member",                "Quick service", 0.5, 5.0),
@@ -64,8 +70,17 @@ def main():
     for i, (key, label, start, dur) in enumerate(CHAPTERS):
         match = next((f for f in files if key.lower() in os.path.basename(f).lower()), None)
         if not match:
-            print(f"!! missing source for {label}")
-            continue
+            # Hard stop, not a warning. These clips live in the user's
+            # Downloads folder and get reorganised; on 2026-08-15 one was
+            # moved mid-session and this quietly emitted a five-chapter
+            # film that looked plausible right up until the last caption
+            # had nothing behind it. A missing source is never something
+            # to continue past.
+            raise SystemExit(
+                f"\n!! no source matching {key!r} for chapter {label!r}\n"
+                f"   looked in {SRC}\n"
+                f"   found: {sorted(os.path.basename(f) for f in files)}\n"
+            )
         frames = extract(match, start, dur, os.path.join(TMP, f"ch{i+1}"))
         print(f"ch{i+1} {label:14s} {len(frames):3d} frames  ({dur}s @ {FPS}fps)")
         chapters.append((label, frames))

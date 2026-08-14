@@ -6,13 +6,15 @@ import { useFrameSequence } from "../hooks/useFrameSequence";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * The scroll film: 334 WebP frames scrubbed by scroll position on a sticky
+ * The scroll film: 399 WebP frames scrubbed by scroll position on a sticky
  * canvas, with captions timed to the chapter boundaries.
  *
  * `in`/`out` below are scroll fractions printed by film-src/build_film.py.
- * The chapters land at:
- *   object 0.00-0.16 · wakes 0.15-0.32 · retail 0.31-0.49
- *   qsr 0.48-0.66 · transport 0.64-0.82 · scale 0.81-1.00
+ * Re-run it after ANY change to the clips and copy the numbers across —
+ * chapter one is the full 10s commercial and takes up 30% of the film on
+ * its own, so these are nothing like an even six-way split:
+ *   object 0.00-0.30 · wakes 0.29-0.44 · retail 0.43-0.58
+ *   qsr 0.57-0.71 · transport 0.70-0.85 · scale 0.84-1.00
  *
  * The opening caption uses a NEGATIVE `in` on purpose — a caption with
  * in=0.00 is invisible at exactly scroll 0, which is where the page loads.
@@ -27,31 +29,31 @@ const CAPTIONS = [
     hero: true,
   },
   {
-    in: 0.175, out: 0.30, align: "left",
+    in: 0.305, out: 0.425, align: "left",
     eyebrow: "Built to be seen",
     title: <>Readable at noon.<br />Bright at midnight.</>,
     body: "High-nit bonded panels that hold their colour in a shopfront window and dim themselves for an overnight lobby.",
   },
   {
-    in: 0.345, out: 0.465, align: "right",
+    in: 0.443, out: 0.563, align: "right",
     eyebrow: "Retail",
     title: <>The shelf that<br />answers back.</>,
     body: "Let a shopper find a size, compare a fit and check stock without waiting for the one free staff member on the floor.",
   },
   {
-    in: 0.51, out: 0.63, align: "left",
+    in: 0.581, out: 0.702, align: "left",
     eyebrow: "Quick service",
     title: <>Menus that move<br />with the day.</>,
     body: "Breakfast flips to lunch on schedule. An item greys out the moment stock runs dry. No one climbs a ladder.",
   },
   {
-    in: 0.675, out: 0.795, align: "right",
+    in: 0.72, out: 0.84, align: "right",
     eyebrow: "Transport",
     title: <>Never dark,<br />never wrong.</>,
     body: "Live operational feeds driving concourse-length display walls, with the failover behaviour terminals actually require.",
   },
   {
-    in: 0.845, out: 1.08, align: "center",
+    in: 0.858, out: 1.08, align: "center",
     eyebrow: "At scale",
     title: <>One estate.<br />One dashboard.</>,
     body: "A thousand screens across a dozen sites, provisioned and monitored from a single pane of glass.",
