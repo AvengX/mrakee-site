@@ -1,7 +1,10 @@
+import { MailIcon, MapPinIcon, PhoneIcon } from "lucide-react";
 import Reveal from "./Reveal";
 import SplitWords from "./SplitWords";
 import Counter from "./Counter";
 import Logo from "./Logo";
+import ContactCard from "./ContactCard";
+import ContactForm from "./ContactForm";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 
 /* --- Content model -------------------------------------------------
@@ -56,6 +59,29 @@ const SERVICES = [
    page says 3.1M / 1,000+ / 28 / 23. These are the homepage (headline)
    numbers. Confirm which set is current before any press use. */
 const SHOW_STATS = true;
+
+/* The APAC office carried over from the acquired business. The phone and
+   address were confirmed; the email was NOT — see the footer's note. */
+const CONTACT_INFO = [
+  {
+    icon: MailIcon,
+    label: "Email",
+    value: "sales@mrakee.com",
+    href: "mailto:sales@mrakee.com",
+  },
+  {
+    icon: PhoneIcon,
+    label: "Phone",
+    value: "+65 6509 4235",
+    href: "tel:+6565094235",
+  },
+  {
+    icon: MapPinIcon,
+    label: "APAC Headquarters",
+    value: "Keck Seng Tower, 133 Cecil Street #04-02, Singapore 069535",
+    wide: true,
+  },
+];
 
 const STATS = [
   { n: "4.0M", l: "Digital signs" },
@@ -212,22 +238,22 @@ export default function BrandPage() {
         </div>
       </section>
 
-      {/* ---------------- CTA ---------------- */}
+      {/* ---------------- CONTACT ----------------
+          Replaced the centred CTA panel: the nav's "Talk to us" and every
+          "Book a demo" on the page point at #contact, and they should
+          arrive somewhere you can actually make contact rather than at
+          another button. */}
       <section className="band" id="contact">
         <div className="band__inner">
-          <Reveal className="cta">
-            <p className="eyebrow">Get started</p>
-            <SplitWords words={["Tell", "us", "about", { t: "the", grad: true }, { t: "space.", grad: true }]} />
-            <p className="lede">
-              Send us the floor plan and the problem. We'll come back with a
-              specification, a rollout shape and a number.
-            </p>
-            <div className="cta__actions">
-              <a className="btn btn--primary" href="mailto:sales@mrakee.com">
-                Book a demo <span className="arrow" aria-hidden="true">→</span>
-              </a>
-              <a className="btn btn--ghost" href="#solutions">See solutions</a>
-            </div>
+          <Reveal>
+            <ContactCard
+              eyebrow="Talk to us"
+              title="Tell us about the space."
+              description="Send us the floor plan and the problem. We'll come back with a specification, a rollout shape and a number — usually within one business day."
+              contactInfo={CONTACT_INFO}
+            >
+              <ContactForm />
+            </ContactCard>
           </Reveal>
         </div>
       </section>
