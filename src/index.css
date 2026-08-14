@@ -1259,15 +1259,9 @@ h3 {
   display: block;
 }
 
-/* the film frames carry a bright, slightly cool grade; this keeps the
-   panel sitting in the same light as the rest of the page */
-.sx__media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 40%),
-    radial-gradient(120% 90% at 50% 100%, rgba(99, 91, 255, 0.1), transparent 60%);
-}
+/* No tint. This existed to settle the film stills into the page's light,
+   and the bespoke images are already shot to it — a wash over them now
+   would only mute photography that was commissioned to look this way. */
 
 .sx__badge {
   position: absolute;
