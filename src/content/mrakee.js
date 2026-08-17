@@ -39,12 +39,22 @@ export const ABOUT = {
   ],
 };
 
+/* Each stage carries the image the About panel shows for it. Only three
+   photographs were commissioned for this (the service images), so
+   Integrate borrows a solutions frame and Care shares the technician
+   with Deploy — both flagged in film-src/AV_SOLUTION_PROMPTS.md as
+   worth shooting properly. */
 export const APPROACH = [
-  { t: "Listen", d: "We begin by listening and understanding your vision, objectives, users and operational requirements." },
-  { t: "Create", d: "Our engineers develop solutions that balance performance, usability, aesthetics and budget." },
-  { t: "Integrate", d: "We bring multiple technologies together into one coordinated and intuitive environment." },
-  { t: "Deploy", d: "Our project teams manage installation, configuration, testing and commissioning with attention to detail." },
-  { t: "MRAKEE Care", d: "Where we continue to be your technology partner, to provide proactive support and maintenance." },
+  { t: "Listen", short: "Listen", img: "services/01.jpg",
+    d: "We begin by listening and understanding your vision, objectives, users and operational requirements." },
+  { t: "Create", short: "Create", img: "services/02.jpg",
+    d: "Our engineers develop solutions that balance performance, usability, aesthetics and budget." },
+  { t: "Integrate", short: "Integrate", img: "solutions/13.jpg",
+    d: "We bring multiple technologies together into one coordinated and intuitive environment." },
+  { t: "Deploy", short: "Deploy", img: "services/03.jpg",
+    d: "Our project teams manage installation, configuration, testing and commissioning with attention to detail." },
+  { t: "MRAKEE Care", short: "Care", img: "services/03.jpg",
+    d: "Where we continue to be your technology partner, to provide proactive support and maintenance." },
 ];
 
 /* The nine solution portfolios. `img` is the closest existing photograph

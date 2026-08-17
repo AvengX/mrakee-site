@@ -1,26 +1,32 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 /* ================================================================
-   ABOUT — text column + tabbed media panel
+   ABOUT — text column + media panel
 
    Adapted from a shadcn/Tailwind/Next component. This project has none
    of those, so the structure was kept and rebuilt on the site's own
    tokens: eyebrow, headline, copy, chips, a disclosure list, two CTAs,
-   and a tall panel whose image is switched by pills along its foot.
+   and a tall panel with pills along its foot.
 
-   Two accessibility decisions, both from the guidance rather than taste:
+   One departure that matters: in the original the pills and the steps
+   are unrelated — the steps explain the process, the pills switch
+   between output styles. Here they are the SAME five stages, so having
+   two independent controls for one idea would be a lie about the
+   content. There is a single `active` index: the open step, the lit
+   pill and the panel image are all it. Selecting either control moves
+   both.
 
-   · The chips are NOT buttons. In the original they are Badge
-     components that look tappable and do nothing — a clickable-looking
-     element with no behaviour is the failure the "compact control
-     semantics" rule calls critical. They are plain text here.
-   · The pills ARE buttons, in a tablist, with roving tabindex and arrow
-     keys. Tab reaches the group once, arrows move within it, which
-     keeps tab order aligned with visual order.
+   That also removes the collapse-to-nothing state. With the panel
+   bound to the selection, "no step open" would mean "no image", which
+   is a worse thing to be able to reach than it is to gain.
 
-   The disclosure list uses button + aria-expanded + aria-controls. No
-   database guidance existed for accordions specifically; this is the
-   standard pattern.
+   Accessibility notes:
+   · The chips are NOT buttons. In the source they are Badge components
+     that look pressable and do nothing — a clickable-looking element
+     with no behaviour is what the guidance calls a critical failure.
+   · The pills ARE buttons, in a tablist with roving tabindex and arrow
+     keys, so Tab reaches the group once and arrows move within it.
+   · The disclosure uses button + aria-expanded + aria-controls.
    ================================================================ */
 
 export default function AboutShowcase({
@@ -29,41 +35,39 @@ export default function AboutShowcase({
   paragraphs = [],
   chips = [],
   steps = [],
-  media = [],
   ctas = [],
 }) {
   const uid = useId();
-  const [open, setOpen] = useState(0); // single-open, collapsible
-  const [tab, setTab] = useState(0);
+  const [active, setActive] = useState(0);
   const [loaded, setLoaded] = useState(() => new Set([0]));
-  const tabRefs = useRef([]);
+  const pillRefs = useRef([]);
   const [focusIdx, setFocusIdx] = useState(null);
 
   useEffect(() => {
     if (focusIdx === null) return;
-    tabRefs.current[focusIdx]?.focus();
+    pillRefs.current[focusIdx]?.focus();
     setFocusIdx(null);
   }, [focusIdx]);
 
-  // only fetch a panel image once its tab has been selected
+  // only fetch a stage's image once it has been selected
   useEffect(() => {
-    setLoaded((s) => (s.has(tab) ? s : new Set(s).add(tab)));
-  }, [tab]);
+    setLoaded((s) => (s.has(active) ? s : new Set(s).add(active)));
+  }, [active]);
 
-  const onTabKey = useCallback(
+  const onPillKey = useCallback(
     (e) => {
-      const last = media.length - 1;
+      const last = steps.length - 1;
       let next = null;
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = tab === last ? 0 : tab + 1;
-      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = tab === 0 ? last : tab - 1;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = active === last ? 0 : active + 1;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = active === 0 ? last : active - 1;
       else if (e.key === "Home") next = 0;
       else if (e.key === "End") next = last;
       if (next === null) return;
       e.preventDefault();
-      setTab(next);
+      setActive(next);
       setFocusIdx(next);
     },
-    [tab, media.length]
+    [active, steps.length]
   );
 
   return (
@@ -87,43 +91,38 @@ export default function AboutShowcase({
           </ul>
         )}
 
-        {steps.length > 0 && (
-          <div className="abt__steps">
-            {steps.map((s, i) => {
-              const isOpen = open === i;
-              return (
-                <div className={`abt__step${isOpen ? " is-open" : ""}`} key={s.t}>
-                  <h3>
-                    <button
-                      type="button"
-                      id={`${uid}-t${i}`}
-                      aria-expanded={isOpen}
-                      aria-controls={`${uid}-p${i}`}
-                      onClick={() => setOpen(isOpen ? -1 : i)}
-                    >
-                      <span className="abt__stepNo">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="abt__stepName">{s.t}</span>
-                      <span className="abt__chev" aria-hidden="true" />
-                    </button>
-                  </h3>
-                  {/* grid-template-rows 0fr -> 1fr animates to the content's
-                      real height; max-height needs a guessed number that is
-                      either too small (clipping) or too big (lazy easing) */}
-                  <div
-                    className="abt__stepBody"
-                    id={`${uid}-p${i}`}
-                    role="region"
-                    aria-labelledby={`${uid}-t${i}`}
+        <div className="abt__steps">
+          {steps.map((s, i) => {
+            const isOpen = active === i;
+            return (
+              <div className={`abt__step${isOpen ? " is-open" : ""}`} key={s.t}>
+                <h3>
+                  <button
+                    type="button"
+                    id={`${uid}-t${i}`}
+                    aria-expanded={isOpen}
+                    aria-controls={`${uid}-p${i}`}
+                    onClick={() => setActive(i)}
                   >
-                    <div>
-                      <p>{s.d}</p>
-                    </div>
+                    <span className="abt__stepNo">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="abt__stepName">{s.t}</span>
+                    <span className="abt__chev" aria-hidden="true" />
+                  </button>
+                </h3>
+                <div
+                  className="abt__stepBody"
+                  id={`${uid}-p${i}`}
+                  role="region"
+                  aria-labelledby={`${uid}-t${i}`}
+                >
+                  <div>
+                    <p>{s.d}</p>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
+              </div>
+            );
+          })}
+        </div>
 
         {ctas.length > 0 && (
           <div className="abt__ctas">
@@ -146,45 +145,52 @@ export default function AboutShowcase({
       </div>
 
       {/* ---- media panel ---- */}
-      {media.length > 0 && (
-        <div className="abt__panel">
-          <div className="abt__media">
-            {media.map((m, i) => (
-              <img
-                key={m.src}
-                className={`abt__img${i === tab ? " is-on" : ""}`}
-                src={loaded.has(i) ? m.src : undefined}
-                alt=""
-                width="1600"
-                height="900"
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding="async"
-              />
-            ))}
-          </div>
-
-          <div
-            className="abt__pills"
-            role="tablist"
-            aria-label="Views of our work"
-            onKeyDown={onTabKey}
-          >
-            {media.map((m, i) => (
-              <button
-                key={m.label}
-                ref={(el) => (tabRefs.current[i] = el)}
-                role="tab"
-                aria-selected={i === tab}
-                tabIndex={i === tab ? 0 : -1}
-                className={`abt__pill${i === tab ? " is-active" : ""}`}
-                onClick={() => setTab(i)}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
+      <div className="abt__panel">
+        <div className="abt__media">
+          {steps.map((s, i) => (
+            <img
+              key={s.t}
+              className={`abt__img${i === active ? " is-on" : ""}`}
+              src={loaded.has(i) ? s.img : undefined}
+              alt=""
+              width="1600"
+              height="900"
+              loading={i === 0 ? "eager" : "lazy"}
+              decoding="async"
+            />
+          ))}
+          {/* the stage's name over the image, so the panel says what it
+              is showing without depending on the pills being visible */}
+          <span className="abt__stageTag">
+            <i aria-hidden="true">{String(active + 1).padStart(2, "0")}</i>
+            {steps[active]?.t}
+          </span>
         </div>
-      )}
+
+        {/* Hidden below 900px: five pills do not fit a phone without a
+            horizontal scroller, and the disclosure list sits directly
+            under the panel there and already names all five. */}
+        <div
+          className="abt__pills"
+          role="tablist"
+          aria-label="Our approach"
+          onKeyDown={onPillKey}
+        >
+          {steps.map((s, i) => (
+            <button
+              key={s.t}
+              ref={(el) => (pillRefs.current[i] = el)}
+              role="tab"
+              aria-selected={i === active}
+              tabIndex={i === active ? 0 : -1}
+              className={`abt__pill${i === active ? " is-active" : ""}`}
+              onClick={() => setActive(i)}
+            >
+              {s.short || s.t}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

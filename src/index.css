@@ -1981,6 +1981,39 @@ h3 {
   transform: scale(1);
 }
 
+/* The stage's name over the image. The pills disappear on a phone, so
+   without this the panel would show a picture with nothing saying which
+   stage it belongs to. */
+.abt__stageTag {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.abt__stageTag i {
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-ink);
+}
+
 .abt__pills {
   position: absolute;
   z-index: 1;
@@ -1988,7 +2021,7 @@ h3 {
   bottom: 1rem;
   transform: translateX(-50%);
   display: flex;
-  gap: 0.2rem;
+  gap: 0.15rem;
   padding: 0.25rem;
   border-radius: 14px;
   border: 1px solid var(--line);
@@ -2000,7 +2033,7 @@ h3 {
 }
 
 .abt__pill {
-  padding: 0.62rem 0.95rem;
+  padding: 0.62rem 0.7rem; /* five stages have to fit the panel's width */
   min-height: 44px; /* comfortable touch target */
   border: none;
   border-radius: 10px;
@@ -2039,6 +2072,13 @@ h3 {
     order: -1; /* the picture first, then the reading */
     aspect-ratio: 16 / 11;
     max-height: none;
+  }
+  /* Five pills do not fit a phone without a horizontal scroller, and a
+     wheel does nothing to one of those. The disclosure list is directly
+     below the panel here and already names all five stages, so the
+     pills are redundant rather than missed. */
+  .abt__pills {
+    display: none;
   }
 }
 

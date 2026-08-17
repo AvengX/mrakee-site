@@ -50,11 +50,6 @@ export default function BrandPage() {
               paragraphs={[ABOUT.lede, ...ABOUT.body]}
               chips={["Design", "Integrate", "Connect", "Perform"]}
               steps={APPROACH}
-              media={[
-                { label: "Survey", src: "services/01.jpg" },
-                { label: "Design", src: "services/02.jpg" },
-                { label: "Support", src: "services/03.jpg" },
-              ]}
               ctas={[
                 { label: "Talk to Our Experts", href: "#contact" },
                 { label: "Explore Our Solutions", href: "#solutions" },
