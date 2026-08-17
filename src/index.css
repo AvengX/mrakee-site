@@ -1763,16 +1763,14 @@ h3 {
 /* ================================================================
    ABOUT — text column + tabbed media panel
    ================================================================ */
-/* Four grid children, not a text column and a panel. On a desktop the
-   panel spans the full height beside them; on a phone it drops between
-   the intro and the stage list, so tapping a stage changes a picture
-   that is directly above the finger rather than a screen away. */
+/* Three grid children, not a text column and a panel: the CTAs sit at
+   the foot of the reading column on a desktop and below the panel on a
+   phone, which a single nested column could not do. */
 .abt {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-areas:
     "intro panel"
-    "steps panel"
     "ctas  panel";
   column-gap: clamp(2rem, 5vw, 4.5rem);
   align-items: start;
@@ -1822,104 +1820,6 @@ h3 {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--teal-ink);
-}
-
-/* ---- stage list (vertical tablist) ----
-   Rows name the stages and nothing more; the description they used to
-   expand now sits under the picture. */
-.abt__steps {
-  grid-area: steps;
-  min-width: 0;
-  margin-top: 2.25rem;
-  border-top: 1px solid var(--line);
-}
-
-.abt__tab {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  width: 100%;
-  padding: 1.05rem 0.25rem;
-  min-height: 44px;
-  border: none;
-  border-bottom: 1px solid var(--line);
-  background: none;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  color: var(--ink-soft);
-  transition: color 0.3s var(--ease-soft);
-}
-
-.abt__tab:hover,
-.abt__tab.is-on {
-  color: var(--ink);
-}
-
-.abt__tab:focus-visible {
-  outline: 2px solid var(--indigo);
-  outline-offset: -2px;
-  border-radius: 8px;
-}
-
-/* The selected row's marker. Absolute, so lighting it moves nothing. */
-.abt__tab::before {
-  content: "";
-  position: absolute;
-  left: -0.75rem;
-  top: 50%;
-  width: 2px;
-  height: 1.15rem;
-  border-radius: 2px;
-  background: var(--gold);
-  opacity: 0;
-  transform: translateY(-50%) scaleY(0.4);
-  transform-origin: center;
-  transition: opacity 0.3s var(--ease-soft), transform 0.42s var(--ease);
-}
-
-.abt__tab.is-on::before {
-  opacity: 1;
-  transform: translateY(-50%) scaleY(1);
-}
-
-.abt__tabNo {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-faint);
-  transition: color 0.3s var(--ease-soft);
-}
-
-.abt__tab.is-on .abt__tabNo {
-  color: var(--gold-ink);
-}
-
-.abt__tabName {
-  flex: 1;
-  font-size: 1.02rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-}
-
-/* Arrow rather than a plus: these rows no longer open, they point at
-   the panel. Hidden until the row is the live one or under the cursor. */
-.abt__tabGo {
-  flex-shrink: 0;
-  font-size: 1rem;
-  line-height: 1;
-  color: var(--gold-ink);
-  opacity: 0;
-  transform: translateX(-6px);
-  transition: opacity 0.3s var(--ease-soft), transform 0.42s var(--ease);
-}
-
-.abt__tab:hover .abt__tabGo,
-.abt__tab.is-on .abt__tabGo {
-  opacity: 1;
-  transform: none;
 }
 
 .abt__ctas {
@@ -2044,6 +1944,14 @@ h3 {
   bottom: 1rem;
   transform: translateX(-50%);
   display: flex;
+  /* width, explicitly: `left: 50%` leaves an absolutely positioned box
+     only half the panel to shrink-to-fit into, so with wrapping on it
+     would fold into two rows on a full-width desktop panel. max-content
+     is the unwrapped bar; the max-width below is what actually makes it
+     wrap, and only once it genuinely cannot fit. */
+  width: max-content;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 0.15rem;
   padding: 0.25rem;
   border-radius: 14px;
@@ -2088,31 +1996,47 @@ h3 {
 }
 
 @media (max-width: 900px) {
-  /* The panel between the intro and the list: the picture and its words
-     are what the rows below change, so they have to be in view when a
-     row is tapped. */
   .abt {
     grid-template-columns: 1fr;
     grid-template-areas:
       "intro"
       "panel"
-      "steps"
       "ctas";
   }
   .abt__panel {
-    position: static; /* no sticking on a phone — it would cover the list */
+    position: static; /* nothing to stick to in a single column */
     margin-top: 2.25rem;
   }
   .abt__media {
-    aspect-ratio: 16 / 11;
+    aspect-ratio: 4 / 3.5;
     max-height: none;
   }
-  /* Five pills do not fit a phone without a horizontal scroller, and a
-     wheel does nothing to one of those. The stage list is directly
-     below the panel here and already names all five, so the pills are
-     redundant rather than missed. */
+}
+
+/* A strip across the foot of the picture rather than a floating bar.
+   The five stages need ~345px unwrapped, which is more than the panel
+   can spare once the columns are this narrow — floating, they fold to
+   two rows and cover a third of the image. Full width they fit on one
+   row and sit on its bottom edge. This starts well above the
+   single-column breakpoint because it is the bar that runs out of
+   room first, not the layout. */
+@media (max-width: 1100px) {
   .abt__pills {
-    display: none;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    width: auto;
+    max-width: none;
+    padding: 0.45rem 0.35rem;
+    border: none;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .abt__pill {
+    padding: 0.6rem;
+    font-size: 0.8rem;
   }
 }
 

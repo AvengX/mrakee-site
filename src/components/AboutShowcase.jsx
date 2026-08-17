@@ -12,30 +12,24 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
    idea rather than two:
 
    · The original's pills switch output styles while its list explains a
-     process — unrelated controls. Here they are the same five stages,
-     so a single `active` index drives the list, the pills, the image
-     and the caption. Selecting any control moves all of them.
-   · The list no longer expands in place. The stage's description sits
-     under its picture instead, so picture and words are read together
-     rather than the picture describing one stage while the open row
-     describes another.
+     process — unrelated controls for unrelated things. Here they were
+     the same five stages twice over, so the list is gone and the pills
+     are the one control. They sit on the panel they change, which also
+     means there is no version of this that puts a control a screen away
+     from its effect.
+   · Nothing expands in place. The stage's description reads under its
+     own picture, so picture and words are taken in together.
 
-   Layout: the four blocks are direct grid children of .abt so the panel
-   can sit beside the list on a desktop and BETWEEN the intro and the
-   list on a phone — a control has to be next to the thing it changes,
-   and on a phone the panel would otherwise be a screen above the row
-   being tapped.
+   Nothing was lost with the list: the pills carry the short stage name,
+   the caption carries the full one and the description.
 
    Accessibility notes:
    · The chips are NOT buttons. In the source they are Badge components
      that look pressable and do nothing — a clickable-looking element
      with no behaviour is what the guidance calls a critical failure.
-   · The stage list is a vertical tablist with roving tabindex and arrow
-     keys, so Tab reaches the group once and arrows move within it. The
-     caption is its tabpanel.
-   · The pills are a shortcut to the same selection, not a second
-     tablist: plain buttons marked aria-current="step". One tabpanel
-     cannot belong to two tablists, and the list is the primary one.
+   · The pills are a tablist with roving tabindex and arrow keys, so Tab
+     reaches the group once and arrows move within it. The caption is
+     its tabpanel.
    ================================================================ */
 
 export default function AboutShowcase({
@@ -50,12 +44,12 @@ export default function AboutShowcase({
   const panelId = `${uid}-panel`;
   const [active, setActive] = useState(0);
   const [loaded, setLoaded] = useState(() => new Set([0]));
-  const tabRefs = useRef([]);
+  const pillRefs = useRef([]);
   const [focusIdx, setFocusIdx] = useState(null);
 
   useEffect(() => {
     if (focusIdx === null) return;
-    tabRefs.current[focusIdx]?.focus();
+    pillRefs.current[focusIdx]?.focus();
     setFocusIdx(null);
   }, [focusIdx]);
 
@@ -64,12 +58,12 @@ export default function AboutShowcase({
     setLoaded((s) => (s.has(active) ? s : new Set(s).add(active)));
   }, [active]);
 
-  const onTabKey = useCallback(
+  const onPillKey = useCallback(
     (e) => {
       const last = steps.length - 1;
       let next = null;
-      if (e.key === "ArrowDown" || e.key === "ArrowRight") next = active === last ? 0 : active + 1;
-      else if (e.key === "ArrowUp" || e.key === "ArrowLeft") next = active === 0 ? last : active - 1;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = active === last ? 0 : active + 1;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = active === 0 ? last : active - 1;
       else if (e.key === "Home") next = 0;
       else if (e.key === "End") next = last;
       if (next === null) return;
@@ -118,15 +112,25 @@ export default function AboutShowcase({
             />
           ))}
 
-          {/* Hidden below 900px: five pills do not fit a phone without a
-              horizontal scroller. The stage list is directly under the
-              panel there and already names all five. */}
-          <div className="abt__pills" aria-label="Jump to a stage">
+          {/* The only control, so it is on every width — the bar wraps
+              to two rows on a phone rather than becoming a horizontal
+              scroller, which a wheel and a keyboard cannot drive. */}
+          <div
+            className="abt__pills"
+            role="tablist"
+            aria-label="Our approach"
+            onKeyDown={onPillKey}
+          >
             {steps.map((s, i) => (
               <button
                 key={s.t}
                 type="button"
-                aria-current={i === active ? "step" : undefined}
+                ref={(el) => (pillRefs.current[i] = el)}
+                id={`${uid}-t${i}`}
+                role="tab"
+                aria-selected={i === active}
+                aria-controls={panelId}
+                tabIndex={i === active ? 0 : -1}
                 className={`abt__pill${i === active ? " is-active" : ""}`}
                 onClick={() => setActive(i)}
               >
@@ -160,36 +164,6 @@ export default function AboutShowcase({
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ---- stage list ---- */}
-      <div
-        className="abt__steps"
-        role="tablist"
-        aria-orientation="vertical"
-        aria-label="Our approach"
-        onKeyDown={onTabKey}
-      >
-        {steps.map((s, i) => (
-          <button
-            key={s.t}
-            type="button"
-            ref={(el) => (tabRefs.current[i] = el)}
-            id={`${uid}-t${i}`}
-            role="tab"
-            aria-selected={i === active}
-            aria-controls={panelId}
-            tabIndex={i === active ? 0 : -1}
-            className={`abt__tab${i === active ? " is-on" : ""}`}
-            onClick={() => setActive(i)}
-          >
-            <span className="abt__tabNo">{String(i + 1).padStart(2, "0")}</span>
-            <span className="abt__tabName">{s.t}</span>
-            <span className="abt__tabGo" aria-hidden="true">
-              →
-            </span>
-          </button>
-        ))}
       </div>
 
       {ctas.length > 0 && (
