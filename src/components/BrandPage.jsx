@@ -4,6 +4,7 @@ import Logo from "./Logo";
 import ContactCard from "./ContactCard";
 import ContactForm from "./ContactForm";
 import FeatureRows from "./FeatureRows";
+import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 import {
@@ -29,48 +30,37 @@ import {
 const SOLUTION_ROWS = SOLUTIONS.map((s) => ({ ...s, d: s.d || s.quote }));
 
 export default function BrandPage() {
-  const approachSurface = usePointerGlow(".pillar");
   const whySurface = usePointerGlow(".pillar");
   const expertiseSurface = usePointerGlow(".pillar");
   const insightsSurface = usePointerGlow(".pillar");
 
   return (
     <div className="brand">
-      {/* ---------------- ABOUT ---------------- */}
+      {/* ---------------- ABOUT ----------------
+          Text column + tabbed media panel. The five approach stages are
+          the disclosure list; the panel shows the three commissioned
+          service photographs, which are the only images on the site of
+          people doing the work rather than of screens. */}
       <section className="band" id="about">
         <div className="band__inner">
-          <Reveal className="band__head">
-            <p className="eyebrow">About Us</p>
-            <SplitWords
-              words={[
-                "Re-imagining", "the", "way", "Technology", "connects",
-                { t: "People", grad: true }, "and",
-                { t: "endless", grad: true }, { t: "Possibilities.", grad: true },
+          <Reveal>
+            <AboutShowcase
+              eyebrow="About Us"
+              title={ABOUT.title}
+              paragraphs={[ABOUT.lede, ...ABOUT.body]}
+              chips={["Design", "Integrate", "Connect", "Perform"]}
+              steps={APPROACH}
+              media={[
+                { label: "Survey", src: "services/01.jpg" },
+                { label: "Design", src: "services/02.jpg" },
+                { label: "Support", src: "services/03.jpg" },
+              ]}
+              ctas={[
+                { label: "Talk to Our Experts", href: "#contact" },
+                { label: "Explore Our Solutions", href: "#solutions" },
               ]}
             />
-            <p className="lede">{ABOUT.lede}</p>
           </Reveal>
-
-          <Reveal className="prose">
-            {ABOUT.body.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-          </Reveal>
-
-          <Reveal className="band__sub">
-            <h3>Our Approach</h3>
-          </Reveal>
-          <div ref={approachSurface}>
-            <Reveal className="split" stagger>
-              {APPROACH.map((s, i) => (
-                <div className="pillar" key={s.t}>
-                  <span className="pillar__no">{String(i + 1).padStart(2, "0")}</span>
-                  <h3>{s.t}</h3>
-                  <p>{s.d}</p>
-                </div>
-              ))}
-            </Reveal>
-          </div>
         </div>
       </section>
 

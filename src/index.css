@@ -1760,8 +1760,290 @@ h3 {
   box-shadow: var(--shadow-md);
 }
 
-/* Running body copy — the About section is the only place the client's
-   content is prose rather than a list. Uses the existing lede scale. */
+/* ================================================================
+   ABOUT — text column + tabbed media panel
+   ================================================================ */
+.abt {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+.abt__col {
+  min-width: 0;
+}
+
+.abt__title {
+  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  text-wrap: balance;
+  max-width: 18ch;
+}
+
+.abt__para {
+  margin-top: 1.15rem;
+  font-size: clamp(0.98rem, 1.1vw, 1.06rem);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+/* Static, and styled so. The original renders these as Badges, which
+   look pressable and do nothing — a control that invites a click and
+   has no behaviour is the failure the guidance calls critical. No
+   hover, no cursor change, no button. */
+.abt__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1.75rem;
+  list-style: none;
+}
+
+.abt__chips li {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--teal-ink);
+}
+
+/* ---- disclosure list ---- */
+.abt__steps {
+  margin-top: 2.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.abt__step {
+  border-bottom: 1px solid var(--line);
+}
+
+.abt__step h3 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.abt__step button {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 1.05rem 0.25rem;
+  min-height: 44px;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink-soft);
+  transition: color 0.3s var(--ease-soft);
+}
+
+.abt__step button:hover,
+.abt__step.is-open button {
+  color: var(--ink);
+}
+
+.abt__step button:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
+.abt__stepNo {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+  transition: color 0.3s var(--ease-soft);
+}
+
+.abt__step.is-open .abt__stepNo {
+  color: var(--gold-ink);
+}
+
+.abt__stepName {
+  flex: 1;
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.abt__chev {
+  position: relative;
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
+.abt__chev::before,
+.abt__chev::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform 0.42s var(--ease), opacity 0.32s var(--ease-soft);
+}
+
+.abt__chev::before {
+  width: 11px;
+  height: 1.5px;
+}
+
+.abt__chev::after {
+  width: 1.5px;
+  height: 11px;
+}
+
+/* plus becomes minus */
+.abt__step.is-open .abt__chev::after {
+  transform: rotate(90deg);
+  opacity: 0;
+}
+
+/* 0fr -> 1fr animates to the content's true height. max-height needs a
+   guessed number: too small clips the text, too large makes the easing
+   look lazy because most of the duration is spent on empty space. */
+.abt__stepBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s var(--ease);
+}
+
+.abt__step.is-open .abt__stepBody {
+  grid-template-rows: 1fr;
+}
+
+.abt__stepBody > div {
+  overflow: hidden;
+}
+
+.abt__stepBody p {
+  padding: 0 0.25rem 1.15rem 2.55rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  max-width: 48ch;
+}
+
+.abt__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 2.25rem;
+}
+
+/* ---- media panel ---- */
+.abt__panel {
+  position: relative;
+  min-width: 0;
+  border-radius: var(--r);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  box-shadow: var(--shadow-lg);
+  /* The original hard-codes 720px. A fixed pixel height is a scrollbar
+     waiting to happen on a short laptop, so this is a ratio with a cap
+     that keeps it inside the viewport. */
+  aspect-ratio: 4 / 5;
+  max-height: min(78vh, 760px);
+}
+
+.abt__media {
+  position: absolute;
+  inset: 0;
+}
+
+.abt__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.03);
+  transition: opacity 0.6s var(--ease-soft), transform 1.2s var(--ease);
+}
+
+.abt__img.is-on {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.abt__pills {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: var(--shadow-md);
+  max-width: calc(100% - 2rem);
+}
+
+.abt__pill {
+  padding: 0.62rem 0.95rem;
+  min-height: 44px; /* comfortable touch target */
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  /* darker than --ink-soft: the bar is 90% white over a photograph, not
+     over the page, and --ink-soft measured 4.08:1 against it */
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.35s var(--ease-soft), color 0.35s var(--ease-soft);
+}
+
+.abt__pill:hover {
+  color: var(--ink);
+  background: rgba(15, 23, 42, 0.045);
+}
+
+.abt__pill:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: -2px;
+}
+
+.abt__pill.is-active {
+  background: var(--ink);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .abt {
+    grid-template-columns: 1fr;
+  }
+  .abt__panel {
+    order: -1; /* the picture first, then the reading */
+    aspect-ratio: 16 / 11;
+    max-height: none;
+  }
+}
+
+/* Running body copy — used by other sections. Kept on the existing lede
+   scale. */
 .prose {
   max-width: 68ch;
   margin-bottom: clamp(2.5rem, 5vw, 4rem);
