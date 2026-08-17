@@ -6,6 +6,7 @@ import Logo from "./Logo";
 import ContactCard from "./ContactCard";
 import ContactForm from "./ContactForm";
 import FeatureRows from "./FeatureRows";
+import ServiceStack from "./ServiceStack";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 
 /* --- Content model -------------------------------------------------
@@ -273,7 +274,7 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <FeatureRows items={SERVICES} variant="tight" />
+          <ServiceStack items={SERVICES} />
         </div>
       </section>
 
