@@ -5,7 +5,7 @@ import Counter from "./Counter";
 import Logo from "./Logo";
 import ContactCard from "./ContactCard";
 import ContactForm from "./ContactForm";
-import SolutionsFeature from "./SolutionsFeature";
+import FeatureRows from "./FeatureRows";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 
 /* --- Content model -------------------------------------------------
@@ -60,7 +60,14 @@ const SOLUTIONS = [
 /* Derived, so the two views of the product range cannot drift apart. */
 const FEATURE_ROWS = FEATURED.map((name) => {
   const s = SOLUTIONS.find((x) => x.t === name);
-  return { ...s, img: `solutions/${String(SOLUTIONS.indexOf(s) + 1).padStart(2, "0")}.jpg`, points: POINTS[name] };
+  const n = String(SOLUTIONS.indexOf(s) + 1).padStart(2, "0");
+  return {
+    ...s,
+    img: `solutions/${n}.jpg`,
+    // the film still this row used before the photography was commissioned
+    fallback: `frames/film/${String(s.frame).padStart(4, "0")}.webp`,
+    points: POINTS[name],
+  };
 });
 const REST = SOLUTIONS.filter((s) => !FEATURED.includes(s.t)).map((s) => s.t);
 
@@ -77,10 +84,34 @@ const PILLARS = [
   { t: "Managed SaaS", d: "We host, monitor and patch it, so your team ships content instead of babysitting infrastructure.", items: ["Hosted platform", "Health monitoring", "Staged rollouts", "Support & SLA"] },
 ];
 
+/* Services get the same treatment as the featured solutions. The copy is
+   longer than it was as a card, because a full row will not carry a
+   single sentence — but nothing here is a new claim: every item is
+   already implied by the Products pillars or the solution descriptions.
+   Images live in public/services/, with a film still standing in until
+   they are commissioned (see film-src/SERVICE_PROMPTS.md). */
 const SERVICES = [
-  { t: "Technical Consulting", d: "Site surveys, network and power planning, integration with your POS, PMS or operations feed, and a rollout plan that survives contact with a live store." },
-  { t: "Creative Services", d: "Motion, layout and templating built for the viewing distance and dwell time of the actual space — not a desktop mockup." },
-  { t: "Support & Maintenance", d: "Monitoring, spares logistics and on-site response, with escalation paths agreed before you need them." },
+  {
+    t: "Technical Consulting",
+    img: "services/01.jpg",
+    fallback: "frames/film/0020.webp",
+    d: "Before anything is specified we walk the site. Sight lines, viewing distances, ambient light through the day, where power and data already run and what it costs to get them where they don't. Then the integration work — POS, PMS or the operations feed that will actually drive the content — and a rollout plan sequenced so the first site teaches you something before the twentieth is committed.",
+    points: ["Site survey and sight-line study", "Network, power and mounting", "POS, PMS and operational feeds"],
+  },
+  {
+    t: "Creative Services",
+    img: "services/02.jpg",
+    fallback: "frames/film/0090.webp",
+    d: "Content built for the room it plays in. A menu board read at three metres by someone already in the queue is a different design problem from a window display glimpsed at eight metres by someone walking past, and neither is a desktop mockup scaled up. We build the templates, the motion and the layout rules, then hand over a system your team can fill rather than a set of files they have to ask us to change.",
+    points: ["Designed to viewing distance and dwell", "Motion and layout templating", "Handed over as a system, not files"],
+  },
+  {
+    t: "Support & Maintenance",
+    img: "services/03.jpg",
+    fallback: "frames/film/0210.webp",
+    d: "A screen estate fails quietly. A player drops off the network on a Sunday, a panel dims over a year, a site runs three versions behind and nobody notices until a customer does. We monitor for it, hold the spares, and agree the escalation path and response times before you need them rather than during the call where you do.",
+    points: ["Health monitoring across the estate", "Spares logistics and on-site response", "Escalation and SLA agreed up front"],
+  },
 ];
 
 /* Real figures, carried over from the acquired business.
@@ -144,7 +175,7 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <SolutionsFeature solutions={FEATURE_ROWS} rest={REST} />
+          <FeatureRows items={FEATURE_ROWS} rest={REST} />
         </div>
       </section>
 
@@ -242,15 +273,7 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <Reveal className="steps" stagger>
-            {SERVICES.map((s, i) => (
-              <div className="step" key={s.t}>
-                <div className="step__no">{String(i + 1).padStart(2, "0")}</div>
-                <h3>{s.t}</h3>
-                <p>{s.d}</p>
-              </div>
-            ))}
-          </Reveal>
+          <FeatureRows items={SERVICES} variant="tight" />
         </div>
       </section>
 
