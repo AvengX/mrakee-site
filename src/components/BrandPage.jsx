@@ -7,6 +7,7 @@ import ContactCard from "./ContactCard";
 import ContactForm from "./ContactForm";
 import FeatureRows from "./FeatureRows";
 import ServiceStack from "./ServiceStack";
+import IndustryShowcase from "./IndustryShowcase";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 
 /* --- Content model -------------------------------------------------
@@ -72,11 +73,41 @@ const FEATURE_ROWS = FEATURED.map((name) => {
 });
 const REST = SOLUTIONS.filter((s) => !FEATURED.includes(s.t)).map((s) => s.t);
 
-/* The 13 industries served by the acquired business. */
+/* The 13 industries served by the acquired business, each as an
+   environment rather than a label.
+
+   `img` is the commissioned photograph in public/industries/ (see
+   film-src/INDUSTRY_PROMPTS.md). `fallback` is the nearest existing
+   solution image, used until that exists — five of the thirteen have no
+   good match and fall back to something merely adjacent, which is the
+   reason to commission them. */
 const INDUSTRIES = [
-  "Retail", "Quick Service Restaurants", "Transportation", "Banking & Finance",
-  "Education", "DOOH & Outdoor", "Corporate Communications", "Grocery",
-  "Automotive", "Hotel & Casino", "Government", "Entertainment", "Healthcare",
+  { t: "Retail", short: "Retail", img: "industries/01.jpg", fallback: "solutions/10.jpg",
+    d: "Window displays, endless aisle and promotional screens running as one estate across a chain — priced, scheduled and swapped without an installer." },
+  { t: "Quick Service Restaurants", short: "QSR", img: "industries/02.jpg", fallback: "solutions/04.jpg",
+    d: "Menu boards that flip breakfast to lunch on schedule and grey out an item the moment stock runs dry. Nobody climbs a ladder." },
+  { t: "Transportation", short: "Transport", img: "industries/03.jpg", fallback: "solutions/05.jpg",
+    d: "Flight and platform information driven off live operational feeds, with the failover behaviour a terminal actually requires." },
+  { t: "Banking & Finance", short: "Banking", img: "industries/04.jpg", fallback: "solutions/12.jpg",
+    d: "Queue calling, rate boards and branch communications — routing people to the right counter instead of the longest line." },
+  { t: "Education", short: "Education", img: "industries/05.jpg", fallback: "solutions/02.jpg",
+    d: "Campus wayfinding, room booking and announcements, updated centrally across faculties that each want to run their own screens." },
+  { t: "DOOH & Outdoor", short: "Outdoor", img: "industries/06.jpg", fallback: "solutions/15.jpg",
+    d: "High-brightness outdoor displays that hold their colour in direct sun and dim themselves overnight, with proof-of-play for advertisers." },
+  { t: "Corporate Communications", short: "Corporate", img: "industries/07.jpg", fallback: "solutions/13.jpg",
+    d: "Lobby walls, floor-plate screens and meeting room panels carrying the same message to every office on the same morning." },
+  { t: "Grocery", short: "Grocery", img: "industries/08.jpg", fallback: "solutions/14.jpg",
+    d: "Shelf-edge pricing, aisle finders and promotional endcaps tied to live stock, so the screen and the shelf never disagree." },
+  { t: "Automotive", short: "Automotive", img: "industries/09.jpg", fallback: "solutions/01.jpg",
+    d: "Showroom displays that configure a vehicle at full scale, and service-lane screens that tell a waiting customer where their car is." },
+  { t: "Hotel & Casino", short: "Hospitality", img: "industries/10.jpg", fallback: "solutions/09.jpg",
+    d: "Check-in, concierge and event boards across a property, with a staffed path always one tap away from the self-serve one." },
+  { t: "Government", short: "Government", img: "industries/11.jpg", fallback: "solutions/07.jpg",
+    d: "Queue management, service information and automated border control, specified to the security requirements those buildings carry." },
+  { t: "Entertainment", short: "Entertainment", img: "industries/12.jpg", fallback: "solutions/03.jpg",
+    d: "Foyer video walls, session boards and concession menus that change with the programme rather than with a print run." },
+  { t: "Healthcare", short: "Healthcare", img: "industries/13.jpg", fallback: "solutions/08.jpg",
+    d: "Departmental wayfinding, waiting-room calling and clinic information — legible, calm, and never showing the wrong list." },
 ];
 
 const PILLARS = [
@@ -181,25 +212,22 @@ export default function BrandPage() {
       </section>
 
       {/* ---------------- INDUSTRIES ----------------
-          Text + visual: the heading holds its position while the chip
-          field scrolls past it. */}
+          One environment on screen at a time. A field of thirteen labels
+          told the visitor the sectors; it could not show them a room. */}
       <section className="band band--alt" id="industries">
-        <div className="band__inner band__split">
-          <Reveal className="band__head">
+        <div className="band__inner">
+          <Reveal className="band__head ind__head">
             <p className="eyebrow">Industries</p>
-            <SplitWords words={["Different", "floors,", "different", "rules."]} />
+            <SplitWords words={["Different", "spaces.", { t: "Different", grad: true, br: true }, { t: "experiences.", grad: true }]} />
             <p className="lede">
               A drive-thru menu board and an immigration hall have almost
-              nothing in common except the need to never go dark. We specify
-              per environment rather than selling one box for all of them.
+              nothing in common except the need to never go dark. One
+              platform, specified per environment rather than one box sold
+              into all of them.
             </p>
           </Reveal>
 
-          <Reveal className="pills" stagger y={18}>
-            {INDUSTRIES.map((n) => (
-              <span className="pill" key={n}>{n}</span>
-            ))}
-          </Reveal>
+          <IndustryShowcase items={INDUSTRIES} />
         </div>
       </section>
 

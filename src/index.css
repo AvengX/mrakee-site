@@ -1437,34 +1437,275 @@ h3 {
 }
 
 /* ================================================================
-   INDUSTRY CHIPS
+   INDUSTRIES — one environment at a time
    ================================================================ */
-.pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
+.ind__head {
+  max-width: 44ch;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
-.pill {
+.ind__stage {
   position: relative;
-  padding: 0.7rem 1.25rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-sm);
-  font-size: 0.92rem;
-  font-weight: 550;
-  color: var(--ink);
-  cursor: default;
-  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease),
-    border-color 0.4s var(--ease), color 0.3s var(--ease-soft);
 }
 
-.pill:hover {
-  transform: translateY(-3px);
-  color: var(--teal-ink);
-  border-color: rgba(15, 125, 132, 0.4);
-  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 12px 26px rgba(15, 125, 132, 0.16);
+.ind__frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  box-shadow: var(--shadow-lg);
+}
+
+/* the layer wrapper is what parallaxes, so the images can crossfade
+   independently of the scroll movement */
+.ind__layers {
+  position: absolute;
+  inset: -5% 0;
+  will-change: transform;
+}
+
+.ind__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.65s var(--ease-soft), transform 1.4s var(--ease);
+}
+
+.ind__img.is-on {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Legibility gradient, bottom-left only — the caption sits there and
+   the rest of the environment stays untouched. */
+.ind__frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top right,
+    rgba(11, 20, 32, 0.72) 0%,
+    rgba(11, 20, 32, 0.34) 32%,
+    transparent 58%
+  );
+}
+
+/* One slow pass of light. 9s apart and 0.35 opacity: present if you
+   watch for it, invisible if you are reading. */
+.ind__scan {
+  position: absolute;
+  top: 0;
+  left: -30%;
+  width: 22%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  animation: ind-scan 9s var(--ease-soft) infinite;
+}
+
+@keyframes ind-scan {
+  0%, 62% { transform: translateX(0); opacity: 0; }
+  66% { opacity: 1; }
+  96% { opacity: 0; }
+  100% { transform: translateX(620%); opacity: 0; }
+}
+
+.ind__caption {
+  position: absolute;
+  z-index: 2;
+  left: clamp(1.25rem, 3vw, 2.5rem);
+  bottom: clamp(1.25rem, 3vw, 2.25rem);
+  right: clamp(1.25rem, 3vw, 2.5rem);
+  max-width: 52ch;
+  color: #fff;
+}
+
+.ind__index {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* the number takes the gold; the rule bridging it to the name takes the
+   teal. That is the whole brand appearance here — used once, not spread
+   across every element. */
+.ind__index::first-letter {
+  color: var(--gold-lite);
+}
+
+.ind__index i {
+  display: block;
+  width: 34px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--teal-lite));
+}
+
+.ind__caption p {
+  margin-top: 0.7rem;
+  font-size: clamp(0.9rem, 1.1vw, 1.02rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 46ch;
+  animation: ind-cap 0.55s var(--ease) both;
+}
+
+@keyframes ind-cap {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+/* ---- the numbered rail ------------------------------------------ */
+.ind__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.ind__rail {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  flex: 1;
+  /* fade the ends so a cut-off item reads as "more here", not as a bug */
+  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+}
+
+.ind__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.ind__tab {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.75rem 0.95rem;
+  min-height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  color: var(--ink-soft);
+  position: relative;
+  transition: color 0.4s var(--ease-soft), background 0.4s var(--ease-soft);
+}
+
+.ind__tab:hover {
+  color: var(--ink);
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.ind__tab:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: -2px;
+}
+
+.ind__tabNo {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+  transition: color 0.4s var(--ease-soft);
+}
+
+.ind__tabName {
+  font-size: 0.95rem;
+  font-weight: 550;
+  white-space: nowrap;
+}
+
+.ind__tab.is-active {
+  color: var(--ink);
+}
+
+.ind__tab.is-active .ind__tabNo {
+  color: var(--gold-ink);
+}
+
+.ind__tab.is-active .ind__tabName {
+  font-weight: 650;
+}
+
+/* the active marker: a gold-to-teal rule under the item */
+.ind__tab::after {
+  content: "";
+  position: absolute;
+  left: 0.95rem;
+  right: 0.95rem;
+  bottom: 0.42rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--teal));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s var(--ease);
+}
+
+.ind__tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.ind__arrow {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.3s var(--ease-soft), background 0.3s var(--ease-soft),
+    border-color 0.3s var(--ease-soft);
+}
+
+.ind__arrow:hover:not(:disabled) {
+  background: #fff;
+  border-color: var(--line-strong);
+}
+
+.ind__arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+@media (max-width: 760px) {
+  .ind__frame {
+    aspect-ratio: 4 / 5; /* portrait reads better on a phone */
+  }
+  .ind__caption {
+    max-width: none;
+  }
+  /* the arrows are for mice; a thumb just swipes the rail */
+  .ind__arrow {
+    display: none;
+  }
 }
 
 /* ================================================================
