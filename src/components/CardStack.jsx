@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motionAllowed } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -77,16 +78,7 @@ export default function CardStack({ items }) {
 
     // Someone who has asked for less movement gets the pile without the
     // travel: the cards are simply there.
-    //
-    // ?motion=on overrides that, and exists because automated browsers
-    // — the Claude Browser pane among them — report `reduce` whatever
-    // the machine is set to, which would leave this effect impossible
-    // to verify anywhere but by eye. It is opt-in via the URL, so no
-    // visitor who has asked for less movement is ever given more.
-    const forced = new URLSearchParams(window.location.search).get("motion") === "on";
-    if (!forced && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return undefined;
-    }
+    if (!motionAllowed()) return undefined;
 
     const set = cards.map((c) => ({
       x: gsap.quickSetter(c, "x", "px"),

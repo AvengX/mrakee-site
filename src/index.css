@@ -1777,6 +1777,196 @@ h3 {
 }
 
 /* ================================================================
+   WHY MRAKEE — a panel that pins beside a scrolling column
+   The panel is the numbering of the list drawn large; see
+   WhyScroll.jsx for why it is not a photograph.
+   ================================================================ */
+.why {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+.why__panel {
+  position: sticky;
+  top: clamp(1.5rem, 9vh, 5.75rem);
+  min-width: 0;
+}
+
+.why__stage {
+  position: relative;
+  height: min(64vh, 580px);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff, var(--surface-soft));
+  box-shadow: var(--shadow-lg);
+}
+
+.why__slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-soft);
+}
+
+.why__slide.is-on {
+  opacity: 1;
+}
+
+/* The atmosphere behind the numeral. Two blobs whose colours are set
+   per slide below, so moving down the list moves through the palette
+   rather than showing the same field six times. */
+.why__slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(90% 80% at 18% 12%, var(--a), transparent 60%),
+    radial-gradient(85% 75% at 82% 88%, var(--b), transparent 60%);
+}
+
+.why__slide:nth-child(1) {
+  --a: rgba(221, 158, 44, 0.2);
+  --b: rgba(6, 160, 162, 0.16);
+}
+.why__slide:nth-child(2) {
+  --a: rgba(6, 160, 162, 0.2);
+  --b: rgba(99, 91, 255, 0.14);
+}
+.why__slide:nth-child(3) {
+  --a: rgba(99, 91, 255, 0.16);
+  --b: rgba(221, 158, 44, 0.2);
+}
+.why__slide:nth-child(4) {
+  --a: rgba(221, 158, 44, 0.22);
+  --b: rgba(139, 92, 246, 0.14);
+}
+.why__slide:nth-child(5) {
+  --a: rgba(6, 182, 212, 0.18);
+  --b: rgba(221, 158, 44, 0.18);
+}
+.why__slide:nth-child(6) {
+  --a: rgba(6, 160, 162, 0.22);
+  --b: rgba(221, 158, 44, 0.16);
+}
+
+.why__slide img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.why__slideNo {
+  position: relative;
+  font-size: clamp(6rem, 13vw, 10rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, var(--gold-deep), var(--teal-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* A shadow paints BEHIND a clipped-to-text fill rather than under the
+     glyph, which washes the gradient out to pale cream. Never here. */
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+.why__rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1.35rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.why__tick {
+  width: 26px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line-strong);
+  transition: background 0.4s var(--ease-soft);
+}
+
+.why__tick.is-on {
+  background: var(--gold);
+}
+
+/* The runway. The vertical space IS the effect: each reason needs room
+   to arrive, hold and leave before the next one starts. */
+.why__list {
+  list-style: none;
+  padding: 28vh 0;
+  display: grid;
+  gap: 24vh;
+  min-width: 0;
+}
+
+/* The scroll effect drives --why-o and --why-ty rather than opacity and
+   transform themselves, so the mobile rule below can overrule it. An
+   inline property would beat any stylesheet rule; an inline variable
+   only feeds one. */
+.why__item {
+  max-width: 44ch;
+  opacity: var(--why-o, 1);
+  transform: translateY(var(--why-ty, 0px));
+}
+
+.why__no {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-ink);
+  margin-bottom: 0.85rem;
+}
+
+.why__item h3 {
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.why__item p {
+  margin-top: 0.9rem;
+  font-size: clamp(0.98rem, 1.15vw, 1.08rem);
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 900px) {
+  /* No panel and no runway on a phone: the panel would take most of the
+     screen to say a number the list already carries, and fading text in
+     a single column hides copy that has nowhere else to be. */
+  .why {
+    grid-template-columns: 1fr;
+  }
+  .why__panel {
+    display: none;
+  }
+  .why__list {
+    padding: 0;
+    gap: 2.75rem;
+  }
+  .why__item {
+    max-width: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ================================================================
    STATS — the light aurora band that replaces the old dark plate
    ================================================================ */
 .band--aurora {

@@ -6,6 +6,7 @@ import ContactForm from "./ContactForm";
 import CardStack from "./CardStack";
 import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
+import WhyScroll from "./WhyScroll";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 import {
   ABOUT, APPROACH, EXPERTISE, EXPERTS, FAQ, FOOTER,
@@ -26,7 +27,6 @@ import {
    -------------------------------------------------------------------- */
 
 export default function BrandPage() {
-  const whySurface = usePointerGlow(".pillar");
   const expertiseSurface = usePointerGlow(".pillar");
   const insightsSurface = usePointerGlow(".pillar");
 
@@ -106,16 +106,7 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <div ref={whySurface}>
-            <Reveal className="split" stagger>
-              {WHY.map((s) => (
-                <div className="pillar" key={s.t}>
-                  <h3>{s.t}</h3>
-                  <p>{s.d}</p>
-                </div>
-              ))}
-            </Reveal>
-          </div>
+          <WhyScroll items={WHY} />
         </div>
       </section>
 
