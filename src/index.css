@@ -1250,8 +1250,13 @@ h3 {
   gap: clamp(1.75rem, 4vw, 3.5rem);
 }
 
+/* 16:9, same as Solutions — the photography is composed for it, and a
+   4:3 box with object-fit:cover would crop a third of the width off,
+   losing the monitor in 02 and the open panel in 03. The variant is
+   carried by the column ratio and type scale instead, which costs the
+   images nothing. */
 .feats--tight .feat__media {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
 }
 
 .feats--tight .feat__body h3 {

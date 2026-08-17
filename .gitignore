@@ -27,3 +27,4 @@ npm-debug.log*
 # raw solution generations, kept out of the repo (3x the size of the
 # processed versions in public/solutions/)
 film-src/_solutions_raw/
+film-src/_services_raw/
