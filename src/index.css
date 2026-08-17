@@ -2672,13 +2672,89 @@ a.contact__info:hover .contact__infoIcon {
 }
 
 /* ---- the form side ---------------------------------------------- */
+/* ---- ruled rows beside the form, from the reference ---- */
+.contact__steps {
+  margin-top: 2.25rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--line);
+}
+
+.contact__stepsLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-faint);
+  margin-bottom: 0.4rem;
+}
+
+.contact__steps ul {
+  list-style: none;
+}
+
+.contact__steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.contact__steps b {
+  display: block;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.contact__stepIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  margin-top: 0.1rem;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--teal-ink);
+}
+
 .contact__form {
+  position: relative;
   display: flex;
   align-items: center;
+  overflow: hidden;
   padding: clamp(1.5rem, 3vw, 2.25rem);
   border-left: 1px solid var(--line);
   background: linear-gradient(180deg, rgba(247, 249, 252, 0.7), rgba(241, 245, 249, 0.6));
   border-radius: 0 var(--r-lg) var(--r-lg) 0;
+}
+
+/* The reference sets a photograph behind this column. Ours is knocked
+   right back: the form card sits on top of it and the card's own
+   contrast has to survive whatever the picture is doing underneath. */
+.contact__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.16;
+  filter: saturate(0.7);
+}
+
+.contact__formInner {
+  position: relative;
+  width: 100%;
+  padding: clamp(1.25rem, 2.5vw, 1.9rem);
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  /* opaque, because it is over a photograph */
+  background: #ffffff;
+  box-shadow: var(--shadow-md);
 }
 
 @media (max-width: 900px) {
@@ -2787,6 +2863,123 @@ a.contact__info:hover .contact__infoIcon {
 
 /* Off-screen rather than display:none — a bot that skips hidden inputs
    walks straight past a display:none honeypot. */
+/* ---- phone: dialling code + national number ---- */
+.phone {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.6rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.97);
+  transition: border-color 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft);
+}
+
+.phone:focus-within {
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.16);
+}
+
+.phone.is-bad {
+  border-color: #b3261e;
+}
+
+.phone.is-ok {
+  border-color: var(--teal);
+}
+
+/* Native, and deliberately: <select> gives type-ahead free, so "ind"
+   jumps to India in a list of fifty-two, and a phone opens its own
+   wheel instead of a scrolling div. Its own text and its own caret are
+   left alone — a select that has been styled until it stops looking
+   like one stops being recognised as one. The trigger may truncate the
+   country name; the code stays legible and the open list is complete. */
+.phone__country {
+  flex: 0 0 auto;
+  width: 8.5rem;
+  padding: 0.7rem 0.4rem 0.7rem 0.7rem;
+  border: none;
+  border-right: 1px solid var(--line);
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.phone__country:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: -2px;
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+}
+
+.phone__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* .field input's own border and background would double up here */
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.phone__input:focus {
+  outline: none;
+}
+
+.phone__state {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #b3261e;
+}
+
+.phone.is-ok .phone__state {
+  color: var(--teal-ink);
+}
+
+.phone__note {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #b3261e;
+}
+
+.phone__note.is-ok {
+  color: var(--teal-ink);
+}
+
+/* Side by side, the country picker leaves 80px for the number on a
+   375px screen, which cannot hold "98765 43210". Stacked, each gets a
+   full row — and the country name stops being truncated as a bonus.
+   16px on both controls, or iOS zooms the page the moment one is
+   focused. */
+@media (max-width: 560px) {
+  .phone {
+    flex-wrap: wrap;
+    padding-right: 0;
+  }
+  .phone__country {
+    width: 100%;
+    min-height: 44px;
+    font-size: 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    border-radius: var(--r-sm) var(--r-sm) 0 0;
+  }
+  /* basis 0, not 100%: at 100% the input fills the second row on its
+     own and pushes the tick onto a third one, floating under the
+     number with nothing beside it. */
+  .phone__input {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+  }
+  .phone__state {
+    padding-right: 0.6rem;
+  }
+}
+
 .field--trap {
   position: absolute;
   left: -9999px;

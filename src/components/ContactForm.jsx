@@ -1,5 +1,7 @@
 import { useId, useRef, useState } from "react";
 import { Check, Loader2, Send } from "lucide-react";
+import PhoneField from "./PhoneField";
+import { checkPhone, digitsOf, findCountry } from "../lib/countries";
 
 /* ================================================================
    The enquiry form.
@@ -28,7 +30,6 @@ const FIELDS = [
   { name: "name", label: "Name", type: "text", autoComplete: "name", required: true },
   { name: "company", label: "Company", type: "text", autoComplete: "organization" },
   { name: "email", label: "Email", type: "email", autoComplete: "email", required: true },
-  { name: "phone", label: "Phone", type: "tel", autoComplete: "tel" },
 ];
 
 function validate(values) {
@@ -39,13 +40,29 @@ function validate(values) {
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email.trim())) {
     errors.email = "That doesn't look like a complete email address.";
   }
+  // The phone is optional, so an empty one is fine — but a half-typed
+  // one is worse than none at all, because we would try to ring it.
+  const phoneState = checkPhone(values.phone, findCountry(values.country));
+  if (phoneState === "short" || phoneState === "long") {
+    errors.phone = "Please finish the phone number, or clear it.";
+  }
   if (values.message.trim().length < 10) {
     errors.message = "A sentence or two about the space helps us reply usefully.";
   }
   return errors;
 }
 
-const EMPTY = { name: "", company: "", email: "", phone: "", message: "", website: "" };
+/* India, because that is where the client is and where most enquiries
+   will come from. The list covers fifty-two others. */
+const EMPTY = {
+  name: "",
+  company: "",
+  email: "",
+  phone: "",
+  country: "IN",
+  message: "",
+  website: "",
+};
 
 export default function ContactForm() {
   const uid = useId();
@@ -74,7 +91,9 @@ export default function ContactForm() {
       `Name: ${payload.name}`,
       payload.company && `Company: ${payload.company}`,
       `Email: ${payload.email}`,
-      payload.phone && `Phone: ${payload.phone}`,
+      // dialling code included, or a ten-digit number reaches nobody
+      payload.phone &&
+        `Phone: ${findCountry(payload.country).dial} ${digitsOf(payload.phone)}`,
       "",
       payload.message,
     ]
@@ -102,7 +121,7 @@ export default function ContactForm() {
     setErrors(found);
     if (Object.keys(found).length) {
       // send focus to the first thing that needs fixing
-      const first = ["name", "email", "message"].find((k) => found[k]);
+      const first = ["name", "email", "phone", "message"].find((k) => found[k]);
       formRef.current?.querySelector(`#${CSS.escape(`${uid}-${first}`)}`)?.focus();
       return;
     }
@@ -171,6 +190,22 @@ export default function ContactForm() {
           )}
         </div>
       ))}
+
+      <PhoneField
+        id={`${uid}-phone`}
+        country={values.country}
+        onCountryChange={(code) => setValues((v) => ({ ...v, country: code }))}
+        value={values.phone}
+        onChange={(phone) => {
+          setValues((v) => ({ ...v, phone }));
+          if (errors.phone) setErrors((x) => ({ ...x, phone: undefined }));
+        }}
+      />
+      {errors.phone && (
+        <p className="field__err" role="alert">
+          {errors.phone}
+        </p>
+      )}
 
       <div className="field">
         <label htmlFor={`${uid}-message`}>

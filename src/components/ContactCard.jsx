@@ -46,6 +46,9 @@ export default function ContactCard({
   title,
   description,
   contactInfo = [],
+  steps = [],
+  stepsLabel,
+  media,
   children,
 }) {
   return (
@@ -60,6 +63,29 @@ export default function ContactCard({
         <h2>{title}</h2>
         <p className="lede">{description}</p>
 
+        {/* Ruled rows, from the reference. What the reference puts in
+            them — "risk-free 60-day pilot" and the rest — is an offer
+            this client has never made, so these carry the client's own
+            words about their own process instead. */}
+        {steps.length > 0 && (
+          <div className="contact__steps">
+            {stepsLabel && <p className="contact__stepsLabel">{stepsLabel}</p>}
+            <ul>
+              {steps.map(({ icon: Icon, t, d }) => (
+                <li key={t}>
+                  <span className="contact__stepIcon">
+                    <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <b>{t}</b>
+                    {d}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Skipped entirely when there is nothing real to put in it —
             an empty rail is a rule and a gap, which reads as broken. */}
         {contactInfo.length > 0 && (
@@ -71,7 +97,12 @@ export default function ContactCard({
         )}
       </div>
 
-      <div className="contact__form">{children}</div>
+      <div className="contact__form">
+        {media && (
+          <img className="contact__bg" src={media} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+        )}
+        <div className="contact__formInner">{children}</div>
+      </div>
     </div>
   );
 }

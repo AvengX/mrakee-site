@@ -8,6 +8,7 @@ import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
 import WhyScroll from "./WhyScroll";
 import FaqMarquee from "./FaqMarquee";
+import { Ear, Layers, PenTool } from "lucide-react";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 import {
   ABOUT, APPROACH, EXPERTISE, EXPERTS, FAQ, FOOTER,
@@ -207,6 +208,16 @@ export default function BrandPage() {
               title="Ready to start your Technology Journey?"
               description="Get in touch with our experts."
               contactInfo={[]}
+              stepsLabel="What happens next"
+              /* The client's own approach, stages one to three, word for
+                 word. The reference's rows promise a free pilot and a
+                 design consultation — offers this client has not made. */
+              steps={[
+                { icon: Ear, t: APPROACH[0].t, d: APPROACH[0].d },
+                { icon: PenTool, t: APPROACH[1].t, d: APPROACH[1].d },
+                { icon: Layers, t: APPROACH[2].t, d: APPROACH[2].d },
+              ]}
+              media="solutions/13.jpg"
             >
               <ContactForm />
             </ContactCard>
