@@ -2295,30 +2295,155 @@ h3 {
 }
 
 /* ================================================================
-   FAQ
-   Two columns of question and answer. Deliberately not an accordion —
-   six short answers hidden behind six clicks is worse than reading
-   them, and a disclosure widget is a UI pattern this site does not
-   otherwise have.
+   FAQ — questions on two moving rows
+   Still not an accordion: six short answers behind six clicks is worse
+   than reading them. See FaqMarquee.jsx for the loop and for why it can
+   always be stopped.
    ================================================================ */
-.faq {
+.faqm {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: clamp(1.75rem, 3.5vw, 3rem) clamp(2rem, 5vw, 4rem);
+  gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-.faq__item h3 {
+.faqm__row {
+  overflow: hidden;
+  /* the ends fade out rather than being cut off, so a card leaving does
+     not vanish at a hard edge */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 7%,
+    #000 93%,
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.faqm__track {
+  display: flex;
+  width: max-content;
+  animation: faqm-slide var(--dur, 60s) linear infinite;
+}
+
+.faqm__row[data-dir="right"] .faqm__track {
+  animation-direction: reverse;
+}
+
+/* Exactly half, because the track holds exactly two identical sets —
+   at -50% the second copy sits where the first began and the loop has
+   no seam to see. */
+@keyframes faqm-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Moving content that cannot be stopped is a WCAG 2.2.2 failure, and
+   hover alone covers neither a touch screen nor a keyboard — the button
+   is the mechanism that counts. :focus-within cannot fire today, since
+   a card holds a heading and a paragraph and nothing focusable; it is
+   here so the rows still behave if a card ever gains a link. */
+.faqm.is-paused .faqm__track,
+.faqm__row:hover .faqm__track,
+.faqm__row:focus-within .faqm__track {
+  animation-play-state: paused;
+}
+
+.faqm__set {
+  display: flex;
+  align-items: stretch;
+  gap: 1.75rem;
+  padding-inline: 0.875rem;
+  list-style: none;
+}
+
+.faqm__card {
+  /* One set has to be WIDER than the row or the same question shows up
+     twice on screen. Three of these beat the 1200px column at every
+     width the site has. */
+  flex: 0 0 clamp(300px, 32vw, 400px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.6rem 1.5rem;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  /* opaque: these pass over each other and over the page's atmosphere */
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.faqm__card h3 {
   font-size: 1.05rem;
   font-weight: 650;
   line-height: 1.35;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 
-.faq__item p {
-  margin-top: 0.6rem;
-  font-size: 0.95rem;
+.faqm__card p {
+  font-size: 0.94rem;
   line-height: 1.65;
   color: var(--ink-soft);
+}
+
+.faqm__toggle {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.8);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease-soft), background 0.3s var(--ease-soft);
+}
+
+.faqm__toggle:hover {
+  border-color: var(--line-strong);
+  background: #ffffff;
+}
+
+.faqm__toggle:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 2px;
+}
+
+.faqm__toggleIcon {
+  width: 9px;
+  height: 11px;
+  background: var(--gold-ink);
+}
+
+.faqm__toggleIcon[data-state="pause"] {
+  /* two bars */
+  clip-path: polygon(0 0, 3px 0, 3px 11px, 0 11px, 0 0, 6px 0, 9px 0, 9px 11px, 6px 11px);
+}
+
+.faqm__toggleIcon[data-state="play"] {
+  clip-path: polygon(0 0, 9px 50%, 0 100%);
+}
+
+/* Reduced motion gets the questions, not a slower marquee. */
+.faqm--still {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+  list-style: none;
+}
+
+.faqm--still .faqm__card {
+  flex: 1 1 auto;
 }
 
 /* ================================================================

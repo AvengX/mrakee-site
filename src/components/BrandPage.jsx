@@ -7,6 +7,7 @@ import CardStack from "./CardStack";
 import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
 import WhyScroll from "./WhyScroll";
+import FaqMarquee from "./FaqMarquee";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 import {
   ABOUT, APPROACH, EXPERTISE, EXPERTS, FAQ, FOOTER,
@@ -188,14 +189,7 @@ export default function BrandPage() {
             <SplitWords words={["Frequently", "asked", { t: "questions.", grad: true }]} />
           </Reveal>
 
-          <Reveal className="faq" stagger y={22}>
-            {FAQ.map((f) => (
-              <div className="faq__item" key={f.q}>
-                <h3>{f.q}</h3>
-                <p>{f.a}</p>
-              </div>
-            ))}
-          </Reveal>
+          <FaqMarquee items={FAQ} />
         </div>
       </section>
 
