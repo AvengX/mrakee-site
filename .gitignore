@@ -28,3 +28,4 @@ npm-debug.log*
 # processed versions in public/solutions/)
 film-src/_solutions_raw/
 film-src/_services_raw/
+film-src/sources/

@@ -15,7 +15,13 @@ import imageio_ffmpeg
 from PIL import Image
 
 EXE = imageio_ffmpeg.get_ffmpeg_exe()
-SRC = "C:/Users/ayush/Downloads/mrakee"
+# Sources live in the project, not in Downloads. They used to be read
+# from C:/Users/ayush/Downloads/mrakee, and that folder was reorganised
+# three times mid-project — once silently dropping a chapter from the
+# built film. film-src/sources/ is gitignored (the derived WebP frames
+# are what the site serves and those ARE committed), so a clone can
+# still deploy; it just cannot re-cut the film without the clips.
+SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sources")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTDIR = os.path.join(ROOT, "public", "frames", "film")
 TMP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_tmp")
@@ -42,7 +48,7 @@ CHAPTERS = [
     # would throw away the payoff. At 10s it is nearly a third of the
     # film, which is why every caption below it had to be re-timed.
     # Previous: ("Self-service_kiosk_orbiting", "The object", 0.0, 4.5)
-    ("MRakee_commercial_hero",      "The object",    0.0, 10.0),
+    ("hero",                        "The object",    0.0, 10.0),
     # Parked 2026-08-15 — the hero commercial runs alone for now so it
     # gets the whole runway and a proper pace. Uncomment to bring the
     # other chapters back; the caption windows for them are in git at
