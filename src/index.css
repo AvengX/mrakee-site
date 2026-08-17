@@ -1763,14 +1763,23 @@ h3 {
 /* ================================================================
    ABOUT — text column + tabbed media panel
    ================================================================ */
+/* Four grid children, not a text column and a panel. On a desktop the
+   panel spans the full height beside them; on a phone it drops between
+   the intro and the stage list, so tapping a stage changes a picture
+   that is directly above the finger rather than a screen away. */
 .abt {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(2rem, 5vw, 4.5rem);
+  grid-template-areas:
+    "intro panel"
+    "steps panel"
+    "ctas  panel";
+  column-gap: clamp(2rem, 5vw, 4.5rem);
   align-items: start;
 }
 
-.abt__col {
+.abt__intro {
+  grid-area: intro;
   min-width: 0;
 }
 
@@ -1815,23 +1824,18 @@ h3 {
   color: var(--teal-ink);
 }
 
-/* ---- disclosure list ---- */
+/* ---- stage list (vertical tablist) ----
+   Rows name the stages and nothing more; the description they used to
+   expand now sits under the picture. */
 .abt__steps {
+  grid-area: steps;
+  min-width: 0;
   margin-top: 2.25rem;
   border-top: 1px solid var(--line);
 }
 
-.abt__step {
-  border-bottom: 1px solid var(--line);
-}
-
-.abt__step h3 {
-  margin: 0;
-  font-size: inherit;
-  font-weight: inherit;
-}
-
-.abt__step button {
+.abt__tab {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -1839,6 +1843,7 @@ h3 {
   padding: 1.05rem 0.25rem;
   min-height: 44px;
   border: none;
+  border-bottom: 1px solid var(--line);
   background: none;
   font: inherit;
   text-align: left;
@@ -1847,18 +1852,39 @@ h3 {
   transition: color 0.3s var(--ease-soft);
 }
 
-.abt__step button:hover,
-.abt__step.is-open button {
+.abt__tab:hover,
+.abt__tab.is-on {
   color: var(--ink);
 }
 
-.abt__step button:focus-visible {
+.abt__tab:focus-visible {
   outline: 2px solid var(--indigo);
   outline-offset: -2px;
   border-radius: 8px;
 }
 
-.abt__stepNo {
+/* The selected row's marker. Absolute, so lighting it moves nothing. */
+.abt__tab::before {
+  content: "";
+  position: absolute;
+  left: -0.75rem;
+  top: 50%;
+  width: 2px;
+  height: 1.15rem;
+  border-radius: 2px;
+  background: var(--gold);
+  opacity: 0;
+  transform: translateY(-50%) scaleY(0.4);
+  transform-origin: center;
+  transition: opacity 0.3s var(--ease-soft), transform 0.42s var(--ease);
+}
+
+.abt__tab.is-on::before {
+  opacity: 1;
+  transform: translateY(-50%) scaleY(1);
+}
+
+.abt__tabNo {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -1867,77 +1893,37 @@ h3 {
   transition: color 0.3s var(--ease-soft);
 }
 
-.abt__step.is-open .abt__stepNo {
+.abt__tab.is-on .abt__tabNo {
   color: var(--gold-ink);
 }
 
-.abt__stepName {
+.abt__tabName {
   flex: 1;
   font-size: 1.02rem;
   font-weight: 600;
   letter-spacing: -0.015em;
 }
 
-.abt__chev {
-  position: relative;
-  width: 11px;
-  height: 11px;
+/* Arrow rather than a plus: these rows no longer open, they point at
+   the panel. Hidden until the row is the live one or under the cursor. */
+.abt__tabGo {
   flex-shrink: 0;
-}
-
-.abt__chev::before,
-.abt__chev::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  background: currentColor;
-  border-radius: 1px;
-  transition: transform 0.42s var(--ease), opacity 0.32s var(--ease-soft);
-}
-
-.abt__chev::before {
-  width: 11px;
-  height: 1.5px;
-}
-
-.abt__chev::after {
-  width: 1.5px;
-  height: 11px;
-}
-
-/* plus becomes minus */
-.abt__step.is-open .abt__chev::after {
-  transform: rotate(90deg);
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--gold-ink);
   opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.3s var(--ease-soft), transform 0.42s var(--ease);
 }
 
-/* 0fr -> 1fr animates to the content's true height. max-height needs a
-   guessed number: too small clips the text, too large makes the easing
-   look lazy because most of the duration is spent on empty space. */
-.abt__stepBody {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.45s var(--ease);
-}
-
-.abt__step.is-open .abt__stepBody {
-  grid-template-rows: 1fr;
-}
-
-.abt__stepBody > div {
-  overflow: hidden;
-}
-
-.abt__stepBody p {
-  padding: 0 0.25rem 1.15rem 2.55rem;
-  font-size: 0.95rem;
-  line-height: 1.65;
-  color: var(--ink-soft);
-  max-width: 48ch;
+.abt__tab:hover .abt__tabGo,
+.abt__tab.is-on .abt__tabGo {
+  opacity: 1;
+  transform: none;
 }
 
 .abt__ctas {
+  grid-area: ctas;
   display: flex;
   flex-wrap: wrap;
   gap: 0.8rem;
@@ -1945,24 +1931,34 @@ h3 {
 }
 
 /* ---- media panel ---- */
+/* Sticky, because the list below the intro is what changes it: the
+   picture and caption have to still be on screen when a row further
+   down the column is clicked. The height is capped against the viewport
+   above, so it cannot outgrow the space it sticks in. */
 .abt__panel {
-  position: relative;
+  grid-area: panel;
+  align-self: start;
+  position: sticky;
+  top: clamp(1.5rem, 9vh, 5.5rem);
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   border-radius: var(--r);
   overflow: hidden;
   border: 1px solid var(--line);
   background: var(--surface-soft);
   box-shadow: var(--shadow-lg);
-  /* The original hard-codes 720px. A fixed pixel height is a scrollbar
-     waiting to happen on a short laptop, so this is a ratio with a cap
-     that keeps it inside the viewport. */
-  aspect-ratio: 4 / 5;
-  max-height: min(78vh, 760px);
 }
 
+/* The original hard-codes a 720px panel. A fixed pixel height is a
+   scrollbar waiting to happen on a short laptop, so the picture is a
+   ratio capped against the viewport and the caption is whatever it
+   needs under it. */
 .abt__media {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  aspect-ratio: 4 / 5;
+  max-height: min(58vh, 560px);
+  overflow: hidden;
 }
 
 .abt__img {
@@ -1981,37 +1977,64 @@ h3 {
   transform: scale(1);
 }
 
-/* The stage's name over the image. The pills disappear on a phone, so
-   without this the panel would show a picture with nothing saying which
-   stage it belongs to. */
-.abt__stageTag {
-  position: absolute;
-  z-index: 1;
-  top: 1rem;
-  left: 1rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.4rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-sm);
-  font-size: 0.78rem;
+/* ---- caption: the selected stage, in words, under its picture ----
+   Every caption occupies the same grid cell, so the block is as tall as
+   the longest one and the panel does not jump as you move between
+   stages. Only the live one is visible, and the rest are taken out of
+   the accessibility tree by aria-hidden in the component. */
+.abt__cap {
+  display: grid;
+  padding: 1.25rem 1.4rem 1.4rem;
+  border-top: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.abt__cap:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: -3px;
+}
+
+.abt__capItem {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(7px);
+  transition: opacity 0.4s var(--ease-soft), transform 0.55s var(--ease),
+    visibility 0s linear 0.4s;
+}
+
+.abt__capItem.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.abt__capName {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1.05rem;
   font-weight: 650;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 
-.abt__stageTag i {
+.abt__capName i {
   font-style: normal;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   font-variant-numeric: tabular-nums;
   color: var(--gold-ink);
+}
+
+.abt__capText {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  max-width: 46ch;
 }
 
 .abt__pills {
@@ -2065,18 +2088,29 @@ h3 {
 }
 
 @media (max-width: 900px) {
+  /* The panel between the intro and the list: the picture and its words
+     are what the rows below change, so they have to be in view when a
+     row is tapped. */
   .abt {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "intro"
+      "panel"
+      "steps"
+      "ctas";
   }
   .abt__panel {
-    order: -1; /* the picture first, then the reading */
+    position: static; /* no sticking on a phone — it would cover the list */
+    margin-top: 2.25rem;
+  }
+  .abt__media {
     aspect-ratio: 16 / 11;
     max-height: none;
   }
   /* Five pills do not fit a phone without a horizontal scroller, and a
-     wheel does nothing to one of those. The disclosure list is directly
-     below the panel here and already names all five stages, so the
-     pills are redundant rather than missed. */
+     wheel does nothing to one of those. The stage list is directly
+     below the panel here and already names all five, so the pills are
+     redundant rather than missed. */
   .abt__pills {
     display: none;
   }

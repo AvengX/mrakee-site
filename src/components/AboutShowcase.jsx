@@ -1,32 +1,41 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 /* ================================================================
-   ABOUT — text column + media panel
+   ABOUT — stage list + media panel
 
    Adapted from a shadcn/Tailwind/Next component. This project has none
    of those, so the structure was kept and rebuilt on the site's own
-   tokens: eyebrow, headline, copy, chips, a disclosure list, two CTAs,
-   and a tall panel with pills along its foot.
+   tokens: eyebrow, headline, copy, chips, the five approach stages, two
+   CTAs, and a panel showing the selected stage.
 
-   One departure that matters: in the original the pills and the steps
-   are unrelated — the steps explain the process, the pills switch
-   between output styles. Here they are the SAME five stages, so having
-   two independent controls for one idea would be a lie about the
-   content. There is a single `active` index: the open step, the lit
-   pill and the panel image are all it. Selecting either control moves
-   both.
+   Two departures from the original, both because the content is one
+   idea rather than two:
 
-   That also removes the collapse-to-nothing state. With the panel
-   bound to the selection, "no step open" would mean "no image", which
-   is a worse thing to be able to reach than it is to gain.
+   · The original's pills switch output styles while its list explains a
+     process — unrelated controls. Here they are the same five stages,
+     so a single `active` index drives the list, the pills, the image
+     and the caption. Selecting any control moves all of them.
+   · The list no longer expands in place. The stage's description sits
+     under its picture instead, so picture and words are read together
+     rather than the picture describing one stage while the open row
+     describes another.
+
+   Layout: the four blocks are direct grid children of .abt so the panel
+   can sit beside the list on a desktop and BETWEEN the intro and the
+   list on a phone — a control has to be next to the thing it changes,
+   and on a phone the panel would otherwise be a screen above the row
+   being tapped.
 
    Accessibility notes:
    · The chips are NOT buttons. In the source they are Badge components
      that look pressable and do nothing — a clickable-looking element
      with no behaviour is what the guidance calls a critical failure.
-   · The pills ARE buttons, in a tablist with roving tabindex and arrow
-     keys, so Tab reaches the group once and arrows move within it.
-   · The disclosure uses button + aria-expanded + aria-controls.
+   · The stage list is a vertical tablist with roving tabindex and arrow
+     keys, so Tab reaches the group once and arrows move within it. The
+     caption is its tabpanel.
+   · The pills are a shortcut to the same selection, not a second
+     tablist: plain buttons marked aria-current="step". One tabpanel
+     cannot belong to two tablists, and the list is the primary one.
    ================================================================ */
 
 export default function AboutShowcase({
@@ -38,14 +47,15 @@ export default function AboutShowcase({
   ctas = [],
 }) {
   const uid = useId();
+  const panelId = `${uid}-panel`;
   const [active, setActive] = useState(0);
   const [loaded, setLoaded] = useState(() => new Set([0]));
-  const pillRefs = useRef([]);
+  const tabRefs = useRef([]);
   const [focusIdx, setFocusIdx] = useState(null);
 
   useEffect(() => {
     if (focusIdx === null) return;
-    pillRefs.current[focusIdx]?.focus();
+    tabRefs.current[focusIdx]?.focus();
     setFocusIdx(null);
   }, [focusIdx]);
 
@@ -54,12 +64,12 @@ export default function AboutShowcase({
     setLoaded((s) => (s.has(active) ? s : new Set(s).add(active)));
   }, [active]);
 
-  const onPillKey = useCallback(
+  const onTabKey = useCallback(
     (e) => {
       const last = steps.length - 1;
       let next = null;
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = active === last ? 0 : active + 1;
-      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = active === 0 ? last : active - 1;
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") next = active === last ? 0 : active + 1;
+      else if (e.key === "ArrowUp" || e.key === "ArrowLeft") next = active === 0 ? last : active - 1;
       else if (e.key === "Home") next = 0;
       else if (e.key === "End") next = last;
       if (next === null) return;
@@ -72,8 +82,8 @@ export default function AboutShowcase({
 
   return (
     <div className="abt">
-      {/* ---- text column ---- */}
-      <div className="abt__col">
+      {/* ---- intro ---- */}
+      <div className="abt__intro">
         {eyebrow && <p className="eyebrow">{eyebrow}</p>}
         <h2 className="abt__title">{title}</h2>
 
@@ -90,61 +100,9 @@ export default function AboutShowcase({
             ))}
           </ul>
         )}
-
-        <div className="abt__steps">
-          {steps.map((s, i) => {
-            const isOpen = active === i;
-            return (
-              <div className={`abt__step${isOpen ? " is-open" : ""}`} key={s.t}>
-                <h3>
-                  <button
-                    type="button"
-                    id={`${uid}-t${i}`}
-                    aria-expanded={isOpen}
-                    aria-controls={`${uid}-p${i}`}
-                    onClick={() => setActive(i)}
-                  >
-                    <span className="abt__stepNo">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="abt__stepName">{s.t}</span>
-                    <span className="abt__chev" aria-hidden="true" />
-                  </button>
-                </h3>
-                <div
-                  className="abt__stepBody"
-                  id={`${uid}-p${i}`}
-                  role="region"
-                  aria-labelledby={`${uid}-t${i}`}
-                >
-                  <div>
-                    <p>{s.d}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {ctas.length > 0 && (
-          <div className="abt__ctas">
-            {ctas.map((c, i) => (
-              <a
-                key={c.href}
-                className={`btn ${i === 0 ? "btn--primary" : "btn--ghost"}`}
-                href={c.href}
-              >
-                {c.label}
-                {i === 0 && (
-                  <span className="arrow" aria-hidden="true">
-                    →
-                  </span>
-                )}
-              </a>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* ---- media panel ---- */}
+      {/* ---- media panel: the selected stage, pictured and described ---- */}
       <div className="abt__panel">
         <div className="abt__media">
           {steps.map((s, i) => (
@@ -159,38 +117,99 @@ export default function AboutShowcase({
               decoding="async"
             />
           ))}
-          {/* the stage's name over the image, so the panel says what it
-              is showing without depending on the pills being visible */}
-          <span className="abt__stageTag">
-            <i aria-hidden="true">{String(active + 1).padStart(2, "0")}</i>
-            {steps[active]?.t}
-          </span>
+
+          {/* Hidden below 900px: five pills do not fit a phone without a
+              horizontal scroller. The stage list is directly under the
+              panel there and already names all five. */}
+          <div className="abt__pills" aria-label="Jump to a stage">
+            {steps.map((s, i) => (
+              <button
+                key={s.t}
+                type="button"
+                aria-current={i === active ? "step" : undefined}
+                className={`abt__pill${i === active ? " is-active" : ""}`}
+                onClick={() => setActive(i)}
+              >
+                {s.short || s.t}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Hidden below 900px: five pills do not fit a phone without a
-            horizontal scroller, and the disclosure list sits directly
-            under the panel there and already names all five. */}
+        {/* All five captions are stacked in one grid cell, so the block
+            is as tall as the longest and the panel does not resize as
+            you move between stages. */}
         <div
-          className="abt__pills"
-          role="tablist"
-          aria-label="Our approach"
-          onKeyDown={onPillKey}
+          className="abt__cap"
+          id={panelId}
+          role="tabpanel"
+          aria-labelledby={`${uid}-t${active}`}
+          tabIndex={0}
         >
           {steps.map((s, i) => (
-            <button
+            <div
+              className={`abt__capItem${i === active ? " is-on" : ""}`}
               key={s.t}
-              ref={(el) => (pillRefs.current[i] = el)}
-              role="tab"
-              aria-selected={i === active}
-              tabIndex={i === active ? 0 : -1}
-              className={`abt__pill${i === active ? " is-active" : ""}`}
-              onClick={() => setActive(i)}
+              aria-hidden={i !== active}
             >
-              {s.short || s.t}
-            </button>
+              <p className="abt__capName">
+                <i aria-hidden="true">{String(i + 1).padStart(2, "0")}</i>
+                {s.t}
+              </p>
+              <p className="abt__capText">{s.d}</p>
+            </div>
           ))}
         </div>
       </div>
+
+      {/* ---- stage list ---- */}
+      <div
+        className="abt__steps"
+        role="tablist"
+        aria-orientation="vertical"
+        aria-label="Our approach"
+        onKeyDown={onTabKey}
+      >
+        {steps.map((s, i) => (
+          <button
+            key={s.t}
+            type="button"
+            ref={(el) => (tabRefs.current[i] = el)}
+            id={`${uid}-t${i}`}
+            role="tab"
+            aria-selected={i === active}
+            aria-controls={panelId}
+            tabIndex={i === active ? 0 : -1}
+            className={`abt__tab${i === active ? " is-on" : ""}`}
+            onClick={() => setActive(i)}
+          >
+            <span className="abt__tabNo">{String(i + 1).padStart(2, "0")}</span>
+            <span className="abt__tabName">{s.t}</span>
+            <span className="abt__tabGo" aria-hidden="true">
+              →
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {ctas.length > 0 && (
+        <div className="abt__ctas">
+          {ctas.map((c, i) => (
+            <a
+              key={c.href}
+              className={`btn ${i === 0 ? "btn--primary" : "btn--ghost"}`}
+              href={c.href}
+            >
+              {c.label}
+              {i === 0 && (
+                <span className="arrow" aria-hidden="true">
+                  →
+                </span>
+              )}
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
