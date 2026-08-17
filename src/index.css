@@ -1122,223 +1122,162 @@ h3 {
 }
 
 /* ================================================================
-   SOLUTIONS EXPLORER — index + panel
-   Replaces a 17-card grid. The index carries the range, the panel
-   carries the depth, and the visitor reads one description instead of
-   seventeen.
+   SOLUTIONS — alternating feature rows
+   Five offers, a full row each, image one side and copy the other.
+   Works precisely because it is five: at seventeen this becomes a
+   scroll marathon, which is why the rest are named in one line below.
    ================================================================ */
-.sx {
+.feats {
   display: grid;
-  grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
-  gap: clamp(1.5rem, 3vw, 3rem);
-  align-items: start;
+  gap: clamp(3.5rem, 7vw, 6.5rem);
 }
 
-.sx__index {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  border-left: 1px solid var(--line);
-  padding-left: 0.25rem;
-}
-
-.sx__item {
-  position: relative;
-  display: flex;
+.feat {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
   align-items: center;
-  gap: 0.85rem;
-  width: 100%;
-  /* 44px minimum row height — these are the section's primary control
-     and 17 of them stacked is a lot of small targets to hit */
-  min-height: 44px;
-  padding: 0.72rem 0.9rem;
-  border: none;
-  border-radius: 10px;
-  background: transparent;
-  font: inherit;
-  font-size: 0.92rem;
-  font-weight: 550;
-  color: var(--ink-soft);
-  text-align: left;
-  cursor: pointer;
-  transition: color 0.28s var(--ease-soft), background 0.28s var(--ease-soft);
 }
 
-/* the active marker rides the left rule rather than boxing the row —
-   a border on the row itself makes a 17-item list look like a table */
-.sx__item::before {
-  content: "";
-  position: absolute;
-  left: -0.25rem;
-  top: 50%;
-  width: 2px;
-  height: 0;
-  border-radius: 2px;
-  background: linear-gradient(180deg, var(--gold), var(--teal));
-  transform: translateY(-50%);
-  transition: height 0.42s var(--ease);
+/* Alternate the image side. Swapping `direction` would flip the text
+   too, so the media column is moved by explicit order instead. */
+.feat:nth-child(even) .feat__media {
+  order: 2;
 }
 
-.sx__item:hover {
-  color: var(--ink);
-  background: rgba(15, 23, 42, 0.035);
-}
-
-/* Its own focus ring rather than the global one: these rows sit flush
-   against the index rule, where a 3px outline-offset would be clipped
-   by the neighbouring row. Arrow keys move focus through this list, so
-   the ring is the only thing telling a keyboard user where they are. */
-.sx__item:focus-visible {
-  outline: 2px solid var(--indigo);
-  outline-offset: -2px;
-  background: rgba(99, 91, 255, 0.07);
-  color: var(--ink);
-}
-
-.sx__item.is-active {
-  color: var(--ink);
-  font-weight: 650;
-}
-
-.sx__item.is-active::before {
-  height: 62%;
-}
-
-.sx__num {
-  font-size: 0.68rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.08em;
-  color: var(--ink-faint);
-  transition: color 0.28s var(--ease-soft);
-}
-
-.sx__item.is-active .sx__num {
-  color: var(--teal-ink);
-}
-
-.sx__name {
-  flex: 1;
-}
-
-/* ---- panel ------------------------------------------------------ */
-.sx__panel {
-  border-radius: var(--r);
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.sx__panel:focus-visible {
-  outline: 2px solid var(--indigo);
-  outline-offset: 3px;
-}
-
-.sx__panelInner {
-  animation: sx-in 0.35s var(--ease) both;
-}
-
-@keyframes sx-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-}
-
-.sx__media {
+.feat__media {
   position: relative;
-  aspect-ratio: 16 / 9;
-  background: var(--surface-soft);
+  border-radius: var(--r);
   overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  aspect-ratio: 16 / 10;
+  background: var(--surface-soft);
 }
 
-.sx__media img {
+.feat__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 1.2s var(--ease);
 }
 
-/* No tint. This existed to settle the film stills into the page's light,
-   and the bespoke images are already shot to it — a wash over them now
-   would only mute photography that was commissioned to look this way. */
+.feat:hover .feat__media img {
+  transform: scale(1.035);
+}
 
-.sx__badge {
-  position: absolute;
-  z-index: 1;
-  top: 0.9rem;
-  left: 0.9rem;
-  padding: 0.32rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  font-size: 0.68rem;
+.feat__no {
+  display: block;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.2em;
   font-variant-numeric: tabular-nums;
-  color: var(--ink-soft);
+  color: var(--teal-ink);
+  margin-bottom: 0.9rem;
 }
 
-.sx__copy {
-  padding: clamp(1.4rem, 2.6vw, 2.1rem);
-}
-
-.sx__copy h3 {
-  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+.feat__body h3 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
   font-weight: 700;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.032em;
+  line-height: 1.06;
   text-wrap: balance;
-  max-width: 24ch;
+  max-width: 16ch;
 }
 
-.sx__copy p {
-  margin-top: 0.7rem;
-  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
-  line-height: 1.62;
+.feat__lede {
+  margin-top: 1rem;
+  font-size: clamp(1rem, 1.15vw, 1.1rem);
+  line-height: 1.65;
   color: var(--ink-soft);
-  max-width: 56ch;
+  max-width: 46ch;
 }
 
-.sx__link {
+.feat__points {
+  list-style: none;
+  margin-top: 1.6rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.feat__points li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* a small brand tick rather than a bullet — drawn, so it stays crisp
+   and needs no icon font */
+.feat__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--teal);
+  border-bottom: 2px solid var(--teal);
+  transform: rotate(-45deg);
+}
+
+.feat__link {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  margin-top: 1.35rem;
-  font-size: 0.9rem;
+  margin-top: 1.9rem;
+  font-size: 0.94rem;
   font-weight: 600;
   color: var(--teal-ink);
   text-decoration: none;
 }
 
-.sx__link .arrow {
+.feat__link .arrow {
   transition: transform 0.35s var(--ease);
 }
 
-.sx__link:hover .arrow {
+.feat__link:hover .arrow {
   transform: translateX(4px);
 }
 
-/* ---- stacked ----------------------------------------------------
-   No horizontal rail for the index. A wheel emits deltaY, which does
-   nothing to a horizontal container, so a rail is unreachable with a
-   mouse — this project has made that mistake before. The panel goes
-   above the list and sticks, so tapping a row visibly changes it.  */
+/* ---- the twelve that did not get a row -------------------------- */
+.feats__rest {
+  margin-top: clamp(1rem, 2vw, 2rem);
+  padding-top: 2.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.feats__rest p {
+  font-size: 0.95rem;
+  line-height: 1.9;
+  color: var(--ink-soft);
+  max-width: 78ch;
+}
+
+.feats__rest span {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.6rem;
+}
+
 @media (max-width: 860px) {
-  .sx {
+  .feat {
     grid-template-columns: 1fr;
+    gap: 1.75rem;
   }
-
-  .sx__panel {
-    order: -1;
-    position: sticky;
-    top: 5.25rem;
-    z-index: 1;
+  /* image always first once stacked — an alternating order that only
+     shows up as "text, image / image, text" reads as a mistake */
+  .feat:nth-child(even) .feat__media {
+    order: 0;
   }
-
-  .sx__item {
-    padding: 0.8rem 0.9rem; /* 44px+ touch target */
+  .feat__media {
+    aspect-ratio: 16 / 11;
   }
 }
 

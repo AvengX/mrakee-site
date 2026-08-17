@@ -5,7 +5,7 @@ import Counter from "./Counter";
 import Logo from "./Logo";
 import ContactCard from "./ContactCard";
 import ContactForm from "./ContactForm";
-import SolutionsExplorer from "./SolutionsExplorer";
+import SolutionsFeature from "./SolutionsFeature";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 
 /* --- Content model -------------------------------------------------
@@ -13,12 +13,30 @@ import { usePointerGlow } from "../hooks/usePointerGlow";
    architecture (solutions → industries → products → services). All copy
    below is original to Mrakee. -------------------------------------- */
 
-/* The full solution set carried over from the acquired APAC business.
-   `frame` is the still shown alongside each one, picked from the film's
-   own frames by chapter so the environment matches the solution —
-   retail solutions get retail footage, transport gets the concourse.
-   Chapter ranges: object 0-53 · wakes 49-108 · retail 104-163 ·
-   qsr 159-218 · transport 214-273 · scale 269-333. */
+/* Five solutions get a feature row each; the rest are named in a single
+   line beneath. The full set is still listed here because it is the real
+   product range and REST is derived from it — losing one means editing
+   one place, not two.
+
+   `img` files are in public/solutions/, numbered in this array's order.
+   Bullets restate what is already in each description; they do not add
+   specifications or claims that are not otherwise on the page. */
+const FEATURED = [
+  "Interactive Kiosk",
+  "Wayfinder",
+  "Digital Menu Board",
+  "Video Walls",
+  "Interactive Retail",
+];
+
+const POINTS = {
+  "Interactive Kiosk": ["Browse, order and pay", "Unattended or staff-assisted", "Interaction data by site and hour"],
+  Wayfinder: ["Floor-aware search", "Route on the screen and on the phone", "Malls, hospitals and campuses"],
+  "Digital Menu Board": ["Rule-based dayparting", "Auto grey-out on stock-out", "Priced and scheduled centrally"],
+  "Video Walls": ["Tiled arrays driven as one canvas", "Four panels to a full façade", "Lobby, atrium and retail frontage"],
+  "Interactive Retail": ["Endless-aisle browsing", "Tied to live catalogue and stock", "On the shop floor, not the back office"],
+};
+
 const SOLUTIONS = [
   { t: "Interactive Kiosk", frame: 20, d: "Self-serve touchpoints that let customers browse, order and pay — and hand you the interaction data afterwards." },
   { t: "Wayfinder", frame: 8, d: "Floor-aware directories for malls, hospitals and campuses. Search a destination, get a route on the screen and on your phone." },
@@ -38,6 +56,13 @@ const SOLUTIONS = [
   { t: "Hotel Self Check-In / Out", frame: 226, d: "Arrival and departure kiosks handling ID, payment and key issue, with a staffed path always one tap away." },
   { t: "Feedback System", frame: 234, d: "One-tap satisfaction capture at the point of experience, reported by site, hour and staff shift." },
 ];
+
+/* Derived, so the two views of the product range cannot drift apart. */
+const FEATURE_ROWS = FEATURED.map((name) => {
+  const s = SOLUTIONS.find((x) => x.t === name);
+  return { ...s, img: `solutions/${String(SOLUTIONS.indexOf(s) + 1).padStart(2, "0")}.jpg`, points: POINTS[name] };
+});
+const REST = SOLUTIONS.filter((s) => !FEATURED.includes(s.t)).map((s) => s.t);
 
 /* The 13 industries served by the acquired business. */
 const INDUSTRIES = [
@@ -119,9 +144,7 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <Reveal>
-            <SolutionsExplorer solutions={SOLUTIONS} />
-          </Reveal>
+          <SolutionsFeature solutions={FEATURE_ROWS} rest={REST} />
         </div>
       </section>
 
