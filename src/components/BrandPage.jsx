@@ -8,6 +8,7 @@ import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
 import WhyScroll from "./WhyScroll";
 import FaqMarquee from "./FaqMarquee";
+import ExpertiseTrail from "./ExpertiseTrail";
 import { Ear, Layers, PenTool } from "lucide-react";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 import {
@@ -29,7 +30,6 @@ import {
    -------------------------------------------------------------------- */
 
 export default function BrandPage() {
-  const expertiseSurface = usePointerGlow(".pillar");
   const insightsSurface = usePointerGlow(".pillar");
 
   return (
@@ -125,17 +125,7 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <div ref={expertiseSurface}>
-            <Reveal className="split" stagger>
-              {EXPERTISE.map((s, i) => (
-                <div className="pillar" key={s.t}>
-                  <span className="pillar__no">{String(i + 1).padStart(2, "0")}</span>
-                  <h3>{s.t}</h3>
-                  <p>{s.d}</p>
-                </div>
-              ))}
-            </Reveal>
-          </div>
+          <ExpertiseTrail items={EXPERTISE} />
         </div>
       </section>
 

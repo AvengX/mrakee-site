@@ -2447,6 +2447,177 @@ h3 {
 }
 
 /* ================================================================
+   OUR EXPERTISE — pinned cards on a dashed trail
+   The trail's path is measured from the cards; see ExpertiseTrail.jsx
+   for why it cannot be written down.
+   ================================================================ */
+.xp {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.xp__trail {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+  /* The width/height ATTRIBUTES are presentation attributes, which beat
+     `inset: 0` — so between a viewport shrinking and the redraw landing
+     the svg keeps its old pixel width and pushes the page sideways.
+     These two lines win over the attributes, and the viewBox then just
+     scales for the frame or two that they disagree. */
+  width: 100%;
+  height: 100%;
+}
+
+.xp__trail path {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 8 6;
+}
+
+/* The class comes from motionAllowed(), so the preference and the
+   ?motion=on override are decided in one place for the whole site
+   rather than half here and half in JS. -140 is ten whole dashes
+   (8 + 6), so the loop has no jump. */
+.xp__trail.is-marching path {
+  animation: xp-march 3s linear infinite;
+}
+
+@keyframes xp-march {
+  to {
+    stroke-dashoffset: -140;
+  }
+}
+
+.xp__list {
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+.xp__item {
+  width: min(330px, 100%);
+}
+
+/* The zig-zag. Odd cards hug the left, even the right, and the trail
+   swings between them. */
+.xp__item:nth-child(even) {
+  align-self: flex-end;
+}
+
+.xp__card {
+  padding: 0.55rem;
+  border-radius: 26px;
+  border: 1px solid var(--line);
+  background: #ffffff; /* opaque: the trail passes behind these */
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease);
+}
+
+.xp__item:nth-child(odd) .xp__card {
+  transform: rotate(1.6deg);
+}
+
+.xp__item:nth-child(even) .xp__card {
+  transform: rotate(-1.6deg);
+}
+
+/* Straightens under the cursor — the tilt is what makes it worth
+   straightening. */
+.xp__card:hover {
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow: var(--shadow-xl, var(--shadow-lg));
+}
+
+.xp__pin {
+  display: grid;
+  place-items: center;
+  margin: 0.25rem auto 0.7rem;
+  color: var(--gold-ink);
+}
+
+.xp__item:nth-child(even) .xp__pin {
+  color: var(--teal-ink);
+}
+
+.xp__tint {
+  padding: 1.15rem 1.2rem 1.3rem;
+  border-radius: 17px;
+  border: 1px solid var(--gold-lite);
+  background: rgba(254, 210, 113, 0.13);
+}
+
+.xp__item:nth-child(even) .xp__tint {
+  border-color: var(--teal-lite);
+  background: rgba(63, 194, 196, 0.12);
+}
+
+.xp__no {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-ink);
+  margin-bottom: 0.85rem;
+}
+
+.xp__item:nth-child(even) .xp__no {
+  color: var(--teal-ink);
+}
+
+.xp__card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  text-wrap: balance;
+  margin-bottom: 0.45rem;
+}
+
+.xp__card p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  /* Darker than --ink-soft, which measured 4.35:1 against the teal
+     tint — the tint is a shade deeper than the page it was chosen for.
+     This reads 5.1:1 there and better on the gold. */
+  color: #5b6a80;
+}
+
+@media (max-width: 860px) {
+  /* Square and stacked. A dashed line between two edges of a phone is a
+     scribble, and a tilted card on a narrow screen just loses corners. */
+  .xp__item {
+    width: 100%;
+  }
+  .xp__item:nth-child(even) {
+    align-self: auto;
+  }
+  .xp__item:nth-child(odd) .xp__card,
+  .xp__item:nth-child(even) .xp__card {
+    transform: none;
+  }
+  .xp__list {
+    gap: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp__card {
+    transition: none;
+  }
+}
+
+/* ================================================================
    PRODUCT PILLARS
    ================================================================ */
 .split {
