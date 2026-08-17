@@ -31,7 +31,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function IndustryShowcase({ items }) {
   const [active, setActive] = useState(0);
-  const [layerA, setLayerA] = useState({ i: 0, src: items[0].fallback });
+  // `tried: false` matters. Seeded with the fallback so there is
+  // something on screen at first paint, but marked un-resolved so the
+  // effect below still goes and looks for the commissioned image —
+  // otherwise industry 01 alone would keep its stand-in forever, and
+  // only the ones you clicked would ever upgrade.
+  const [layerA, setLayerA] = useState({ i: 0, src: items[0].fallback, tried: false });
   const [layerB, setLayerB] = useState(null);
   const [showB, setShowB] = useState(false);
 
@@ -49,7 +54,7 @@ export default function IndustryShowcase({ items }) {
   useEffect(() => {
     const it = items[active];
     const visible = showB ? layerB : layerA;
-    if (visible && visible.i === active) return;
+    if (visible && visible.i === active && visible.tried) return;
 
     let alive = true;
     const load = (src, onDone) => {
@@ -61,10 +66,10 @@ export default function IndustryShowcase({ items }) {
     // try the commissioned environment, fall back to a related still
     load(it.img || it.fallback, (src) => {
       if (showB) {
-        setLayerA({ i: active, src });
+        setLayerA({ i: active, src, tried: true });
         setShowB(false);
       } else {
-        setLayerB({ i: active, src });
+        setLayerB({ i: active, src, tried: true });
         setShowB(true);
       }
     });

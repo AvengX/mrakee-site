@@ -215,7 +215,9 @@ export default function BrandPage() {
           One environment on screen at a time. A field of thirteen labels
           told the visitor the sectors; it could not show them a room. */}
       <section className="band band--alt" id="industries">
-        <div className="band__inner">
+        {/* heading and stage side by side — stacked, the heading left
+            759px of dead space beside it, which is most of the row */}
+        <div className="band__inner ind__grid">
           <Reveal className="band__head ind__head">
             <p className="eyebrow">Industries</p>
             <SplitWords words={["Different", "spaces.", { t: "Different", grad: true, br: true }, { t: "experiences.", grad: true }]} />

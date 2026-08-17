@@ -1439,13 +1439,44 @@ h3 {
 /* ================================================================
    INDUSTRIES — one environment at a time
    ================================================================ */
+/* Heading beside the stage, not above it. Above, the heading occupies a
+   437px column in a 1200px row and the remaining 63% is empty — which is
+   exactly what it looked like. */
+.ind__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.6fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
 .ind__head {
-  max-width: 44ch;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: 0;
+  /* holds its position while the taller stage column scrolls past */
+  position: sticky;
+  top: 7.5rem;
+}
+
+@media (max-width: 960px) {
+  .ind__grid {
+    grid-template-columns: 1fr;
+  }
+  .ind__head {
+    position: static;
+    margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
+  }
+}
+
+/* min-width:0 is load-bearing, not tidiness. A grid item defaults to
+   min-width:auto, so the rail's thirteen tabs (~1600px of content) push
+   this track wider than its share and the whole page gains a horizontal
+   scrollbar. The rail scrolls precisely so that cannot happen. */
+.ind {
+  min-width: 0;
 }
 
 .ind__stage {
   position: relative;
+  min-width: 0;
 }
 
 .ind__frame {
@@ -1587,6 +1618,8 @@ h3 {
   scroll-behavior: smooth;
   scrollbar-width: none;
   flex: 1;
+  min-width: 0; /* same reason — a flex item will not shrink below its
+                   content without this, and the tabs are 1600px wide */
   /* fade the ends so a cut-off item reads as "more here", not as a bug */
   mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
 }
