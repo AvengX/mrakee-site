@@ -1760,51 +1760,59 @@ h3 {
   box-shadow: var(--shadow-md);
 }
 
-.stats {
+/* Running body copy — the About section is the only place the client's
+   content is prose rather than a list. Uses the existing lede scale. */
+.prose {
+  max-width: 68ch;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.prose p {
+  font-size: clamp(1rem, 1.15vw, 1.1rem);
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.prose p + p {
+  margin-top: 1.1rem;
+}
+
+/* A sub-heading inside a band, for "Our Approach" sitting under the
+   About copy rather than in a band of its own. */
+.band__sub {
+  margin-bottom: 1.6rem;
+}
+
+.band__sub h3 {
+  font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+/* ================================================================
+   FAQ
+   Two columns of question and answer. Deliberately not an accordion —
+   six short answers hidden behind six clicks is worse than reading
+   them, and a disclosure widget is a UI pattern this site does not
+   otherwise have.
+   ================================================================ */
+.faq {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
-  gap: 2.2rem 1rem;
-  text-align: center;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: clamp(1.75rem, 3.5vw, 3rem) clamp(2rem, 5vw, 4rem);
 }
 
-/* separators between stats, drawn as fading verticals */
-.stat + .stat {
-  position: relative;
+.faq__item h3 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-wrap: balance;
 }
 
-.stat + .stat::before {
-  content: "";
-  position: absolute;
-  left: -0.5rem;
-  top: 12%;
-  height: 76%;
-  width: 1px;
-  background: linear-gradient(180deg, transparent, var(--line-strong), transparent);
-}
-
-@media (max-width: 620px) {
-  .stat + .stat::before {
-    display: none;
-  }
-}
-
-.stat__num {
-  font-size: clamp(2.4rem, 5vw, 3.8rem);
-  font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  background: linear-gradient(140deg, var(--gold-deep), var(--gold) 42%, var(--teal-deep));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.stat__label {
-  margin-top: 0.65rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+.faq__item p {
+  margin-top: 0.6rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
   color: var(--ink-soft);
 }
 

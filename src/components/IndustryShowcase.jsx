@@ -202,7 +202,10 @@ export default function IndustryShowcase({ items }) {
               <i aria-hidden="true" />
               {current.t}
             </span>
-            <p key={active}>{current.d}</p>
+            {/* The client supplied industry names without descriptions.
+                Rather than write one for them, the caption carries the
+                name alone when there is no copy. */}
+            {current.d && <p key={active}>{current.d}</p>}
           </div>
         </div>
       </div>

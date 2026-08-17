@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
 
 const LINKS = [
-  { href: "#solutions", label: "Solutions", hint: "17 touchpoints" },
-  { href: "#industries", label: "Industries", hint: "13 sectors" },
-  { href: "#products", label: "Products", hint: "Software · Hardware" },
-  { href: "#services", label: "Services", hint: "Plan · Build · Run" },
+  { href: "#about", label: "About", hint: "Who we are" },
+  { href: "#solutions", label: "Solutions", hint: "9 portfolios" },
+  { href: "#industries", label: "Industries", hint: "8 sectors" },
+  { href: "#services", label: "Expertise", hint: "Concept to care" },
+  { href: "#insights", label: "Insights", hint: "Technology" },
 ];
 
 /**

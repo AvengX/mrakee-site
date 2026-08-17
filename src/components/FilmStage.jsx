@@ -25,9 +25,9 @@ const CAPTIONS = [
   {
     // Solid at rest, starts going the moment you scroll, gone by ~32vh.
     in: -0.05, out: 0.06, fade: 0.03, align: "center",
-    eyebrow: "Digital Signage · Kiosks · Singapore",
-    title: <>Screens that <span className="grad-text">do more</span> than show.</>,
-    body: "Displays, kiosks and the software behind them — deployed as one estate, managed from one place.",
+    eyebrow: "AV Systems Integration",
+    title: <>Visibly <span className="grad-text">Different</span>.</>,
+    body: "Re-engineering the way technology connects the future. Design. Integrate. Connect. Perform.",
     hero: true,
   },
   // The three below are placed against what the commercial is actually
@@ -37,21 +37,21 @@ const CAPTIONS = [
   // they are in git at a229ad8 if those chapters come back.
   {
     in: 0.26, out: 0.44, align: "left",
-    eyebrow: "Built to be seen",
-    title: <>Readable at noon.<br />Bright at midnight.</>,
-    body: "High-nit bonded panels that hold their colour in a shopfront window and dim themselves for an overnight lobby.",
+    eyebrow: "Digital Signage",
+    title: <>Capturing<br />Media Magic.</>,
+    body: "Deliver the right message to the right audience at the right time — centrally managed for seamless distribution.",
   },
   {
     in: 0.62, out: 0.8, align: "right",
-    eyebrow: "Quick service",
-    title: <>Menus that move<br />with the day.</>,
-    body: "Breakfast flips to lunch on schedule. An item greys out the moment stock runs dry. No one climbs a ladder.",
+    eyebrow: "Smart Spaces",
+    title: <>Spaces that are<br />intuitive to use.</>,
+    body: "AV technology, engineering expertise and intentional design, brought together into one coordinated environment.",
   },
   {
     in: 0.86, out: 1.08, align: "center",
-    eyebrow: "At scale",
-    title: <>One estate.<br />One dashboard.</>,
-    body: "A thousand screens across a dozen sites, provisioned and monitored from a single pane of glass.",
+    eyebrow: "One team",
+    title: <>One Team, One Goal,<br />One Seamless AV experience.</>,
+    body: "From concept, design and installation through to training, after care and on-going support.",
   },
 ];
 
@@ -159,9 +159,9 @@ export default function FilmStage() {
             {c.hero && (
               <div className="hero__cta">
                 <a className="btn btn--primary" href="#contact">
-                  Book a demo <span className="arrow" aria-hidden="true">→</span>
+                  Talk to Our Experts <span className="arrow" aria-hidden="true">→</span>
                 </a>
-                <a className="btn btn--ghost" href="#solutions">Explore solutions</a>
+                <a className="btn btn--ghost" href="#solutions">Explore Our Solutions</a>
               </div>
             )}
           </div>

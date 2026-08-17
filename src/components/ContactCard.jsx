@@ -60,11 +60,15 @@ export default function ContactCard({
         <h2>{title}</h2>
         <p className="lede">{description}</p>
 
-        <div className="contact__infos">
-          {contactInfo.map((info) => (
-            <ContactInfo key={info.label} {...info} />
-          ))}
-        </div>
+        {/* Skipped entirely when there is nothing real to put in it —
+            an empty rail is a rule and a gap, which reads as broken. */}
+        {contactInfo.length > 0 && (
+          <div className="contact__infos">
+            {contactInfo.map((info) => (
+              <ContactInfo key={info.label} {...info} />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="contact__form">{children}</div>
