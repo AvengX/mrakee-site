@@ -3,7 +3,7 @@ import SplitWords from "./SplitWords";
 import Logo from "./Logo";
 import ContactCard from "./ContactCard";
 import ContactForm from "./ContactForm";
-import FeatureRows from "./FeatureRows";
+import CardStack from "./CardStack";
 import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
 import { usePointerGlow } from "../hooks/usePointerGlow";
@@ -24,10 +24,6 @@ import {
    company's, so the aurora band now carries the client's own "Our
    Experts" copy instead of being deleted.
    -------------------------------------------------------------------- */
-
-/* FeatureRows wants a single description; most portfolios lead with a
-   line in quotes and then list what they support. */
-const SOLUTION_ROWS = SOLUTIONS.map((s) => ({ ...s, d: s.d || s.quote }));
 
 export default function BrandPage() {
   const whySurface = usePointerGlow(".pillar");
@@ -59,8 +55,11 @@ export default function BrandPage() {
         </div>
       </section>
 
-      {/* ---------------- SOLUTIONS PORTFOLIO ---------------- */}
-      <section className="band band--rule" id="solutions">
+      {/* ---------------- SOLUTIONS PORTFOLIO ----------------
+          A dealt deck: each portfolio pins under the nav and the next
+          arrives over it from the left, the right or from below.
+          band--clip is what hides them off the side of the page. */}
+      <section className="band band--rule band--clip" id="solutions">
         <div className="band__inner">
           <Reveal className="band__head">
             <p className="eyebrow">Solutions Portfolio</p>
@@ -74,7 +73,7 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <FeatureRows items={SOLUTION_ROWS} />
+          <CardStack items={SOLUTIONS} />
         </div>
       </section>
 

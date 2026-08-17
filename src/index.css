@@ -1063,6 +1063,15 @@ h3 {
   background: linear-gradient(90deg, transparent, var(--line-strong) 22%, var(--line-strong) 78%, transparent);
 }
 
+/* Cards arrive from off the side of the page, so something has to hide
+   them on the way in. `clip` and not `hidden`: hidden makes the element
+   a scroll container, which would stop every sticky card inside it from
+   ever sticking. clip does not, and pairs legally with a visible
+   vertical axis, so the pile still pins to the viewport. */
+.band--clip {
+  overflow-x: clip;
+}
+
 .band__inner {
   max-width: var(--maxw);
   margin: 0 auto;
@@ -1282,20 +1291,33 @@ h3 {
 }
 
 /* ================================================================
-   SERVICES — stacking cards
-   Each card pins under the nav and the next scrolls up over it.
+   STACKING CARDS
+   Each card pins under the nav and the next covers it. They arrive from
+   alternating sides — see CardStack.jsx for the scroll maths.
    ================================================================ */
 .stack {
-  display: grid;
+  /* Flex column, NOT grid. A sticky grid item is constrained to its own
+     grid area, and with one card per row that area is exactly the card
+     — zero travel, so nothing ever pins and the deck is just nine rows
+     going past. A flex item's containing block is the whole flex
+     container, which is the runway the pile needs. */
+  display: flex;
+  flex-direction: column;
   gap: 2.25rem;
+  /* the offsetParent the arrival maths measures against; without it
+     offsetTop is reported against .band and every window is out by the
+     section's own offset */
+  position: relative;
 }
 
 .stack__card {
   position: sticky;
-  /* clear the floating nav, then stagger each card 16px lower than the
-     last so the edge of the one beneath stays visible — without the
-     stagger the pile is invisible and it just looks like one card */
-  top: calc(5.75rem + var(--i) * 16px);
+  /* Clear the floating nav, then stagger each card below the last so
+     the edge of the one beneath stays visible — without the stagger the
+     pile is invisible and it just looks like one card. Capped at six
+     steps: nine cards at the old 16px pushed the last one 128px down,
+     which on a short laptop put its foot off the bottom. */
+  top: calc(5.75rem + min(var(--i), 6) * 10px);
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 60vh;
@@ -1363,6 +1385,19 @@ h3 {
   line-height: 1.06;
   text-wrap: balance;
   max-width: 15ch;
+}
+
+/* The line the client's document leads each portfolio with, in quotes.
+   Kept apart from the description rather than folded into it — it is a
+   claim about the space, not a summary of the kit. */
+.stack__quote {
+  margin-top: 0.9rem;
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.45;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--teal-ink);
+  max-width: 34ch;
 }
 
 .stack__lede {
