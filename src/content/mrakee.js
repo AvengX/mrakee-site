@@ -1,32 +1,48 @@
 /* ================================================================
    CLIENT CONTENT — MRAKEE TECHNOLOGIES
-   Source: "MRAKEE TECHNOLOGIES - Edit 1.docx" (client-supplied).
+   Source: "MRAKEE TECHNOLOGIES - Final Version.docx" (client-supplied,
+   received 2026-08-22). Supersedes "Edit 1".
 
    Everything in this file is the client's own words. Where the document
    gave a name with no description, the name is all that appears —
    nothing here is written to fill a gap.
 
-   Note on what this replaced: the site previously carried the product
-   range, industries, head-office details and headline statistics of an
-   acquired APAC digital-signage business. None of that is in the
-   client's document, and the statistics in particular belonged to
-   another company, so they are gone rather than re-homed.
+   WHAT CHANGED FROM EDIT 1, so it can be checked against the document:
+     · a new hero headline, "AV Integration made Simple", and a second
+       intro paragraph
+     · seven of the nine solution portfolios have a new line in quotes
+     · "Connectivity beyond a room" was a bullet under Seamless
+       Communication and is now that portfolio's quoted line, so it is
+       no longer also in its list
+     · Video Walls and Large Venue lost their descriptions; Hospitality
+       AV lost its description and gained five bullets
+     · the Our Expertise matrix is reworded
+     · two of the six Why reasons are reworded
+
+   ONE LINE DELIBERATELY NOT CARRIED: under Digital Signage the document
+   has "Digital Signage solutions for your space.. centrally managed for
+   seamless distribution..", which restates the quoted line directly
+   above it. Set back-to-back on a card the two read as a stutter. Say
+   the word and it goes back in.
 
    STILL MISSING, flagged rather than invented:
-     · phone, email and postal address — the document has
+     · phone, email and postal address — the final document still has
        "+91 XXXXX XXXXX", "info@yourMRAKEE Technologies.com" and
        "[Company Address]", all placeholders
      · social URLs for LinkedIn / Instagram / YouTube
-     · a Projects section — listed in the footer's quick links but no
-       project content was supplied
+     · a Projects section — in the footer quick links, but no project
+       content was supplied
    ================================================================ */
 
 export const HERO = {
   eyebrow: "AV Systems Integration",
-  tagline: "Design. Integrate. Connect. Perform.",
+  headline: "AV Integration made Simple",
   strap: "Re-engineering the way technology connects the future.",
-  intro:
-    "An AV Systems Integration business creating the road map for smart, reliable, scalable technology solutions — for modern workplaces, educational institutions, secure government facilities, hospitality, critical command centres and large enterprise environments.",
+  tagline: "Design. Integrate. Connect. Perform.",
+  intro: [
+    "MRAKEE TECHNOLOGIES is an AV Systems Integration business that creates the road map for delivering smart, reliable, scalable technology solutions for business that are looking to redefine their technology. Expertise that range for solutions to support modern workplaces, educational institutions, secure government facilities, hospitality, critical command centres and large enterprise environments.",
+    "MRAKEE Technologies brings together AV Technology, leading engineering expertise, revolutionary and intentional design to create spaces that are intuitive to use. Powerful in performance and built to scale with your business. Where growth is built together.",
+  ],
 };
 
 export const ABOUT = {
@@ -43,7 +59,11 @@ export const ABOUT = {
    photographs were commissioned for this (the service images), so
    Integrate borrows a solutions frame and Care shares the technician
    with Deploy — both flagged in film-src/AV_SOLUTION_PROMPTS.md as
-   worth shooting properly. */
+   worth shooting properly.
+
+   The final document writes the last stage "Mrakee Care"; kept as
+   "MRAKEE Care", which is how that same document sets the name
+   everywhere else, including "MRAKEE After Care" further down. */
 export const APPROACH = [
   { t: "Listen", short: "Listen", img: "services/01.jpg",
     d: "We begin by listening and understanding your vision, objectives, users and operational requirements." },
@@ -57,17 +77,17 @@ export const APPROACH = [
     d: "Where we continue to be your technology partner, to provide proactive support and maintenance." },
 ];
 
-/* The nine solution portfolios. `img` is the closest existing photograph
-   on the site; most were shot for digital signage and do not show a
-   boardroom, a classroom or a control room. See
+/* The nine solution portfolios. Each `img` is the closest existing
+   photograph on the site; most were shot for digital signage and do not
+   show a boardroom, a classroom or a control room. See
    film-src/AV_SOLUTION_PROMPTS.md — six of the nine need new images. */
 export const SOLUTIONS = [
   {
     t: "Seamless Communication & Video Conferencing",
-    quote: "Meetings made easy.",
+    quote: "Connectivity beyond a room…",
     img: "solutions/13.jpg",
     fallback: "solutions/13.jpg",
-    points: ["Video conferencing systems", "Conference room AV", "Wireless presentation", "Room scheduling", "Professional microphones and speakers", "Camera systems", "Collaboration platforms", "Room control and automation", "Connectivity beyond a room"],
+    points: ["Video conferencing systems", "Conference room AV", "Wireless presentation", "Room scheduling", "Professional microphones and speakers", "Camera systems", "Collaboration platforms", "Room control and automation"],
   },
   {
     t: "Corporate Meeting & Board Rooms",
@@ -78,7 +98,7 @@ export const SOLUTIONS = [
   },
   {
     t: "Smart Classrooms & Learning Spaces",
-    quote: "Where Knowledge is given wings.",
+    quote: "Wisdom is shared.",
     img: "solutions/02.jpg",
     fallback: "solutions/02.jpg",
     points: ["Interactive displays", "Projectors and projection systems", "Digital podiums", "Classroom audio", "Wireless presentation", "Lecture capture", "Video conferencing", "Content distribution", "Centralized control"],
@@ -92,42 +112,39 @@ export const SOLUTIONS = [
   },
   {
     t: "Experience Centres",
-    quote: "Stepping into the realm of Possibilities.",
+    quote: "Where seeing is believing.",
     img: "solutions/03.jpg",
     fallback: "solutions/03.jpg",
     points: ["Interactive displays", "Video walls", "Immersive projection", "Touch interfaces", "Digital content systems", "Professional audio", "Lighting integration", "Interactive demonstrations", "Centralized control"],
   },
   {
     t: "Digital Signage",
-    quote: "Capturing Media Magic.",
+    quote: "Centrally Managed for Seamless Distribution through the network.",
     img: "solutions/15.jpg",
     fallback: "solutions/15.jpg",
-    d: "Deliver the right message to the right audience at the right time. Digital signage for corporate offices, retail environments, campuses, hospitals, hospitality spaces, transportation facilities and public areas — from display hardware to content distribution and centralized management, built for continuous operation.",
+    d: "Deliver the right message to the right audience at the right time. MRAKEE TECHNOLOGIES provides digital signage solutions for corporate offices, retail environments, campuses, hospitals, hospitality spaces, transportation facilities and public areas. From display hardware to content distribution and centralized management, we create signage ecosystems that are easy to manage and built for continuous operation.",
     points: [],
   },
   {
     t: "Video Walls & Large Displays",
-    quote: "Make information impossible to miss.",
+    quote: "Visualisation at Large.",
     img: "solutions/03.jpg",
     fallback: "solutions/03.jpg",
-    d: "We design and deploy high-performance display environments, helping select the right display technology, configuration and processing architecture for each application.",
     points: ["Command centres", "Corporate lobbies", "Experience centres", "Retail environments", "Control rooms", "Auditoriums", "Large venues", "Monitoring applications"],
   },
   {
     t: "Large Venue & Auditorium AV",
-    quote: "Deliver exceptional experiences to large audiences.",
+    quote: "Showcasing the Big Message.",
     img: "solutions/12.jpg",
     fallback: "solutions/12.jpg",
-    d: "Integrated AV for auditoriums, conference halls, training centres, event spaces and multipurpose venues.",
     points: ["Large-format projection", "LED displays", "Professional sound systems", "Stage audio", "Microphone systems", "Video processing", "Streaming and recording", "Digital control systems", "Lighting integration"],
   },
   {
     t: "Hospitality AV",
-    quote: "Technology that complements the guest experience.",
+    quote: "Smart Hospitality… Smart Guest Experience.",
     img: "solutions/09.jpg",
     fallback: "solutions/09.jpg",
-    d: "AV environments for hotels, restaurants, conference facilities, lounges, banquet halls and other hospitality spaces — combining performance, aesthetics and ease of operation.",
-    points: [],
+    points: ["Digital Signage", "Large Event Spaces", "Workspace Management", "Virtual Concierge", "Self-Check In"],
   },
 ];
 
@@ -145,36 +162,39 @@ export const INDUSTRIES = [
 ];
 
 export const WHY = [
-  { t: "Technical Transformation", d: "Each requirement is evaluated both technically and user friendly. Creating solutions designed for real-world use." },
-  { t: "End to End Capability", d: "One team to assist customers from concept to deployment." },
+  { t: "Technical Transformation", d: "Each requirement is evaluated both technically and user friendly. Creating Solutions designed for real-world use." },
+  { t: "End to End Capability", d: "One Team to assist customers from Concept to Deployment." },
   { t: "Technology Agnostic", d: "Understanding requirements to successfully recommending the right solution." },
-  { t: "Intentional Design", d: "Technology should feel natural — we place importance on intuitive interfaces and user experiences." },
-  { t: "Scalable Solutions", d: "We are in it for the long haul. Designs which grow as the customer grows." },
-  { t: "Reliable, Seamless Execution", d: "Planning successfully means successful project outcomes." },
+  { t: "Intentional Design", d: "Technology should feel natural where we place importance on intuitive interfaces and user experiences." },
+  { t: "Scalable Solutions", d: "We are in it for the long haul, Designs which grow as the customer grows." },
+  { t: "Reliable, Seamless Execution", d: "Planning successfully means Successful Project outcomes." },
 ];
 
-/* The five-stage matrix. Note this covers much the same ground as
-   APPROACH above — both are in the client's document, described twice. */
+/* The five-stage matrix. The final document runs stages two to five as
+   sentences with no heading of their own; the headings below are the
+   ones the client gave these same five stages in Edit 1, and each names
+   the team its sentence goes on to describe. */
 export const EXPERTISE = [
-  { t: "Begin with Questions", d: "Our experts evaluate your current set up, objectives, infrastructure and set goals." },
-  { t: "Engineering", d: "Our engineering experts then work the magic of bridging concept to detailed AV designs." },
-  { t: "Project Delivery", d: "Our project team work with the customer to manage procurement, scheduling, installing, stakeholder management, testing and ensuring successful timely completion." },
-  { t: "Training", d: "Our training team will share user and administrator testing which will allow customers to confidently operate the new solutions." },
-  { t: "MRAKEE After Care", d: "An after care team is assigned to ensure that maintenance and support are managed." },
+  { t: "Begin with Questions", d: "Where our experts evaluate your current set up, objectives, infrastructure and set goals." },
+  { t: "Engineering", d: "Our Engineering experts then work the magic of bridging concept to detailed AV Designs." },
+  { t: "Project Delivery", d: "Then our Project Team work with the customer to manage procurement, scheduling, installing, stakeholder management, testing and ensuring successful timely completion." },
+  { t: "Training", d: "Our Training Team will share customers with user and administrator testing which will allow the customers to confidently operate the new solutions." },
+  { t: "MRAKEE After Care", d: "MRAKEE After Care team will be assigned to ensure that maintenance and support are managed." },
 ];
 
 export const EXPERTS = {
   title: "One Team, One Goal, One Seamless AV experience.",
   body: [
-    "MRAKEE TECHNOLOGIES invests in having the best minds in the business. This allows our customers to feel confident that who they interact with have the technical, operational and market knowledge and experience to help with their requirements.",
+    "MRAKEE TECHNOLOGIES invests in having the best minds in the business. This allows our customers to feel confident that who they interact with, have the technical, operational and market knowledge and experience to help with their requirements.",
     "Collaborative, approachable and professional are the pillars of the teams that will support your business needs.",
   ],
 };
 
-/* Flagged by the client's reviewer: "Blog Categories - Unsure what this
-   is for but I didnt make any changes." Carried through as written. */
+/* Flagged again by the client reviewer on the final version: "Blog
+   Categories - Unsure what this is for but I didnt make any changes."
+   Carried through as written. */
 export const INSIGHTS = {
-  title: "Know what's happening within the Technology.",
+  title: "Know what is happening within the Technology.",
   lede: "Shaping modern technology today and beyond.",
   items: [
     { t: "AV Technology", d: "Understand emerging technologies and how they can improve your environment." },
@@ -185,8 +205,8 @@ export const INSIGHTS = {
   ],
 };
 
-/* Also flagged by the reviewer: "Again FAQ - unsure who designed these,
-   but I have not made any changes." */
+/* Also flagged again: "Again FAQ - unsure who designed these, but I
+   have not made any changes." */
 export const FAQ = [
   { q: "What does MRAKEE TECHNOLOGIES do?", a: "MRAKEE TECHNOLOGIES designs, supplies, integrates and supports professional audio-visual technology for organizations across corporate, education, government, hospitality and other sectors." },
   { q: "Can MRAKEE TECHNOLOGIES upgrade an existing AV system?", a: "Yes. We can assess existing infrastructure and recommend upgrades, replacements or improvements based on your requirements and available infrastructure." },
@@ -200,7 +220,7 @@ export const FOOTER = {
   strap: "Intelligent Audio-Visual Solutions. Seamlessly Integrated.",
   disciplines: [
     "Audio-Visual Systems Integration", "Collaboration", "Digital Signage",
-    "Smart Spaces", "Command Centers", "Learning Spaces", "Large Venues",
+    "Smart Spaces", "Command Centres", "Learning Spaces", "Large Venues",
   ],
   // LinkedIn / Instagram / YouTube are named in the document but no URLs
   // were supplied, so they are not rendered as links here.

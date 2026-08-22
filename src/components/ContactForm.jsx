@@ -2,6 +2,7 @@ import { useId, useRef, useState } from "react";
 import { Check, Loader2, Send } from "lucide-react";
 import PhoneField from "./PhoneField";
 import { checkPhone, digitsOf, findCountry } from "../lib/countries";
+import { SOLUTIONS } from "../content/mrakee";
 
 /* ================================================================
    The enquiry form.
@@ -60,9 +61,18 @@ const EMPTY = {
   email: "",
   phone: "",
   country: "IN",
+  city: "",
+  projectType: "",
   message: "",
   website: "",
 };
+
+/* The final document asks for a Project Type but does not say what the
+   types are. Rather than invent a list, these are the client's own nine
+   solution portfolios — which is what a project type means for this
+   business — plus an escape hatch, so nobody is forced into a box that
+   does not fit. */
+const PROJECT_TYPES = [...SOLUTIONS.map((s) => s.t), "Something else"];
 
 export default function ContactForm() {
   const uid = useId();
@@ -94,6 +104,8 @@ export default function ContactForm() {
       // dialling code included, or a ten-digit number reaches nobody
       payload.phone &&
         `Phone: ${findCountry(payload.country).dial} ${digitsOf(payload.phone)}`,
+      payload.city && `City / Location: ${payload.city}`,
+      payload.projectType && `Project type: ${payload.projectType}`,
       "",
       payload.message,
     ]
@@ -161,7 +173,7 @@ export default function ContactForm() {
 
   return (
     <form ref={formRef} className="form" onSubmit={onSubmit} noValidate>
-      <p className="form__head">Tell us about the space</p>
+      <p className="form__head">Quick Enquiry</p>
 
       {FIELDS.map((f) => (
         <div className="field" key={f.name}>
@@ -208,8 +220,38 @@ export default function ContactForm() {
       )}
 
       <div className="field">
+        <label htmlFor={`${uid}-city`}>City / Location</label>
+        <input
+          id={`${uid}-city`}
+          name="city"
+          type="text"
+          autoComplete="address-level2"
+          value={values.city}
+          onChange={set("city")}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor={`${uid}-projectType`}>Project Type</label>
+        <select
+          id={`${uid}-projectType`}
+          name="projectType"
+          className="field__select"
+          value={values.projectType}
+          onChange={set("projectType")}
+        >
+          <option value="">Select a project type</option>
+          {PROJECT_TYPES.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="field">
         <label htmlFor={`${uid}-message`}>
-          What are you trying to solve?
+          Tell us about your requirement
           <span className="field__req" aria-hidden="true">
             *
           </span>
@@ -260,7 +302,7 @@ export default function ContactForm() {
           </>
         ) : (
           <>
-            Send enquiry <Send size={16} aria-hidden="true" />
+            Submit Enquiry <Send size={16} aria-hidden="true" />
           </>
         )}
       </button>

@@ -70,8 +70,8 @@ export default function BrandPage() {
             />
             <p className="lede">
               MRAKEE Technologies solutions portfolios are developed around
-              customers. How customers work, how customers learn, how customers
-              communicate and how customers engage.
+              Customers. How Customers work, how Customers learn, how Customers
+              communicate and how Customers engage.
             </p>
           </Reveal>
 
@@ -88,7 +88,7 @@ export default function BrandPage() {
               words={["Catered", "to", { t: "every", grad: true, br: true }, { t: "environment.", grad: true }]}
             />
             <p className="lede">
-              Our solutions portfolios are catered to every environment.
+              Our Solutions Portfolios are catered to every environment.
             </p>
           </Reveal>
 
@@ -101,10 +101,11 @@ export default function BrandPage() {
         <div className="band__inner">
           <Reveal className="band__head">
             <p className="eyebrow">Why MRAKEE Technologies</p>
-            <SplitWords words={["Solutions", "are", "just", "the", { t: "beginning.", grad: true }]} />
+            <SplitWords words={["We", "believe", "Solutions", "are", "just", "the", { t: "beginning.", grad: true }]} />
             <p className="lede">
-              We understand that choosing the right technology is only one part
-              of a successful AV project. That's why we believe in the following.
+              We understand the importance that choosing the right technology
+              is only one part of a successful AV project. That's why we believe
+              in the following.
             </p>
           </Reveal>
 
@@ -119,9 +120,11 @@ export default function BrandPage() {
             <p className="eyebrow">Our Expertise</p>
             <SplitWords words={["Across", "the", "whole", { t: "project", grad: true }, { t: "life-cycle.", grad: true }]} />
             <p className="lede">
-              Our experts work closely with customers throughout the project
-              life-cycle, allowing customers to feel empowered to find the right
-              solution for their business needs.
+              At MRAKEE TECHNOLOGIES our experts work closely with customers
+              throughout the project life-cycle, allowing customers to feel
+              empowered to find the right solution for their business needs. The
+              team uses the following matrix giving a personalised approach in
+              understanding the customer's needs.
             </p>
           </Reveal>
 

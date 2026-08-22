@@ -2980,6 +2980,36 @@ a.contact__info:hover .contact__infoIcon {
     background 0.25s var(--ease-soft);
 }
 
+/* The Project Type picker. Same box as the text inputs, with room kept
+   on the right for the native caret so a long portfolio name does not
+   run underneath it. */
+.field__select {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft);
+}
+
+.field__select:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.16);
+}
+
+@media (max-width: 760px) {
+  /* 16px, or iOS zooms the page the moment it is focused */
+  .field__select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+}
+
 .field textarea {
   resize: vertical;
   min-height: 96px;

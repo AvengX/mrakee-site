@@ -26,7 +26,7 @@ const CAPTIONS = [
     // Solid at rest, starts going the moment you scroll, gone by ~32vh.
     in: -0.05, out: 0.06, fade: 0.03, align: "center",
     eyebrow: "AV Systems Integration",
-    title: <>Visibly <span className="grad-text">Different</span>.</>,
+    title: <>AV Integration made <span className="grad-text">Simple</span>.</>,
     body: "Re-engineering the way technology connects the future. Design. Integrate. Connect. Perform.",
     hero: true,
   },
@@ -38,7 +38,7 @@ const CAPTIONS = [
   {
     in: 0.26, out: 0.44, align: "left",
     eyebrow: "Digital Signage",
-    title: <>Capturing<br />Media Magic.</>,
+    title: <>Centrally Managed for<br />Seamless <span className="grad-text">Distribution</span>.</>,
     body: "Deliver the right message to the right audience at the right time — centrally managed for seamless distribution.",
   },
   {
