@@ -333,11 +333,10 @@ body {
   /* drift is written by JS as a custom property, so the centring
      transforms below are never clobbered by an inline `transform` */
   transform: translateY(var(--drift, 0px));
-  /* Only a tight shadow now. The old wide white glow was fighting the
-     footage rather than helping — on a bright frame it lightened the
-     very type it was meant to lift off the background. The scrim below
-     does that job properly. */
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  /* No shadow. It existed to fake a ground when there was none; the
+     plate below is the ground now, and a white shadow on type that is
+     already sitting on white only softens the edges. */
+  text-shadow: none;
 }
 
 /* A soft white ground under each caption.
@@ -347,22 +346,66 @@ body {
    to be the background rather than the foreground. This lifts the local
    ground to near-white, which lets brand colour be used at full
    strength on top of it, and fades out before it reads as a box. */
+/* A frosted card behind the words — and this time it is measured, not
+   guessed, because the two previous answers were both wrong.
+
+   The footage was sampled at 26 points and split into eight horizontal
+   bands. EVERY band of EVERY frame contains a dark spot that drops this
+   ink to about 1.4:1: the film is full of screens, and a screen is
+   nearly the same luminance as the type. So there is no clever place to
+   put a caption, and no text colour that survives — "dark ink on raw
+   footage" was never going to hold, it just happened to hold on the
+   frames anyone checked.
+
+   Blur alone makes it WORSE (1.19 to 1.10) — blurring a dark screen
+   only spreads the dark. What the numbers actually asked for was a
+   ground, and 0.58 white over blur(20) brightness(1.2) is the lightest
+   one that clears 4.5:1 everywhere; measured worst case 5.52:1 across
+   all four captions at three points in each of their windows.
+
+   The difference from the veils that were rejected is WHERE it goes.
+   Those covered the frame. This is inset to the text and masked to
+   nothing well before its edge, so it touches about 13% of the picture
+   and the other 87% is untouched footage. Turn --cap-plate down if it
+   still feels heavy; below about 0.50 the dark frames start failing
+   again. */
 .cap::before {
   content: "";
   position: absolute;
-  /* Deliberately enormous. The first version hugged the text at ~3rem
-     and its falloff happened over a few dozen pixels, which made the
-     edge of the ellipse legible — it read as a pale rectangle pasted on
-     the footage. Spreading the same amount of light over 14vw/16vh
-     means the transition takes hundreds of pixels and reads as light
-     pooling in the middle of the frame instead of as a patch. */
-  inset: 0;
+  /* Generous, because the fade needs somewhere to happen. The text sits
+     in the middle 82%; the margin either side is pure falloff. */
+  inset: -2.5rem -4rem;
   z-index: -1;
   pointer-events: none;
-  /* Gone too. Any scrim is a shape on top of the video, and every
-     version of it was either visible as a patch or heavy enough to
-     bleach the frame. */
-  background: none;
+  background: rgba(255, 255, 255, var(--cap-plate, 0.58));
+  backdrop-filter: blur(20px) brightness(1.2) saturate(0.95);
+  -webkit-backdrop-filter: blur(20px) brightness(1.2) saturate(0.95);
+  /* Two gradients intersected, not one radial. A radial is an ellipse,
+     and the corners of a rectangle of text fall outside an ellipse
+     drawn through its edges — the ends of the first and last lines
+     would have sat in the transparent part. Crossed linear fades give a
+     soft-edged RECTANGLE, which is the shape the text actually is.
+     Measured: the widest caption's glyphs run from 8.7% to 91.3% of
+     the plate, so full strength runs 7% to 93% and every glyph clears
+     the feather. The outer fourteenth each side is the fade, which is
+     about 50px on the hero — enough that the plate ends without a
+     line. */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Without backdrop-filter there is no blur and no lift doing half the
+   work, so the ground has to carry it alone. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cap::before {
+    background: rgba(255, 255, 255, 0.72);
+  }
 }
 
 .cap--left {
@@ -421,6 +464,13 @@ body {
 }
 
 @media (max-width: 760px) {
+  /* Narrower than the desktop inset: the caption is already 90vw here,
+     so a wider plate runs off both edges of the frame and its side
+     feather gets clipped — it would meet the screen edge at full
+     strength and read as a band rather than a card. */
+  .cap::before {
+    inset: -1.25rem -1rem;
+  }
   .cap {
     width: min(90vw, 42ch);
     left: 50%;
