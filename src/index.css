@@ -2530,11 +2530,16 @@ h3 {
   stroke-dasharray: 8 6;
 }
 
-/* The class comes from motionAllowed(), so the preference and the
-   ?motion=on override are decided in one place for the whole site
-   rather than half here and half in JS. -140 is ten whole dashes
-   (8 + 6), so the loop has no jump. */
-.xp__trail.is-marching path {
+/* Runs for everyone, including under a reduced-motion preference, and
+   that is a deliberate call rather than an oversight. This is a 2px
+   dashed line creeping along at 4px/s: the amplitude is a couple of
+   pixels and it covers no area. The preference exists for motion that
+   can unsettle — parallax, large-area slides, zooms — and the things on
+   this site that qualify DO honour it: the card stack's arrivals, the
+   Why column's fade and drift, the FAQ marquee. Suppressing this one as
+   well bought nobody anything and left the trail looking broken.
+   -140 is ten whole dashes (8 + 6), so the loop has no jump. */
+.xp__trail path {
   animation: xp-march 3s linear infinite;
 }
 

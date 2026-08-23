@@ -36,6 +36,9 @@ gsap.registerPlugin(ScrollTrigger);
    Below 900px the pinning and the fading both go: on a phone the panel
    would take most of the screen and the fade would hide text that has
    nowhere else to be. It becomes a plain numbered list.
+
+   Reduced motion keeps the panel tracking and drops only the fade and
+   the drift — see the note in the effect.
    ================================================================ */
 
 /* The original's opacity curve: in, hold, out — mapped across the
@@ -66,7 +69,16 @@ export default function WhyScroll({ items }) {
 
   useLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root || !motionAllowed()) return undefined;
+    if (!root) return undefined;
+
+    /* Reduced motion suppresses the MOVEMENT, never the tracking.
+       Gating the whole effect on it — which is what this used to do —
+       left the panel showing 01 while you read reason four, because the
+       panel is content and not decoration. So the triggers are always
+       built and the panel always follows; only the fade and the drift
+       below are skipped, and the stylesheet's defaults then hold every
+       reason at full opacity where it belongs. */
+    const animate = motionAllowed();
 
     const mm = gsap.matchMedia();
 
@@ -123,7 +135,8 @@ export default function WhyScroll({ items }) {
         i === 0 ? FADE_FIRST : i === last ? FADE_LAST : FADE;
 
       const draw = (i, p) => {
-        progress[i] = p;
+        progress[i] = p; // the panel needs this either way
+        if (!animate) return;
         set[i].o(ramp(p, curve(i)));
         set[i].y(20 - 40 * p);
       };

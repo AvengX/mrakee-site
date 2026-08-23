@@ -1,6 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { Pin } from "lucide-react";
-import { motionAllowed } from "../lib/motion";
 
 /* ================================================================
    OUR EXPERTISE — pinned cards on a dashed trail
@@ -44,10 +43,6 @@ export default function ExpertiseTrail({ items }) {
   const wrapRef = useRef(null);
   const cardRefs = useRef([]);
   const [trail, setTrail] = useState({ d: "", w: 0, h: 0 });
-  /* The march is gated here rather than by a media query in the sheet,
-     so the whole site answers to one rule — motionAllowed() honours the
-     preference and the ?motion=on override together. */
-  const [marching] = useState(() => motionAllowed());
 
   useLayoutEffect(() => {
     const wrap = wrapRef.current;
@@ -110,7 +105,7 @@ export default function ExpertiseTrail({ items }) {
     <div className="xp" ref={wrapRef}>
       {trail.d && (
         <svg
-          className={`xp__trail${marching ? " is-marching" : ""}`}
+          className="xp__trail"
           viewBox={`0 0 ${trail.w} ${trail.h}`}
           width={trail.w}
           height={trail.h}
