@@ -378,8 +378,8 @@ body {
   z-index: -1;
   pointer-events: none;
   background: rgba(255, 255, 255, var(--cap-plate, 0.58));
-  backdrop-filter: blur(20px) brightness(1.2) saturate(0.95);
   -webkit-backdrop-filter: blur(20px) brightness(1.2) saturate(0.95);
+  backdrop-filter: blur(20px) brightness(1.2) saturate(0.95);
   /* Two gradients intersected, not one radial. A radial is an ellipse,
      and the corners of a rectangle of text fall outside an ellipse
      drawn through its edges — the ends of the first and last lines
@@ -508,8 +508,8 @@ body {
      surface — and it is a bar, not a layer over the footage, so making
      it more solid costs no video. */
   background: rgba(255, 255, 255, 0.86);
-  backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
+  backdrop-filter: blur(14px) saturate(180%);
   transform: translateX(-50%);
   transition: background 0.5s var(--ease), border-color 0.5s var(--ease),
     box-shadow 0.5s var(--ease), padding 0.5s var(--ease);
@@ -710,8 +710,8 @@ body {
   border-radius: 20px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
   box-shadow: var(--shadow-lg);
   opacity: 0;
   visibility: hidden;
@@ -914,8 +914,8 @@ body {
   border-radius: 999px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.93);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   box-shadow: var(--shadow-sm);
   font-size: 0.68rem;
   letter-spacing: 0.18em;
@@ -2232,8 +2232,8 @@ h3 {
   border-radius: 14px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
   box-shadow: var(--shadow-md);
   max-width: calc(100% - 2rem);
 }
