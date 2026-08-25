@@ -31,8 +31,21 @@ TMP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_tmp")
 # small movement — which reads as the film being rushed rather than coarse.
 # Doubling the frames halves the step without changing how far you scroll.
 FPS = 24
-WIDTH = 1400
-HEIGHT = 788        # forced, so the 1080p and 720p sources land identically
+# The crop's own output size, so `scale` below is an identity op and the
+# frames are never resampled at all. It used to be 1400x788, which threw
+# away 17% of the source's linear resolution and then left the browser
+# upscaling 1.53x to fill a 2138px canvas.
+#
+# Measured on one frame, rendered up to that 2138px canvas (edge stdev):
+#   1400x788  q82   56 kB/frame  13.3 MB  21.29
+#   1690x950  q82   73 kB/frame  17.4 MB  23.77   <- this
+#   1690x950  q90  118 kB/frame  28.1 MB  23.98
+#   1920x1080 q88  113 kB/frame  27.0 MB  23.03   (worse: past the source)
+#
+# So resolution was the lever and quality was not: q90 costs another
+# 11 MB to gain 0.2%, and scaling beyond the source actively loses.
+WIDTH = 1690
+HEIGHT = 950        # forced, so the 1080p and 720p sources land identically
 XFADE = 5           # frames of crossfade between chapters (~0.4s)
 QUALITY = 82
 
