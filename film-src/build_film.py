@@ -45,13 +45,18 @@ FPS = 24
 # So resolution was the lever and quality was not: q90 costs another
 # 11 MB to gain 0.2%, and scaling beyond the source actively loses.
 WIDTH = 1690
-HEIGHT = 950        # forced, so the 1080p and 720p sources land identically
+HEIGHT = 1080       # forced, so the 1080p and 720p sources land identically
 XFADE = 5           # frames of crossfade between chapters (~0.4s)
 QUALITY = 82
 
-# Watermark sits at x 89.3-92.7%, y 81.6-88.8% of frame in every clip.
-# Keeping 88% of the width clears it; trimming height to match restores 16:9.
-CROP = "crop=iw*0.88:iw*0.88*9/16:0:(ih-iw*0.88*9/16)/2"
+# Watermark sits at x 89.3-92.7%, y 81.6-88.8% of frame in every clip, so
+# keeping 88% of the WIDTH is what clears it. The height used to be trimmed
+# to match, "restoring 16:9" — but the canvas is cover-fit, so it crops
+# whatever does not fit anyway and the frame's aspect never mattered. That
+# trim was discarding 130 rows of source for nothing, and height is exactly
+# what constrains a 100vh stage on a tall window: on a phone the cover-fit
+# upscale drops from 1.71x to 1.50x by keeping them.
+CROP = "crop=iw*0.88:ih:0:0"
 
 # (keyword, label, start, duration) — segments chosen from the QC sheets
 CHAPTERS = [

@@ -165,6 +165,15 @@ export function useFrameSequence(name) {
     }
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Chrome defaults imageSmoothingQuality to "low", which is a cheap
+    // bilinear filter. The frame is 1690px wide and a HiDPI display asks
+    // for up to 3840, so this resample runs at 2-3x on exactly the pixels
+    // people look at. "high" costs nothing measurable and is the whole
+    // difference between soft and mushy.
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
     ctx.clearRect(0, 0, cw, ch);
 
     // Cover-fit, always: fill the stage edge to edge and crop whatever
