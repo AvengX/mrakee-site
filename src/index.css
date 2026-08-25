@@ -28,17 +28,31 @@
    ================================================================ */
 
 :root {
-  /* ---- Brand (fills) ---- */
-  --gold: #dd9e2c; /* sampled from the artwork */
-  --gold-lite: #fed271; /* sampled highlight */
-  --gold-deep: #c5880b; /* 3.0:1 — fills and large type only */
-  --teal: #06a0a2; /* sampled from the artwork */
-  --teal-lite: #3fc2c4;
-  --teal-deep: #017e80; /* 4.89:1 on white */
+  /* ---- Brand (fills) ----
+     The official palette, off the MRAKEE brand colour board, exactly as
+     specified. These used to be eyedropped from the logo artwork and
+     were all a shade or two out. Ratios are against white. */
+  --gold: #d8a32a; /* Premium Gold  2.28:1 — fills and graphics only */
+  --gold-lite: #ffe08a; /* gold gradient start  1.29:1 — fills only */
+  --gold-deep: #b87810; /* Deep Gold  3.66:1 — large text and UI only */
+  --teal: #00a0a0; /* Teal  3.21:1 — large text and UI only */
+  --teal-lite: #33c7c7; /* teal gradient start  2.07:1 — fills only */
+  --teal-deep: #006f73; /* Deep Teal  5.96:1 — safe for body text */
+  --red: #c81010; /* Corporate Red  5.94:1 — safe for body text */
+  --red-lite: #ff4d4d; /* red gradient start  3.27:1 */
 
-  /* ---- Brand (text-safe ink) ---- */
-  --gold-ink: #8b6009; /* 5.56:1 on white */
-  --teal-ink: #0a6e70; /* 6.04:1 on white */
+  /* ---- Brand (text-safe ink) ----
+     The board is a palette for fills; small type needs more contrast
+     than most of it can give, and the board says so itself ("maintain
+     high contrast for readability").
+
+     Teal needs no special ink: Deep Teal is already 5.96:1, so the
+     official colour IS the text colour. Gold has no such member —
+     Deep Gold is 3.66:1, which is fine for a 2rem numeral and not for a
+     12px label — so this is Deep Gold's own hue taken down to where it
+     clears AA, rather than a new colour invented beside it. */
+  --gold-ink: #8a5a0c; /* Deep Gold at 75% lightness  5.92:1 */
+  --teal-ink: var(--teal-deep); /* 5.96:1 */
 
   /* ---- Cool atmosphere — backgrounds and glow only ---- */
   --indigo: #635bff; /* 4.7:1 — safe as text if ever needed */
@@ -47,9 +61,11 @@
 
   /* ---- Surfaces ---- */
   --bg: #ffffff;
-  --bg-soft: #f7f9fc;
+  --bg-soft: #f7f8f6; /* Off White, from the board */
   --surface: #ffffff;
-  --surface-soft: #f1f5f9;
+  /* the next step down from Off White, kept on the board's neutral cast
+     rather than the cool blue-grey this used to be */
+  --surface-soft: #eff1ed;
 
   /* ---- Ink ---- */
   --ink: #111827;
@@ -69,7 +85,7 @@
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.05);
   --shadow-md: 0 2px 4px rgba(15, 23, 42, 0.04), 0 14px 32px rgba(15, 23, 42, 0.07);
   --shadow-lg: 0 4px 10px rgba(15, 23, 42, 0.05), 0 28px 64px rgba(15, 23, 42, 0.11);
-  --shadow-brand: 0 2px 4px rgba(177, 128, 31, 0.18), 0 12px 28px rgba(212, 163, 57, 0.26);
+  --shadow-brand: 0 2px 4px rgba(184, 120, 16, 0.18), 0 12px 28px rgba(216, 163, 42, 0.26);
 
   /* ---- Geometry ---- */
   --r-sm: 12px;
@@ -835,14 +851,19 @@ body {
 }
 
 .btn--primary {
+  /* the board's gold gradient, #ffe08a -> #b87810, with the mid stop */
   background: linear-gradient(135deg, var(--gold-lite) 0%, var(--gold) 52%, var(--gold-deep) 100%);
-  color: #2a1e05;
+  /* A shade darker than it was. The official Deep Gold is darker than
+     the eyedropped one it replaced, which dropped this label to 4.46:1
+     where the gradient ends — just under. Measured against all three
+     stops now: 13.9:1, 7.7:1, 4.68:1. */
+  color: #241a04;
   box-shadow: var(--shadow-brand);
 }
 
 .btn--primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(177, 128, 31, 0.2), 0 18px 38px rgba(212, 163, 57, 0.34);
+  box-shadow: 0 2px 4px rgba(184, 120, 16, 0.2), 0 18px 38px rgba(216, 163, 42, 0.34);
 }
 
 .btn--ghost {
@@ -1879,28 +1900,28 @@ h3 {
 }
 
 .why__slide:nth-child(1) {
-  --a: rgba(221, 158, 44, 0.2);
-  --b: rgba(6, 160, 162, 0.16);
+  --a: rgba(216, 163, 42, 0.2);
+  --b: rgba(0, 160, 160, 0.16);
 }
 .why__slide:nth-child(2) {
-  --a: rgba(6, 160, 162, 0.2);
+  --a: rgba(0, 160, 160, 0.2);
   --b: rgba(99, 91, 255, 0.14);
 }
 .why__slide:nth-child(3) {
   --a: rgba(99, 91, 255, 0.16);
-  --b: rgba(221, 158, 44, 0.2);
+  --b: rgba(216, 163, 42, 0.2);
 }
 .why__slide:nth-child(4) {
-  --a: rgba(221, 158, 44, 0.22);
+  --a: rgba(216, 163, 42, 0.22);
   --b: rgba(139, 92, 246, 0.14);
 }
 .why__slide:nth-child(5) {
   --a: rgba(6, 182, 212, 0.18);
-  --b: rgba(221, 158, 44, 0.18);
+  --b: rgba(216, 163, 42, 0.18);
 }
 .why__slide:nth-child(6) {
-  --a: rgba(6, 160, 162, 0.22);
-  --b: rgba(221, 158, 44, 0.16);
+  --a: rgba(0, 160, 160, 0.22);
+  --b: rgba(216, 163, 42, 0.16);
 }
 
 .why__slide img {
@@ -2607,12 +2628,12 @@ h3 {
   padding: 1.15rem 1.2rem 1.3rem;
   border-radius: 17px;
   border: 1px solid var(--gold-lite);
-  background: rgba(254, 210, 113, 0.13);
+  background: rgba(255, 224, 138, 0.13);
 }
 
 .xp__item:nth-child(even) .xp__tint {
   border-color: var(--teal-lite);
-  background: rgba(63, 194, 196, 0.12);
+  background: rgba(51, 199, 199, 0.12);
 }
 
 .xp__no {
@@ -3086,7 +3107,7 @@ a.contact__info:hover .contact__infoIcon {
 
 .field input[aria-invalid="true"],
 .field textarea[aria-invalid="true"] {
-  border-color: #b3261e;
+  border-color: var(--red);
 }
 
 .field input[aria-invalid="true"]:focus,
@@ -3110,7 +3131,7 @@ a.contact__info:hover .contact__infoIcon {
   margin-top: 0.4rem;
   font-size: 0.8rem;
   line-height: 1.45;
-  color: #b3261e; /* 5.9:1 on white */
+  color: var(--red);
 }
 
 .field__err a {
@@ -3137,7 +3158,7 @@ a.contact__info:hover .contact__infoIcon {
 }
 
 .phone.is-bad {
-  border-color: #b3261e;
+  border-color: var(--red);
 }
 
 .phone.is-ok {
@@ -3187,7 +3208,7 @@ a.contact__info:hover .contact__infoIcon {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  color: #b3261e;
+  color: var(--red);
 }
 
 .phone.is-ok .phone__state {
@@ -3198,7 +3219,7 @@ a.contact__info:hover .contact__infoIcon {
   margin-top: 0.35rem;
   font-size: 0.78rem;
   line-height: 1.45;
-  color: #b3261e;
+  color: var(--red);
 }
 
 .phone__note.is-ok {
