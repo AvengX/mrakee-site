@@ -88,3 +88,54 @@ It re-cuts all 239 frames at 1690x950 and rewrites the manifest. Check
 the printed scroll fractions afterwards — if the arc lands differently,
 the caption windows in `FilmStage.jsx` (`in` / `out`) need moving to
 match what the footage is showing at that moment.
+
+---
+
+## Making the on-screen content legible
+
+Asking a video model for "clear" or "sharp" or "readable" text does
+nothing — it produces confident gibberish at any setting. The only
+lever is to ask for content that is legible by construction.
+
+Append to whichever prompt you use:
+
+> **On-screen content — large graphics only.** Every display and kiosk
+> screen shows one of: a single oversized wayfinding arrow; one very
+> large icon; a bold abstract chart with thick bars and no labels; a
+> smooth teal-and-amber gradient motion graphic; or two words maximum
+> set very large, filling most of the panel in heavy uppercase. Nothing
+> else on any screen. No paragraphs, no lists, no tables, no timetable
+> rows, no menus, no price lists, no small captions, no fine print, no
+> numbers in columns. Screens are clean, high-contrast and uncluttered,
+> like a modern airport wayfinding sign rather than a departures board.
+
+Avoid list:
+
+> small text, body text, fine print, paragraphs, lists, tables,
+> timetable rows, departure boards, flight schedules, menus, price
+> lists, columns of numbers, subtitles, captions, cluttered screens,
+> dense information displays
+
+### What survives, measured against the current footage
+
+"Flight Schedule" and the "MRAKEE TECHNOLOGIES" wordmark on the closing
+kiosks both rendered legibly; the rows under the flight title did not.
+
+| survives | fails |
+|---|---|
+| 1–2 words, huge, uppercase | anything at body-text size |
+| big arrows, icons, symbols | rows, columns, tables |
+| large numerals (24/7, 01) | strings of digits, times, prices |
+| bold shapes and gradients | logos of real brands |
+
+Even survivors get misspelled. Pick words where a wrong letter costs
+nothing — WELCOME, ARRIVALS, GATE. The client's own name is not one of
+them: a mangled MRAKEE is worse than no wordmark at all.
+
+### The route that always works
+
+Screens show abstract motion graphics in brand colours; real text is
+overlaid in HTML on top. Crisp at any resolution, editable without
+regenerating video, legible on a phone. This is what the original
+six-chapter prompts in PROMPTS.md did, and why they carried a blanket
+"no text, no lettering, no words, no numbers" constraint.
