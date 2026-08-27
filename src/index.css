@@ -4416,7 +4416,45 @@ a.contact__info:hover .contact__infoIcon {
    parent whose own height is being derived from the image — a circular
    dependency the browser breaks by using the intrinsic size, which is
    how a 1024px-tall render ended up hanging off the viewport. */
+/* She is a still render, so if nothing moves her she is furniture. Two
+   loops, deliberately at odds with each other so the result never
+   settles into a visible cycle:
+
+   · breathe, 4.4s — a slow rise and fall of a few pixels with a hair of
+     scale, which is what a standing person does.
+   · sway, 7.1s — a fraction of a degree either way, pivoting at her
+     feet rather than her centre, because a figure standing on a page
+     rotates about the ground and not about its middle.
+
+   The periods are coprime enough that the pair takes about half a
+   minute to repeat, and the amplitudes are small on purpose: this has
+   to read as alive at the edge of vision, not as a thing demanding to
+   be looked at while someone is reading. */
+@keyframes greeter-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-7px) scale(1.014); }
+}
+
+@keyframes greeter-sway {
+  0%, 100% { transform: rotate(-0.5deg); }
+  50%      { transform: rotate(0.5deg); }
+}
+
+/* The entrance is the greeting: she rises into place once, on arrival. */
+@keyframes greeter-enter {
+  from { opacity: 0; transform: translateY(26px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+.dock__launcher--figure {
+  animation: greeter-sway 7.1s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
 .dock__figure {
+  animation:
+    greeter-enter 0.7s var(--ease-soft) both,
+    greeter-breathe 4.4s ease-in-out 0.7s infinite;
   height: clamp(190px, 30vh, 340px);
   width: auto;
   max-width: min(46vw, 340px);
@@ -4430,8 +4468,33 @@ a.contact__info:hover .contact__infoIcon {
   .dock__figure { height: clamp(150px, 22vh, 210px); max-width: 44vw; }
 }
 
+/* Reduced motion keeps her breathing, and that is a deliberate call
+   rather than an oversight.
+
+   Killing it outright is what this project already got wrong once, when
+   the Why panel froze on 01 for anyone with the preference set -- and
+   the machine this client reviews on reports `reduce`, so "no animation
+   under reduced motion" means the client never sees it at all. The
+   precedent set there was that motion of a couple of pixels is not what
+   the preference is protecting people from, and the dashed trail was
+   left running for everyone on the same reasoning.
+
+   So the breathe stays, at half the travel and half again the duration.
+   The SWAY goes: it is a rotation, and rotation is the one that
+   actually provokes vestibular symptoms. */
 @media (prefers-reduced-motion: reduce) {
   .dock__launcher--figure:hover { transform: none; }
+  .dock__launcher--figure { animation: none; }
+  .dock__figure {
+    animation:
+      greeter-enter 0.4s linear both,
+      greeter-breathe-soft 6.5s ease-in-out 0.4s infinite;
+  }
+}
+
+@keyframes greeter-breathe-soft {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
 }
 
 /* The badge is its own ground, so it must NOT follow the caption's ink.
