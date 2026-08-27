@@ -46,7 +46,33 @@ export default function AssistantAvatar({ state = "idle", size = 84 }) {
     return () => { alive = false; };
   }, [pose]);
 
-  const talking = pose === "answering";
+  /* A mouth that opens and closes while the voice runs.
+
+     Not lip sync, and it does not pretend to be: real sync needs
+     visemes off a rigged head, and the client's own reference does not
+     have it either -- measured over two seconds of that kiosk
+     "speaking", its avatar changes by 0.004 grey levels per 100ms,
+     which is a still image. What sells speech at this size is simply
+     that the mouth is not frozen.
+
+     The interval is jittered rather than metronomic. A mouth opening on
+     an exact beat reads as a machine; speech is uneven, and 90ms of
+     wobble is enough to suggest it. */
+  const [mouthOpen, setMouthOpen] = useState(true);
+
+  useEffect(() => {
+    if (pose !== "answering") { setMouthOpen(true); return; }
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    let id;
+    const tick = () => {
+      setMouthOpen((m) => !m);
+      id = setTimeout(tick, 130 + Math.random() * 90);
+    };
+    id = setTimeout(tick, 150);
+    return () => clearTimeout(id);
+  }, [pose]);
+
+  const talking = pose === "answering" && mouthOpen;
   const attentive = pose === "listening" || pose === "thinking";
 
   return (
@@ -56,7 +82,15 @@ export default function AssistantAvatar({ state = "idle", size = 84 }) {
       aria-hidden="true"
     >
       {custom ? (
-        <img src={custom} alt="" width={size} height={size} />
+        /* While answering, the closed-mouth idle frame alternates with
+           the open-mouth answering one. Both are already preloaded by
+           the probe below, so the swap never flashes. */
+        <img
+          src={pose === "answering" && !mouthOpen ? fileFor("idle") : custom}
+          alt=""
+          width={size}
+          height={size}
+        />
       ) : (
         <svg viewBox="0 0 100 100" width={size} height={size}>
           <defs>
