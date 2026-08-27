@@ -52,7 +52,12 @@
      12px label — so this is Deep Gold's own hue taken down to where it
      clears AA, rather than a new colour invented beside it. */
   --gold-ink: #8a5a0c; /* Deep Gold at 75% lightness  5.92:1 */
-  --teal-ink: var(--teal-deep); /* 5.96:1 */
+  /* The accent ink is GOLD, on request: headings carry the teal, and
+     everything that used to be teal beside them — eyebrows, pull quotes,
+     counters, inline links — carries gold instead. Kept as its own
+     token rather than swapped at every call site, so the pairing can be
+     reversed in one line. 5.92:1 on white. */
+  --teal-ink: var(--gold-ink);
 
   /* ---- Cool atmosphere — backgrounds and glow only ---- */
   --indigo: #635bff; /* 4.7:1 — safe as text if ever needed */
