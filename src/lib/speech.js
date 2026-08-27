@@ -28,14 +28,49 @@ export const canSpeak =
  * One dictation. Resolves with the final transcript, or rejects with a
  * reason the interface can actually show someone.
  */
-export function listen({ onPartial, onStart } = {}) {
+/* Every code the spec defines, in words a visitor can act on. Leaving
+   these unmapped is what made a failure look like a dead button: the
+   only one that ever surfaced was not-allowed, so no-speech, network
+   and language-not-supported were all silently swallowed and the
+   assistant just sat there. */
+export const SPEECH_ERRORS = {
+  "no-speech": "I didn't catch anything — try again, and speak just after the mic turns red.",
+  "audio-capture": "No microphone was found on this device.",
+  "not-allowed": "Microphone access was blocked. You can still type your question.",
+  "service-not-allowed": "This browser blocked the speech service. You can still type your question.",
+  "network": "Speech recognition needs a connection to work and could not reach the service.",
+  "language-not-supported": "This browser does not support the language setting for speech.",
+  "bad-grammar": "Speech recognition failed to start properly.",
+};
+
+/* Ask for the microphone BEFORE recognition starts.
+ *
+ * Chrome raises its permission bubble at the moment rec.start() runs,
+ * and the engine is live behind it — so on a first visit the visitor
+ * taps, the bubble appears, they speak into a session that is not
+ * capturing, they grant access, and by then the session has ended with
+ * nothing. Nothing restarts, and it reads exactly like a microphone
+ * that cannot hear them.
+ *
+ * getUserMedia settles only once the visitor has actually answered, so
+ * awaiting it puts the prompt before the recording instead of during
+ * it. The stream is stopped immediately — it was only ever the
+ * question, not the capture; recognition opens its own. */
+export async function ensureMicPermission() {
+  if (!navigator?.mediaDevices?.getUserMedia) return; // let start() report it
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  stream.getTracks().forEach((t) => t.stop());
+}
+
+export function listen({ onPartial, onStart, lang = "en-IN" } = {}) {
   if (!Recognition) return { start: () => {}, stop: () => {}, promise: Promise.reject(new Error("unsupported")) };
 
   const rec = new Recognition();
   // en-IN because this client and most of its enquiries are Indian; the
   // engine still understands other English accents, it just weights
-  // toward this one.
-  rec.lang = "en-IN";
+  // toward this one. Not every build ships it though, so the caller
+  // retries in en-US on language-not-supported.
+  rec.lang = lang;
   rec.interimResults = true;
   rec.continuous = false;
   rec.maxAlternatives = 1;
@@ -43,8 +78,10 @@ export function listen({ onPartial, onStart } = {}) {
   let finalText = "";
   let lastInterim = "";
   let settled = false;
+  let reject;
 
-  const promise = new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, _reject) => {
+    reject = _reject;
     rec.onstart = () => onStart?.();
     rec.onresult = (e) => {
       let interim = "";
@@ -77,7 +114,21 @@ export function listen({ onPartial, onStart } = {}) {
   });
 
   return {
-    start: () => { try { rec.start(); } catch { /* already started */ } },
+    lang,
+    start: () => {
+      try {
+        rec.start();
+      } catch (e) {
+        /* Not swallowed. start() throws if the engine is already
+           running or unavailable, and eating that exception is what
+           turns a broken microphone into a button that does nothing at
+           all. */
+        if (!settled) {
+          settled = true;
+          reject(Object.assign(new Error(e.message || "start-failed"), { code: "bad-grammar" }));
+        }
+      }
+    },
     stop: () => { try { rec.stop(); } catch { /* not running */ } },
     abort: () => { try { rec.abort(); } catch { /* not running */ } },
     promise,

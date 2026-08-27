@@ -3,7 +3,7 @@ import { Mic, MicOff, SendHorizontal, RotateCcw, Volume2, VolumeX, Radio, Square
 import { QUICK_ASKS } from "../lib/assistantPrompt";
 import { SOLUTIONS } from "../content/mrakee";
 import AssistantAvatar from "./AssistantAvatar";
-import { canListen, canSpeak, listen, speak, stopSpeaking } from "../lib/speech";
+import { canListen, canSpeak, listen, speak, stopSpeaking, SPEECH_ERRORS, ensureMicPermission } from "../lib/speech";
 
 /* ================================================================
    THE ASSISTANT — built as a kiosk, not a chat bubble
@@ -53,6 +53,11 @@ export default function Assistant() {
   const [convo, setConvo] = useState(false);
   const convoRef = useRef(false);
   const silentRef = useRef(0);
+  /* True from the moment the mic is asked for until it is stopped. The
+     permission prompt is awaited, and a visitor can dismiss the whole
+     assistant while it is open — without this the recogniser would then
+     start against an interface that is gone. */
+  const micLive = useRef(false);
 
   useEffect(() => {
     // keep the newest answer in view without yanking the whole page
@@ -126,15 +131,34 @@ export default function Assistant() {
     }
   }
 
-  function startListening() {
+  async function startListening(lang) {
     if (!canListen || state === "thinking") return;
     stopSpeaking();
     setError(null);
     setHeard("");
     setState("listening");
     setVoice(true);
+    micLive.current = true;
 
-    const session = listen({ onPartial: setHeard });
+    /* Settle the permission question first, so the prompt cannot eat
+       the visitor's first sentence. Once granted this resolves without
+       a prompt, so it costs a tick on every later turn and a round of
+       confusion only on the first. */
+    try {
+      await ensureMicPermission();
+    } catch (e) {
+      micLive.current = false;
+      endConversation();
+      setState("error");
+      setError({
+        text: SPEECH_ERRORS[e?.name === "NotFoundError" ? "audio-capture" : "not-allowed"],
+        offerEnquiry: false,
+      });
+      return;
+    }
+    if (!micLive.current) return; // stopped while the prompt was open
+
+    const session = listen({ onPartial: setHeard, lang });
     micRef.current = session;
     session.start();
 
@@ -148,31 +172,56 @@ export default function Assistant() {
           return;
         }
         setState("idle");
-        /* Heard nothing. In hands-free mode try twice more, then stop —
-           an open microphone re-arming forever on an abandoned page is
-           both a battery drain and a thing nobody consented to. */
-        if (convoRef.current) {
-          silentRef.current += 1;
-          if (silentRef.current >= 3) endConversation();
-          else setTimeout(() => startListening(), 300);
-        }
+        heardNothing();
       })
       .catch((err) => {
         micRef.current = null;
         setHeard("");
-        convoRef.current = false;
-        setConvo(false);
-        setState(err.code === "not-allowed" ? "error" : "idle");
-        if (err.code === "not-allowed") {
-          setError({
-            text: "Microphone access was blocked. You can still type your question.",
-            offerEnquiry: false,
-          });
+
+        /* The visitor pressed stop. Not a failure, and not something to
+           tell them about — they know. */
+        if (err.code === "aborted") { setState("idle"); return; }
+
+        /* en-IN is not in every browser's voice pack. Fall back once to
+           en-US rather than reporting a failure the visitor cannot act
+           on. */
+        if (err.code === "language-not-supported" && lang !== "en-US") {
+          startListening("en-US");
+          return;
         }
+
+        /* Silence is not an error condition, whatever the spec calls
+           it: Chrome raises no-speech for a pause as ordinary as
+           thinking about the question. It takes the same path as an
+           empty result. */
+        if (err.code === "no-speech") { setState("idle"); heardNothing(); return; }
+
+        endConversation();
+        setState("error");
+        setError({
+          text: SPEECH_ERRORS[err.code] || "The microphone could not be started. You can still type your question.",
+          offerEnquiry: false,
+        });
       });
   }
 
-  const stopListening = () => micRef.current?.stop();
+  /* Nothing came back. Say so — a microphone that opens, closes and
+     leaves no trace is indistinguishable from one that is broken, which
+     is exactly how this read to the client. */
+  function heardNothing() {
+    if (!convoRef.current) {
+      setError({ text: SPEECH_ERRORS["no-speech"], offerEnquiry: false });
+      return;
+    }
+    silentRef.current += 1;
+    if (silentRef.current >= 3) endConversation();
+    else setTimeout(() => startListening(), 300);
+  }
+
+  function stopListening() {
+    micLive.current = false;
+    micRef.current?.stop();
+  }
 
   function beginConversation() {
     if (!canListen) return;
@@ -180,10 +229,11 @@ export default function Assistant() {
     silentRef.current = 0;
     setConvo(true);
     setVoice(true);
-    startListening();
+    startListening(undefined);
   }
 
   function endConversation() {
+    micLive.current = false;
     convoRef.current = false;
     setConvo(false);
     micRef.current?.abort();
