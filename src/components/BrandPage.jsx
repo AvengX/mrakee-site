@@ -8,6 +8,7 @@ import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
 import WhyScroll from "./WhyScroll";
 import FaqMarquee from "./FaqMarquee";
+import Assistant from "./Assistant";
 import ExpertiseTrail from "./ExpertiseTrail";
 import { Ear, Layers, PenTool } from "lucide-react";
 import { usePointerGlow } from "../hooks/usePointerGlow";
@@ -186,6 +187,25 @@ export default function BrandPage() {
           </Reveal>
 
           <FaqMarquee items={FAQ} />
+        </div>
+      </section>
+
+      {/* ---------------- ASSISTANT ----------------
+          Sits immediately above Contact on purpose: it answers what it
+          can from the client's own words, and every dead end it reaches
+          points at the enquiry form directly below it. */}
+      <section className="band band--rule" id="assistant">
+        <div className="band__inner">
+          <Reveal className="band__head">
+            <p className="eyebrow">Ask us anything</p>
+            <SplitWords words={["Tell", "us", "about", "your", { t: "space.", grad: true }]} />
+            <p className="lede">
+              Our assistant answers from what we publish — what we build, how we
+              work, and which environments we cover.
+            </p>
+          </Reveal>
+
+          <Assistant />
         </div>
       </section>
 
