@@ -415,7 +415,13 @@ body {
      screens and the type now has no ground of its own. Restore by
      setting --cap-plate to 0.58 and putting the two backdrop-filter
      lines back. */
-  background: none;
+  background: linear-gradient(
+    180deg,
+    rgba(11, 31, 42, 0) 0%,
+    rgba(11, 31, 42, var(--cap-scrim, 0.72)) 22%,
+    rgba(11, 31, 42, var(--cap-scrim, 0.72)) 78%,
+    rgba(11, 31, 42, 0) 100%
+  );
   /* Two gradients intersected, not one radial. A radial is an ellipse,
      and the corners of a rectangle of text fall outside an ellipse
      drawn through its edges — the ends of the first and last lines
@@ -486,13 +492,32 @@ body {
 /* Over footage the standard body ink is too quiet even on the scrim —
    slate-600 rather than slate-500 gives the supporting line the weight
    the headline already has. */
-/* The film is the one place the brand teal cannot go. Measured on the
-   footage, teal headings failed over 98-100% of their own area because
-   teal sits mid-luminance and the frames are bright. Dark ink here,
-   brand teal everywhere else on the site. */
+/* The film runs the board's dark combination, not its light one.
+
+   No single ink can work here: the hero headline crosses a bright
+   window AND a dark kiosk screen inside one line, so dark type dies on
+   the screen and light type dies on the window. Every band of every
+   frame was sampled and there is no safe zone.
+
+   So the ground is made rather than found — Executive Dark (#0b1f2a,
+   the board's combination 6) behind Off White (#f7f8f6) type. That is
+   the same pairing as the board's own WEBSITE HEADER example, it is
+   guaranteed regardless of what the footage does, and a dark scrim over
+   video reads as cinematic rather than as a patch stuck on top. */
 .cap h1,
-.cap h2 {
-  color: #10243a;
+.cap h2,
+.cap .eyebrow {
+  color: #f7f8f6;
+}
+
+/* On the dark scrim the gradient word flips to the board's BRIGHT pair,
+   Premium Gold into Teal — the same two the logo uses on its dark
+   variant. The --gold-ink/--teal-ink pair everywhere else on the site
+   is darkened for white grounds and would all but vanish here. */
+.cap .grad-text {
+  background: linear-gradient(100deg, var(--gold-lite) 0%, var(--teal-lite) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .cap .lede {
@@ -500,7 +525,7 @@ body {
      footage, where slate-700 measured 3.6:1 over the retail chapter.
      This is the price of an unveiled film, and it is the right one to
      pay — darker type costs nothing, a white wash costs the video. */
-  color: #1e293b; /* 14.6:1 on white */
+  color: #f7f8f6; /* Off White, on the dark scrim below */
 }
 
 .cap .eyebrow--badge {
@@ -526,13 +551,32 @@ body {
   .cap .eyebrow {
     justify-content: center;
   }
-  /* The film is the one place the brand teal cannot go. Measured on the
-   footage, teal headings failed over 98-100% of their own area because
-   teal sits mid-luminance and the frames are bright. Dark ink here,
-   brand teal everywhere else on the site. */
+  /* The film runs the board's dark combination, not its light one.
+
+   No single ink can work here: the hero headline crosses a bright
+   window AND a dark kiosk screen inside one line, so dark type dies on
+   the screen and light type dies on the window. Every band of every
+   frame was sampled and there is no safe zone.
+
+   So the ground is made rather than found — Executive Dark (#0b1f2a,
+   the board's combination 6) behind Off White (#f7f8f6) type. That is
+   the same pairing as the board's own WEBSITE HEADER example, it is
+   guaranteed regardless of what the footage does, and a dark scrim over
+   video reads as cinematic rather than as a patch stuck on top. */
 .cap h1,
-.cap h2 {
-  color: #10243a;
+.cap h2,
+.cap .eyebrow {
+  color: #f7f8f6;
+}
+
+/* On the dark scrim the gradient word flips to the board's BRIGHT pair,
+   Premium Gold into Teal — the same two the logo uses on its dark
+   variant. The --gold-ink/--teal-ink pair everywhere else on the site
+   is darkened for white grounds and would all but vanish here. */
+.cap .grad-text {
+  background: linear-gradient(100deg, var(--gold-lite) 0%, var(--teal-lite) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .cap .lede {
