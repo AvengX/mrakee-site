@@ -16,6 +16,8 @@
    ================================================================ */
 
 import { VOICE } from "./voiceConfig.js";
+import { analyseElement } from "./voice/audioAnalyzer.js";
+import { createLipSync, createSyntheticEnvelope } from "./voice/lipSync.js";
 
 const Recognition =
   typeof window !== "undefined"
@@ -162,6 +164,11 @@ export function listen({ onPartial, onStart, lang = "en-IN" } = {}) {
    ---------------------------------------------------------------- */
 
 let current = null; // the audio element or utterance in flight
+let mouth = null;   // the lip-sync driver for whatever is in flight
+
+function endMouth() {
+  if (mouth) { mouth.stop(); mouth = null; }
+}
 
 /* The browser fallback. There is no gender field on
    SpeechSynthesisVoice, so the only handle on "female" is the name;
@@ -181,7 +188,7 @@ function pickBrowserVoice() {
   return best(inLang) || best(inEn) || inLang[0] || inEn[0] || null;
 }
 
-function speakInBrowser(text, onEnd) {
+function speakInBrowser(text, onEnd, onMouth) {
   if (!canSpeak) { onEnd?.(); return; }
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
@@ -189,8 +196,19 @@ function speakInBrowser(text, onEnd) {
   u.rate = VOICE.browser.rate;
   u.pitch = VOICE.browser.pitch;
   u.voice = pickBrowserVoice();
-  u.onend = () => onEnd?.();
-  u.onerror = () => onEnd?.();
+  /* No real analysis is possible here: speechSynthesis exposes no
+     stream and no element, so there is nothing for an AnalyserNode to
+     attach to. This is a synthetic envelope, and it is named that way
+     so it is never mistaken for the measured path. */
+  if (onMouth) {
+    endMouth();
+    mouth = createSyntheticEnvelope({ onChange: onMouth });
+    mouth.start();
+  }
+
+  const finish = () => { endMouth(); onEnd?.(); };
+  u.onend = finish;
+  u.onerror = finish;
   current = { stop: () => window.speechSynthesis.cancel() };
   window.speechSynthesis.speak(u);
 }
@@ -201,7 +219,7 @@ function speakInBrowser(text, onEnd) {
  * server path is after a network round trip, so the interface must not
  * assume the two are simultaneous.
  */
-export function speak(text, { onEnd, onStart } = {}) {
+export function speak(text, { onEnd, onStart, onMouth } = {}) {
   if (!text) { onEnd?.(); return () => {}; }
   stopSpeaking();
 
@@ -214,7 +232,7 @@ export function speak(text, { onEnd, onStart } = {}) {
   const remote = VOICE.order.filter((p) => p !== "browser");
   if (!remote.length) {
     onStart?.();
-    speakInBrowser(text, done);
+    speakInBrowser(text, done, onMouth);
     return stopSpeaking;
   }
 
@@ -237,11 +255,26 @@ export function speak(text, { onEnd, onStart } = {}) {
       const el = new Audio(url);
       /* Revoked on both paths — an object URL held open per reply is a
          leak that only shows up in a long conversation. */
-      const cleanup = () => { URL.revokeObjectURL(url); done(); };
+      let detach = () => {};
+      const cleanup = () => { detach(); endMouth(); URL.revokeObjectURL(url); done(); };
       el.onended = cleanup;
       el.onerror = cleanup;
-      current = { stop: () => { el.pause(); URL.revokeObjectURL(url); } };
-      el.play().then(() => onStart?.()).catch(cleanup);
+      current = { stop: () => { detach(); el.pause(); URL.revokeObjectURL(url); } };
+
+      el.play()
+        .then(() => {
+          onStart?.();
+          if (!onMouth) return;
+          /* THE REAL PATH. The analyser reads the very samples going to
+             the speakers, so the mouth cannot drift from the voice —
+             there is one stream and one decode. */
+          endMouth();
+          const driver = createLipSync({ onChange: onMouth });
+          mouth = driver;
+          driver.start();
+          detach = analyseElement(el, (rms) => driver.push(rms));
+        })
+        .catch(cleanup);
     })
     .catch(() => {
       /* 503 means no provider is configured; anything else means every
@@ -249,13 +282,16 @@ export function speak(text, { onEnd, onStart } = {}) {
          an answer, so this is a downgrade rather than a failure. */
       if (cancelled) return;
       onStart?.();
-      speakInBrowser(text, done);
+      speakInBrowser(text, done, onMouth);
     });
 
   return stopSpeaking;
 }
 
 export function stopSpeaking() {
+  /* Mouth first, always. A barge-in that stops the audio but leaves the
+     face moving is worse than no animation at all. */
+  endMouth();
   if (current) { try { current.stop(); } catch { /* already gone */ } current = null; }
   if (canSpeak) window.speechSynthesis.cancel();
 }

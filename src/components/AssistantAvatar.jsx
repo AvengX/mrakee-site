@@ -37,7 +37,7 @@ const baseFor = (pose) =>
 const fileFor = (pose) => `${baseFor(pose)}.${resolvedExt}`;
 let resolvedExt = EXTS[0];
 
-export default function AssistantAvatar({ state = "idle", size = 84 }) {
+export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0 }) {
   const pose = POSES.includes(state) ? state : "idle";
   const [custom, setCustom] = useState(null);
 
@@ -59,33 +59,28 @@ export default function AssistantAvatar({ state = "idle", size = 84 }) {
     return () => { alive = false; };
   }, [pose]);
 
-  /* A mouth that opens and closes while the voice runs.
+  /* `mouth` is 0..1 and comes from the audio that is actually playing.
+     It is a prop, not a timer: this component decides how a mouth
+     LOOKS at a given openness and nothing about when it moves. */
+  const open = pose === "answering" ? Math.max(0, Math.min(1, mouth)) : 0;
 
-     Not lip sync, and it does not pretend to be: real sync needs
-     visemes off a rigged head, and the client's own reference does not
-     have it either -- measured over two seconds of that kiosk
-     "speaking", its avatar changes by 0.004 grey levels per 100ms,
-     which is a still image. What sells speech at this size is simply
-     that the mouth is not frozen.
-
-     The interval is jittered rather than metronomic. A mouth opening on
-     an exact beat reads as a machine; speech is uneven, and 90ms of
-     wobble is enough to suggest it. */
-  const [mouthOpen, setMouthOpen] = useState(true);
-
+  /* Blinking, for both the still and the drawn avatar. Human blink
+     spacing is irregular — a fixed interval reads as a tic — so each
+     one schedules the next somewhere between 2.4 and 7 seconds. */
+  const [blink, setBlink] = useState(false);
   useEffect(() => {
-    if (pose !== "answering") { setMouthOpen(true); return; }
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    let id;
-    const tick = () => {
-      setMouthOpen((m) => !m);
-      id = setTimeout(tick, 130 + Math.random() * 90);
+    let t;
+    const next = () => {
+      t = setTimeout(() => {
+        setBlink(true);
+        setTimeout(() => setBlink(false), 110);
+        next();
+      }, 2400 + Math.random() * 4600);
     };
-    id = setTimeout(tick, 150);
-    return () => clearTimeout(id);
-  }, [pose]);
-
-  const talking = pose === "answering" && mouthOpen;
+    next();
+    return () => clearTimeout(t);
+  }, []);
   const attentive = pose === "listening" || pose === "thinking";
 
   return (
@@ -95,15 +90,35 @@ export default function AssistantAvatar({ state = "idle", size = 84 }) {
       aria-hidden="true"
     >
       {custom ? (
-        /* While answering, the closed-mouth idle frame alternates with
-           the open-mouth answering one. Both are already preloaded by
-           the probe below, so the swap never flashes. */
-        <img
-          src={pose === "answering" && !mouthOpen ? fileFor("idle") : custom}
-          alt=""
-          width={size}
-          height={size}
-        />
+        /* TWO ALIGNED STILLS, CROSSFADED BY THE AUDIO.
+
+           These renders share a head position — measured at generation
+           time: identical hair-top row, head widths within 2.7% — which
+           is the only reason this works. The closed-mouth frame sits
+           underneath and the open-mouth frame fades in over it in
+           proportion to how loud the voice is right now, so the mouth
+           moves continuously with the speech rather than switching
+           between two states.
+
+           What it CANNOT do, and no crossfade of two photographs can:
+           tell an "oo" from an "ee". That needs a viseme set or a rig,
+           and this asset has neither. */
+        <span className="avatar__stack" style={{ width: size, height: size }}>
+          <img src={fileFor("idle")} alt="" width={size} height={size} />
+          {pose === "answering" && (
+            <img
+              className="avatar__mouthFrame"
+              src={fileFor("answering")}
+              alt=""
+              width={size}
+              height={size}
+              style={{ opacity: open }}
+            />
+          )}
+          {pose !== "answering" && custom !== fileFor("idle") && (
+            <img className="avatar__mouthFrame" src={custom} alt="" width={size} height={size} style={{ opacity: 1 }} />
+          )}
+        </span>
       ) : (
         <svg viewBox="0 0 100 100" width={size} height={size}>
           <defs>
@@ -153,21 +168,35 @@ export default function AssistantAvatar({ state = "idle", size = 84 }) {
             />
 
             {/* eyes */}
-            <ellipse cx="43.4" cy="45" rx="2.1" ry="2.4" fill="#2a1d15" />
-            <ellipse cx="56.6" cy="45" rx="2.1" ry="2.4" fill="#2a1d15" />
-            <circle cx="44.1" cy="44.2" r="0.7" fill="#fff" />
-            <circle cx="57.3" cy="44.2" r="0.7" fill="#fff" />
+            {/* Eyes collapse to a line on a blink — possible here
+                because they are drawn elements. The photographic avatar
+                gets no blink: an eyelid painted over a rendered face
+                reads as a smudge, and a bad blink is worse than none. */}
+            <ellipse cx="43.4" cy="45" rx="2.1" ry={blink ? 0.35 : 2.4} fill="#2a1d15" />
+            <ellipse cx="56.6" cy="45" rx="2.1" ry={blink ? 0.35 : 2.4} fill="#2a1d15" />
+            {!blink && <circle cx="44.1" cy="44.2" r="0.7" fill="#fff" />}
+            {!blink && <circle cx="57.3" cy="44.2" r="0.7" fill="#fff" />}
 
             {/* mouth: closed smile, or open mid-sentence while answering */}
-            {talking ? (
-              <ellipse cx="50" cy="54" rx="3.1" ry="2.3" fill="#8c3d3d" />
+            {open > 0.04 ? (
+              /* ry scales with the audio, so this is a real analogue
+                 mouth rather than two states: 0.5 closed-ish, 3.4 at a
+                 shout. rx widens a little too — a mouth that only grows
+                 downward looks like a hinge. */
+              <ellipse
+                cx="50"
+                cy={53.6 + open * 0.7}
+                rx={2.4 + open * 1.3}
+                ry={0.5 + open * 2.9}
+                fill="#8c3d3d"
+              />
             ) : (
               <path d="M46.4 53.4q3.6 3 7.2 0" stroke="#8c3d3d" strokeWidth="1.6"
                     strokeLinecap="round" fill="none" />
             )}
 
             {/* the presenting hand, only while answering */}
-            {talking && (
+            {open > 0.3 && (
               <g>
                 <path d="M74 108c-4-9-9-14-14-16l4-7 8 3z" fill="url(#avCoat)" />
                 <ellipse cx="68" cy="83" rx="5" ry="4.3" fill="#f0c39a"

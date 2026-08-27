@@ -46,6 +46,10 @@ export default function Assistant({ compact = false }) {
      audio running past three seconds — which is the toggle below. */
   const [voice, setVoice] = useState(false);
   const [heard, setHeard] = useState("");
+  /* 0..1, driven by the audio that is actually playing. Kept in a ref
+     as well: the rAF driver writes it up to 60 times a second and the
+     ref is what the barge-in path zeroes without waiting for a render. */
+  const [mouth, setMouth] = useState(0);
   /* Hands-free mode: listen, answer, speak, listen again, until it is
      stopped. Driven from refs rather than state because the loop is
      rebuilt inside async callbacks, where a captured `convo` would be
@@ -116,6 +120,7 @@ export default function Assistant({ compact = false }) {
       setState("answering");
       if ((voice || convoRef.current) && canSpeak) {
         speak(data.reply, {
+          onMouth: setMouth,
           onStart: () => {
             /* Barge-in, and only in hands-free mode. If the visitor is
                typing, audio they can already stop with the Sound button
@@ -123,7 +128,13 @@ export default function Assistant({ compact = false }) {
             if (!convoRef.current) return;
             bargeRef.current = watchForSpeech({
               onSpeech: () => {
+                /* Order matters. stopSpeaking() tears the lip-sync
+                   driver down first and it emits a final 0, but the
+                   mouth is zeroed here too so there is no frame in
+                   which the audio has stopped and the face is still
+                   moving. */
                 stopSpeaking();
+                setMouth(0);
                 stopBarge();
                 /* Straight into listening rather than waiting for the
                    utterance to end — the whole point is not waiting. */
@@ -133,6 +144,7 @@ export default function Assistant({ compact = false }) {
           },
           onEnd: () => {
             stopBarge();
+            setMouth(0);
             setState((st) => (st === "answering" ? "idle" : st));
             /* Reopen the microphone only once the voice has actually
                stopped. A recogniser open during playback transcribes the
@@ -258,6 +270,7 @@ export default function Assistant({ compact = false }) {
 
   function endConversation() {
     stopBarge();
+    setMouth(0);
     micLive.current = false;
     convoRef.current = false;
     setConvo(false);
@@ -289,7 +302,7 @@ export default function Assistant({ compact = false }) {
     <div className={`kiosk${compact ? " kiosk--compact" : ""}`}>
       <div className="kiosk__frame">
         <div className="kiosk__head">
-          <AssistantAvatar state={pose} size={compact ? 44 : 84} />
+          <AssistantAvatar state={pose} size={compact ? 44 : 84} mouth={mouth} />
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE Assistant</p>
             <p className="kiosk__hint">
