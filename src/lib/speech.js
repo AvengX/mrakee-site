@@ -208,7 +208,11 @@ export function speak(text, { onEnd, onStart } = {}) {
   let cancelled = false;
   const done = () => { if (!cancelled) { cancelled = true; onEnd?.(); } };
 
-  if (VOICE.provider !== "server") {
+  /* Providers the SERVER can attempt, in the configured order. The
+     browser entry is not sent — it is what happens if the server has
+     none of them, and it is handled here rather than there. */
+  const remote = VOICE.order.filter((p) => p !== "browser");
+  if (!remote.length) {
     onStart?.();
     speakInBrowser(text, done);
     return stopSpeaking;
@@ -217,7 +221,14 @@ export function speak(text, { onEnd, onStart } = {}) {
   fetch("/api/tts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, voice: VOICE.name, instructions: VOICE.instructions }),
+    body: JSON.stringify({
+      text,
+      order: remote,
+      /* Voice settings travel with the request so that changing a voice
+         is an edit to voiceConfig.js alone. No key is sent, ever — the
+         server holds those. */
+      options: Object.fromEntries(remote.map((p) => [p, VOICE[p]])),
+    }),
   })
     .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
     .then((blob) => {
@@ -233,8 +244,9 @@ export function speak(text, { onEnd, onStart } = {}) {
       el.play().then(() => onStart?.()).catch(cleanup);
     })
     .catch(() => {
-      /* 503 means no key, anything else means the service is unhappy.
-         Either way the visitor should still hear an answer. */
+      /* 503 means no provider is configured; anything else means every
+         configured one failed. Either way the visitor should still hear
+         an answer, so this is a downgrade rather than a failure. */
       if (cancelled) return;
       onStart?.();
       speakInBrowser(text, done);
