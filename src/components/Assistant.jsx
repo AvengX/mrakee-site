@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Mic, SendHorizontal, RotateCcw } from "lucide-react";
+import { Mic, MicOff, SendHorizontal, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { QUICK_ASKS } from "../lib/assistantPrompt";
 import { SOLUTIONS } from "../content/mrakee";
 import AssistantAvatar from "./AssistantAvatar";
+import { canListen, canSpeak, listen, speak, stopSpeaking } from "../lib/speech";
 
 /* ================================================================
    THE ASSISTANT — built as a kiosk, not a chat bubble
@@ -31,9 +32,20 @@ export default function Assistant() {
   const [turns, setTurns] = useState([]);
   const [draft, setDraft] = useState("");
   const [state, setState] = useState("idle"); // idle · thinking · error
+  // { text, offerEnquiry } — a blocked microphone is a local problem
+  // the visitor can solve by typing, so it must not also tell them to
+  // go and fill in a form.
   const [error, setError] = useState(null);
   const logRef = useRef(null);
   const inputRef = useRef(null);
+  const micRef = useRef(null);
+  /* Speaking replies aloud is OFF until someone actually uses the
+     microphone. If you type, it stays silent; if you talk to it, it
+     talks back. Sound that starts on its own is the fastest way to make
+     someone close a tab, and WCAG 1.4.2 requires a way to stop any
+     audio running past three seconds — which is the toggle below. */
+  const [voice, setVoice] = useState(false);
+  const [heard, setHeard] = useState("");
 
   useEffect(() => {
     // keep the newest answer in view without yanking the whole page
@@ -44,6 +56,7 @@ export default function Assistant() {
     const question = text.trim();
     if (!question || state === "thinking") return;
 
+    stopSpeaking();
     const history = [...turns, { role: "user", content: question }];
     setTurns(history);
     setDraft("");
@@ -83,24 +96,76 @@ export default function Assistant() {
           handoff: !!data.handoff,
         },
       ]);
-      // hold the presenting pose while the answer is new, then settle
+      // Hold the presenting pose while the answer is new. When it is
+      // being spoken, hold it until the voice actually stops rather
+      // than guessing a duration.
       setState("answering");
-      setTimeout(() => setState((st) => (st === "answering" ? "idle" : st)), 2600);
+      if (voice && canSpeak) {
+        speak(data.reply, {
+          onEnd: () => setState((st) => (st === "answering" ? "idle" : st)),
+        });
+      } else {
+        setTimeout(() => setState((st) => (st === "answering" ? "idle" : st)), 2600);
+      }
     } catch (e) {
-      setError(e.message);
+      setError({ text: e.message, offerEnquiry: true });
       setState("error");
     }
   }
 
+  function startListening() {
+    if (!canListen || state === "thinking") return;
+    stopSpeaking();
+    setError(null);
+    setHeard("");
+    setState("listening");
+    setVoice(true);
+
+    const session = listen({ onPartial: setHeard });
+    micRef.current = session;
+    session.start();
+
+    session.promise
+      .then((text) => {
+        micRef.current = null;
+        setHeard("");
+        if (text) ask(text);
+        else setState("idle");
+      })
+      .catch((err) => {
+        micRef.current = null;
+        setHeard("");
+        setState(err.code === "not-allowed" ? "error" : "idle");
+        if (err.code === "not-allowed") {
+          setError({
+            text: "Microphone access was blocked. You can still type your question.",
+            offerEnquiry: false,
+          });
+        }
+      });
+  }
+
+  const stopListening = () => micRef.current?.stop();
+
+  // never leave a microphone open or a voice talking to an empty page
+  useEffect(() => () => { micRef.current?.abort(); stopSpeaking(); }, []);
+
   const reset = () => {
+    stopSpeaking();
+    micRef.current?.abort();
     setTurns([]);
     setError(null);
     setState("idle");
     inputRef.current?.focus();
   };
 
+  const listening = state === "listening";
   const speaking = state === "thinking";
-  const pose = state === "thinking" ? "thinking" : state === "answering" ? "answering" : "idle";
+  const pose =
+    state === "listening" ? "listening"
+    : state === "thinking" ? "thinking"
+    : state === "answering" ? "answering"
+    : "idle";
 
   return (
     <div className="kiosk">
@@ -110,9 +175,29 @@ export default function Assistant() {
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE Assistant</p>
             <p className="kiosk__hint">
-              {turns.length ? "Ask me anything else about what we build." : GREETING}
+              {listening
+                ? "Listening — ask about a room, a space or a solution."
+                : turns.length
+                ? "Ask me anything else about what we build."
+                : GREETING}
             </p>
           </div>
+          {voice && canSpeak && (
+            <button
+              type="button"
+              className="kiosk__mute"
+              onClick={() => {
+                stopSpeaking();
+                setVoice((v) => !v);
+                setState((st) => (st === "answering" ? "idle" : st));
+              }}
+              aria-pressed={!voice}
+              title={voice ? "Stop speaking answers" : "Speak answers aloud"}
+            >
+              {voice ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />}
+              {voice ? "Sound on" : "Sound off"}
+            </button>
+          )}
           {turns.length > 0 && (
             <button type="button" className="kiosk__reset" onClick={reset}>
               <RotateCcw size={15} aria-hidden="true" />
@@ -176,8 +261,13 @@ export default function Assistant() {
 
           {state === "error" && (
             <p className="kiosk__error" role="alert">
-              {error}{" "}
-              <a href="#contact">Send us an enquiry instead</a>.
+              {error?.text}
+              {error?.offerEnquiry && (
+                <>
+                  {" "}
+                  <a href="#contact">Send us an enquiry instead</a>.
+                </>
+              )}
             </p>
           )}
         </div>
@@ -199,23 +289,27 @@ export default function Assistant() {
             ask(draft);
           }}
         >
-          {/* Visible and disabled on purpose: voice is the next step, and
-              a control that appears then vanishes is worse than one that
-              is plainly not ready yet. */}
+          {/* Disabled rather than hidden where the browser has no
+              recognition — Firefox has none and iOS Safari is
+              unreliable — so the control does not appear and vanish
+              between machines. The typed path never depends on it. */}
           <button
             type="button"
-            className="kiosk__mic"
-            disabled
-            title="Voice input is coming next"
-            aria-label="Voice input — not available yet"
+            className={`kiosk__mic${listening ? " is-live" : ""}`}
+            onClick={listening ? stopListening : startListening}
+            disabled={!canListen || state === "thinking"}
+            title={canListen ? (listening ? "Stop listening" : "Ask by voice") : "Voice input is not supported in this browser"}
+            aria-label={listening ? "Stop listening" : "Ask by voice"}
+            aria-pressed={listening}
           >
-            <Mic size={18} aria-hidden="true" />
+            {canListen ? <Mic size={18} aria-hidden="true" /> : <MicOff size={18} aria-hidden="true" />}
           </button>
           <input
             ref={inputRef}
-            value={draft}
+            value={listening ? heard : draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Type your question…"
+            placeholder={listening ? "Listening…" : "Type your question…"}
+            readOnly={listening}
             maxLength={600}
             aria-label="Ask the MRAKEE assistant"
             disabled={state === "thinking"}

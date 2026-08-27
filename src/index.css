@@ -2969,7 +2969,68 @@ h3 {
   color: var(--ink-faint);
 }
 
-.kiosk__mic:disabled { cursor: not-allowed; }
+.kiosk__mic:disabled { cursor: not-allowed; opacity: 0.55; }
+
+/* Live: the button becomes the loudest thing in the bar, because while
+   it is open the microphone is on and that should never be ambiguous. */
+.kiosk__mic.is-live {
+  background: var(--red);
+  color: #f7f8f6;
+}
+
+.kiosk__mic.is-live::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--red);
+  animation: mic-live 1.4s var(--ease-soft) infinite;
+}
+
+.kiosk__mic { position: relative; }
+
+@keyframes mic-live {
+  0%   { opacity: 0.6; transform: scale(1); }
+  70%  { opacity: 0;   transform: scale(1.35); }
+  100% { opacity: 0;   transform: scale(1.35); }
+}
+
+/* Reduced motion still needs to show the microphone is open — the ring
+   holds steady instead of pulsing. */
+@media (prefers-reduced-motion: reduce) {
+  .kiosk__mic.is-live::after { animation: none; opacity: 0.7; }
+}
+
+.kiosk__mute {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--teal-ink);
+  cursor: pointer;
+}
+
+.kiosk__mute:hover { border-color: var(--line-strong); }
+
+.kiosk__mute:focus-visible,
+.kiosk__mic:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 2px;
+}
+
+/* while dictating, the field is a transcript rather than an input */
+.kiosk__bar input[readonly] {
+  color: var(--ink-soft);
+  font-style: italic;
+}
 
 .kiosk__send {
   background: var(--teal-deep);
