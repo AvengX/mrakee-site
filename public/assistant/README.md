@@ -6,10 +6,10 @@ breaks the page.
 
 | File | Where it appears | Framing |
 |---|---|---|
-| `greeter.png` | the floating launcher, bottom-right of every page | **full figure**, transparent background |
-| `avatar-idle.png` | panel header, at rest | head and shoulders |
-| `avatar-listening.png` | panel header, listening **and** thinking | head and shoulders |
-| `avatar-answering.png` | panel header, speaking | head and shoulders |
+| `greeter.webp` (or .png) | the floating launcher, bottom-right of every page | **full figure**, transparent background |
+| `avatar-idle.webp` | panel header, at rest | head and shoulders |
+| `avatar-listening.webp` | panel header, listening **and** thinking | head and shoulders |
+| `avatar-answering.webp` | panel header, speaking | head and shoulders |
 
 ## greeter.png — the one the client asked for
 

@@ -34,7 +34,7 @@ import { stopSpeaking } from "../lib/speech";
    for its own file rather than reusing avatar-idle.png: that one is
    framed head-and-shoulders for the panel header, and the two framings
    cannot be the same picture. */
-const GREETER = "assistant/greeter.png";
+const GREETER_SRCS = ["assistant/greeter.webp", "assistant/greeter.png"];
 
 export default function AssistantDock() {
   const [open, setOpen] = useState(false);
@@ -63,10 +63,18 @@ export default function AssistantDock() {
 
   useEffect(() => {
     let alive = true;
-    const probe = new Image();
-    probe.onload = () => { if (alive && probe.naturalWidth > 1) setGreeter(GREETER); };
-    probe.onerror = () => alive && setGreeter(null);
-    probe.src = GREETER;
+    const tryOne = (i) => {
+      if (!alive || i >= GREETER_SRCS.length) { if (alive) setGreeter(null); return; }
+      const probe = new Image();
+      probe.onload = () => {
+        if (!alive) return;
+        if (probe.naturalWidth > 1) setGreeter(GREETER_SRCS[i]);
+        else tryOne(i + 1);
+      };
+      probe.onerror = () => tryOne(i + 1);
+      probe.src = GREETER_SRCS[i];
+    };
+    tryOne(0);
     return () => { alive = false; };
   }, []);
 

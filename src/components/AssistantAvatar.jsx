@@ -27,8 +27,15 @@ import { useEffect, useState } from "react";
    ================================================================ */
 
 const POSES = ["idle", "listening", "thinking", "answering"];
-const fileFor = (pose) =>
-  `assistant/avatar-${pose === "thinking" ? "listening" : pose}.png`;
+/* WebP first, PNG second. The renders are 3D with soft gradients and an
+   alpha edge, which is the case PNG handles worst — 18 kB against 222.
+   PNG stays in the list so a file dropped in later still works without
+   anyone having to know this. */
+const EXTS = ["webp", "png"];
+const baseFor = (pose) =>
+  `assistant/avatar-${pose === "thinking" ? "listening" : pose}`;
+const fileFor = (pose) => `${baseFor(pose)}.${resolvedExt}`;
+let resolvedExt = EXTS[0];
 
 export default function AssistantAvatar({ state = "idle", size = 84 }) {
   const pose = POSES.includes(state) ? state : "idle";
@@ -36,13 +43,19 @@ export default function AssistantAvatar({ state = "idle", size = 84 }) {
 
   useEffect(() => {
     let alive = true;
-    const src = fileFor(pose);
-    const probe = new Image();
-    probe.onload = () => {
-      if (alive && probe.naturalWidth > 1) setCustom(src);
+    const tryExt = (i) => {
+      if (!alive || i >= EXTS.length) { if (alive) setCustom(null); return; }
+      const src = `${baseFor(pose)}.${EXTS[i]}`;
+      const probe = new Image();
+      probe.onload = () => {
+        if (!alive) return;
+        if (probe.naturalWidth > 1) { resolvedExt = EXTS[i]; setCustom(src); }
+        else tryExt(i + 1);
+      };
+      probe.onerror = () => tryExt(i + 1);
+      probe.src = src;
     };
-    probe.onerror = () => alive && setCustom(null);
-    probe.src = src;
+    tryExt(0);
     return () => { alive = false; };
   }, [pose]);
 
