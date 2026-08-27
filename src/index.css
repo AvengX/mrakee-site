@@ -366,6 +366,7 @@ body {
   /* drift is written by JS as a custom property, so the centring
      transforms below are never clobbered by an inline `transform` */
   transform: translateY(var(--drift, 0px));
+
   /* No shadow. It existed to fake a ground when there was none; the
      plate below is the ground now, and a white shadow on type that is
      already sitting on white only softens the edges. */
@@ -415,13 +416,7 @@ body {
      screens and the type now has no ground of its own. Restore by
      setting --cap-plate to 0.58 and putting the two backdrop-filter
      lines back. */
-  background: linear-gradient(
-    180deg,
-    rgba(11, 31, 42, 0) 0%,
-    rgba(11, 31, 42, var(--cap-scrim, 0.72)) 22%,
-    rgba(11, 31, 42, var(--cap-scrim, 0.72)) 78%,
-    rgba(11, 31, 42, 0) 100%
-  );
+  background: none;
   /* Two gradients intersected, not one radial. A radial is an ellipse,
      and the corners of a rectangle of text fall outside an ellipse
      drawn through its edges — the ends of the first and last lines
@@ -507,7 +502,27 @@ body {
 .cap h1,
 .cap h2,
 .cap .eyebrow {
-  color: #f7f8f6;
+  color: #111111; /* Premium Black, board combination 7 */
+}
+
+/* Light held tight to the letterforms instead of a panel behind them.
+
+   On the ELEMENTS, not on .cap — FilmStage writes an inline
+   `filter: blur()` on the caption itself to fade it in, and an inline
+   filter replaces a stylesheet one outright rather than composing with
+   it. Put here, the two compose.
+
+   drop-shadow and not text-shadow: it follows the glyph's own alpha, so
+   it works on the background-clip:text word as well, where a
+   text-shadow paints through the transparent fill and washes the
+   gradient out. */
+.cap h1,
+.cap h2,
+.cap .lede,
+.cap .eyebrow {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
 }
 
 /* On the dark scrim the gradient word flips to the board's BRIGHT pair,
@@ -515,7 +530,7 @@ body {
    variant. The --gold-ink/--teal-ink pair everywhere else on the site
    is darkened for white grounds and would all but vanish here. */
 .cap .grad-text {
-  background: linear-gradient(100deg, var(--gold-lite) 0%, var(--teal-lite) 100%);
+  background: linear-gradient(100deg, var(--gold) 0%, var(--teal) 100%);
   -webkit-background-clip: text;
   background-clip: text;
 }
@@ -525,7 +540,7 @@ body {
      footage, where slate-700 measured 3.6:1 over the retail chapter.
      This is the price of an unveiled film, and it is the right one to
      pay — darker type costs nothing, a white wash costs the video. */
-  color: #f7f8f6; /* Off White, on the dark scrim below */
+  color: #111111; /* Premium Black */
 }
 
 .cap .eyebrow--badge {
@@ -566,7 +581,27 @@ body {
 .cap h1,
 .cap h2,
 .cap .eyebrow {
-  color: #f7f8f6;
+  color: #111111; /* Premium Black, board combination 7 */
+}
+
+/* Light held tight to the letterforms instead of a panel behind them.
+
+   On the ELEMENTS, not on .cap — FilmStage writes an inline
+   `filter: blur()` on the caption itself to fade it in, and an inline
+   filter replaces a stylesheet one outright rather than composing with
+   it. Put here, the two compose.
+
+   drop-shadow and not text-shadow: it follows the glyph's own alpha, so
+   it works on the background-clip:text word as well, where a
+   text-shadow paints through the transparent fill and washes the
+   gradient out. */
+.cap h1,
+.cap h2,
+.cap .lede,
+.cap .eyebrow {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
 }
 
 /* On the dark scrim the gradient word flips to the board's BRIGHT pair,
@@ -574,7 +609,7 @@ body {
    variant. The --gold-ink/--teal-ink pair everywhere else on the site
    is darkened for white grounds and would all but vanish here. */
 .cap .grad-text {
-  background: linear-gradient(100deg, var(--gold-lite) 0%, var(--teal-lite) 100%);
+  background: linear-gradient(100deg, var(--gold) 0%, var(--teal) 100%);
   -webkit-background-clip: text;
   background-clip: text;
 }
