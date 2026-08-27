@@ -4328,3 +4328,34 @@ a.contact__info:hover .contact__infoIcon {
   .dock__launcher { transition: none; }
   .dock__launcher:hover { transform: none; }
 }
+
+/* ---- captions on the dark half of the film ----
+
+   The hero clip changes ground halfway through: a glass-walled airport,
+   then a restaurant lit for evening. Premium Black measures 2.11:1 over
+   the "Smart Spaces" caption and 3.02:1 over the closing one, with 89%
+   and 76% of that area below AA — so those two flip to Off White, which
+   measures 9.02:1 and 5.01:1 on the same frames.
+
+   The halo has to flip with the ink. It is doing the same job in both
+   directions — holding a ground tight to the letterforms — but a white
+   halo behind white type is invisible, and would leave the type naked on
+   the lit patches the restaurant does have. */
+.cap--light h1,
+.cap--light h2,
+.cap--light .lede,
+.cap--light .eyebrow,
+.cap--light .cap__title {
+  color: #f7f8f6; /* Off White, the board's dark-combination text */
+  filter: drop-shadow(0 0 2px rgba(11, 31, 42, 0.95))
+    drop-shadow(0 1px 3px rgba(11, 31, 42, 0.85))
+    drop-shadow(0 0 12px rgba(11, 31, 42, 0.7));
+}
+
+/* The gradient word takes the board's BRIGHT accent pair on this ground,
+   the gold and teal gradient STARTS rather than the darkened inks — the
+   same flip the dark hero scrim used, and the same pair the logo uses on
+   its dark variant. */
+.cap--light .grad-text {
+  background-image: linear-gradient(92deg, var(--gold-lite), var(--teal-lite));
+}

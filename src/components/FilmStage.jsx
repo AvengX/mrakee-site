@@ -21,6 +21,22 @@ gsap.registerPlugin(ScrollTrigger);
  * The opening caption uses a NEGATIVE `in` on purpose — a caption with
  * in=0.00 is invisible at exactly scroll 0, which is where the page loads.
  */
+/* INK IS PER CAPTION, because this film has two acts with opposite
+   luminance: a glass-walled airport that is bright throughout, then a
+   restaurant lit for evening. Measured on the built frames, over the
+   area each caption actually occupies at 1440x900:
+
+                   Premium Black      Off White
+     opening        5.54:1  41%      2.73:1  67%
+     solutions      4.48:1  53%      4.42:1  54%
+     spaces         2.11:1  89%      9.02:1  25%
+     closing        3.02:1  76%      5.01:1  45%
+
+   No single ink survives both halves, so the first two keep Premium
+   Black and the last two flip to Off White. Deep Teal was measured too
+   and fails everywhere (88-100% of the area), which is the same result
+   it gave on the previous footage -- it is mid-luminance, so it has
+   nowhere to hide on either a bright frame or a dark one. */
 const CAPTIONS = [
   {
     // Solid at rest, starts going the moment you scroll, gone by ~32vh.
@@ -42,13 +58,13 @@ const CAPTIONS = [
     body: "Deliver the right message to the right audience at the right time — centrally managed for seamless distribution.",
   },
   {
-    in: 0.62, out: 0.8, align: "right",
+    in: 0.62, out: 0.8, align: "right", ink: "light",
     eyebrow: "Smart Spaces",
     title: <>Spaces that are<br />intuitive to use.</>,
     body: "AV technology, engineering expertise and intentional design, brought together into one coordinated environment.",
   },
   {
-    in: 0.86, out: 1.08, align: "center",
+    in: 0.86, out: 1.08, align: "center", ink: "light",
     eyebrow: "One team",
     title: <>One Team, One Goal,<br />One Seamless AV experience.</>,
     body: "From concept, design and installation through to training, after care and on-going support.",
@@ -150,7 +166,7 @@ export default function FilmStage() {
           <div
             key={i}
             ref={(el) => (capRefs.current[i] = el)}
-            className={`cap cap--${c.align}`}
+            className={`cap cap--${c.align}${c.ink === "light" ? " cap--light" : ""}`}
             style={{ opacity: 0, visibility: "hidden" }}
           >
             {/* The hero runs without one: its headline is the first thing
