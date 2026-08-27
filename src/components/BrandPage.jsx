@@ -8,7 +8,7 @@ import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
 import WhyScroll from "./WhyScroll";
 import FaqMarquee from "./FaqMarquee";
-import Assistant from "./Assistant";
+import AssistantDock from "./AssistantDock";
 import ExpertiseTrail from "./ExpertiseTrail";
 import { Ear, Layers, PenTool } from "lucide-react";
 import { usePointerGlow } from "../hooks/usePointerGlow";
@@ -194,21 +194,6 @@ export default function BrandPage() {
           Sits immediately above Contact on purpose: it answers what it
           can from the client's own words, and every dead end it reaches
           points at the enquiry form directly below it. */}
-      <section className="band band--rule" id="assistant">
-        <div className="band__inner">
-          <Reveal className="band__head">
-            <p className="eyebrow">Ask us anything</p>
-            <SplitWords words={["Tell", "us", "about", "your", { t: "space.", grad: true }]} />
-            <p className="lede">
-              Our assistant answers from what we publish — what we build, how we
-              work, and which environments we cover.
-            </p>
-          </Reveal>
-
-          <Assistant />
-        </div>
-      </section>
-
       {/* ---------------- CONTACT ----------------
           contactInfo is empty on purpose: the client's document gives
           "+91 XXXXX XXXXX", "info@yourMRAKEE Technologies.com" and
@@ -285,6 +270,10 @@ export default function BrandPage() {
           <span>Privacy Policy · Terms &amp; Conditions</span>
         </div>
       </footer>
+
+      {/* Outside every section on purpose: it is pinned to the viewport,
+          so it must not inherit a band's stacking context or transform. */}
+      <AssistantDock />
     </div>
   );
 }

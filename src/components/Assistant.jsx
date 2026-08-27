@@ -28,7 +28,7 @@ import { canListen, canSpeak, listen, speak, stopSpeaking, SPEECH_ERRORS, ensure
 const GREETING =
   "Ask me what MRAKEE can build for your space — meeting rooms, control rooms, signage, classrooms.";
 
-export default function Assistant() {
+export default function Assistant({ compact = false }) {
   const [turns, setTurns] = useState([]);
   const [draft, setDraft] = useState("");
   const [state, setState] = useState("idle"); // idle · thinking · error
@@ -261,10 +261,10 @@ export default function Assistant() {
     : "idle";
 
   return (
-    <div className="kiosk">
+    <div className={`kiosk${compact ? " kiosk--compact" : ""}`}>
       <div className="kiosk__frame">
         <div className="kiosk__head">
-          <AssistantAvatar state={pose} />
+          <AssistantAvatar state={pose} size={compact ? 44 : 84} />
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE Assistant</p>
             <p className="kiosk__hint">

@@ -4153,3 +4153,178 @@ a.contact__info:hover .contact__infoIcon {
     scroll-behavior: auto;
   }
 }
+
+/* ================================================================
+   THE DOCKED ASSISTANT
+   ================================================================ */
+
+.dock {
+  position: fixed;
+  right: clamp(0.9rem, 2vw, 1.5rem);
+  bottom: clamp(0.9rem, 2vw, 1.5rem);
+  z-index: 9996;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.85rem;
+  /* The wrapper must not swallow clicks on the page it floats over —
+     only the launcher and the panel inside it take pointer events. */
+  pointer-events: none;
+}
+
+.dock > * { pointer-events: auto; }
+
+/* ---- the launcher ---- */
+
+.dock__launcher {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: #ffffff;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(11, 31, 42, 0.22);
+  transition: transform 0.22s var(--ease-soft), box-shadow 0.22s var(--ease-soft);
+}
+
+.dock__launcher:hover { transform: translateY(-2px) scale(1.04); }
+.dock__launcher:active { transform: translateY(0) scale(0.98); }
+
+.dock__launcher:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
+
+/* Open state drops the avatar for a plain close affordance, and the
+   circle becomes brand teal so it reads as "this is the thing that is
+   open" rather than as a second, different control. */
+.dock__launcher.is-open {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+  color: #ffffff;
+}
+
+.dock__face {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- the panel ---- */
+
+.dock__panel {
+  position: relative;
+  width: min(400px, calc(100vw - 1.8rem));
+  /* dvh, not vh: on a phone vh includes the browser chrome that is not
+     actually there, so the panel would run under the address bar. */
+  height: min(580px, calc(100dvh - 8.5rem));
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(11, 31, 42, 0.28);
+  transform-origin: bottom right;
+  opacity: 0;
+  transform: scale(0.92) translateY(12px);
+  transition: opacity 0.2s var(--ease-soft), transform 0.24s var(--ease-soft);
+}
+
+.dock__panel.is-open {
+  opacity: 1;
+  transform: none;
+}
+
+.dock__close {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s;
+}
+
+.dock__close:hover { color: var(--ink); border-color: var(--line-strong); }
+.dock__close:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+/* ---- the kiosk, compacted into the panel ----
+   The section version is 780px wide with room to breathe. None of those
+   measurements survive a 400px column, so the compact variant is not a
+   scale-down but its own set of spacings. */
+
+.kiosk--compact { max-width: none; height: 100%; }
+
+.kiosk--compact .kiosk__frame {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.kiosk--compact .kiosk__head {
+  gap: 0.7rem;
+  padding: 0.9rem 2.6rem 0.9rem 1rem; /* right padding clears the close button */
+  flex-wrap: wrap;
+}
+
+.kiosk--compact .kiosk__name { font-size: 0.9rem; }
+.kiosk--compact .kiosk__hint { font-size: 0.76rem; }
+
+/* The log takes whatever the header and the input bar leave, rather
+   than a viewport fraction — inside a fixed-height panel a vh cap
+   either overflows it or leaves dead space under it. */
+.kiosk--compact .kiosk__log {
+  flex: 1;
+  max-height: none;
+  min-height: 0;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.kiosk--compact .kiosk__chips { padding: 0 1rem 0.6rem; }
+.kiosk--compact .kiosk__chips button { font-size: 0.72rem; }
+.kiosk--compact .kiosk__bar { margin: 0 0.8rem 0.8rem; }
+.kiosk--compact .kiosk__cardImg { width: 46px; height: 46px; }
+
+/* ---- phone: a sheet, not a floating card ----
+   A 400px card on a 360px screen is a card with its edges cut off. */
+
+@media (max-width: 520px) {
+  .dock { left: 0; right: 0; bottom: 0; align-items: stretch; gap: 0; }
+
+  .dock__panel {
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    transform-origin: bottom center;
+  }
+
+  .dock__launcher {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  /* Hidden behind a full-screen sheet — it would otherwise sit on top
+     of the conversation with nothing to toggle back to. */
+  .dock__panel.is-open ~ .dock__launcher { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock__panel { transition: opacity 0.15s linear; transform: none; }
+  .dock__launcher { transition: none; }
+  .dock__launcher:hover { transform: none; }
+}
