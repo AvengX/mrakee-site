@@ -506,8 +506,7 @@ body {
    guaranteed regardless of what the footage does, and a dark scrim over
    video reads as cinematic rather than as a patch stuck on top. */
 .cap h1,
-.cap h2,
-.cap .eyebrow {
+.cap h2 {
   /* Executive Dark, not Premium Black. Both are on the board, but this
      is the one the board pairs with Off White, and the site's theme is
      teal-and-gold rather than neutral — a pure black caption reads as
@@ -531,8 +530,7 @@ body {
    gradient out. */
 .cap h1,
 .cap h2,
-.cap .lede,
-.cap .eyebrow {
+.cap .lede {
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
     drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
     drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
@@ -556,11 +554,6 @@ body {
   color: #111111; /* Premium Black */
 }
 
-.cap .eyebrow--badge {
-  color: #475569;
-  background: rgba(255, 255, 255, 0.95);
-}
-
 @media (max-width: 760px) {
   /* Narrower than the desktop inset: the caption is already 90vw here,
      so a wider plate runs off both edges of the frame and its side
@@ -576,9 +569,6 @@ body {
     transform: translate(-50%, var(--drift, 0px));
     text-align: center;
   }
-  .cap .eyebrow {
-    justify-content: center;
-  }
   /* The film runs the board's dark combination, not its light one.
 
    No single ink can work here: the hero headline crosses a bright
@@ -592,8 +582,7 @@ body {
    guaranteed regardless of what the footage does, and a dark scrim over
    video reads as cinematic rather than as a patch stuck on top. */
 .cap h1,
-.cap h2,
-.cap .eyebrow {
+.cap h2 {
   /* Executive Dark, not Premium Black. Both are on the board, but this
      is the one the board pairs with Off White, and the site's theme is
      teal-and-gold rather than neutral — a pure black caption reads as
@@ -617,8 +606,7 @@ body {
    gradient out. */
 .cap h1,
 .cap h2,
-.cap .lede,
-.cap .eyebrow {
+.cap .lede {
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
     drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
     drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
@@ -1063,29 +1051,6 @@ body {
   height: 2px;
   border-radius: 2px;
   background: linear-gradient(90deg, var(--gold), var(--teal));
-}
-
-/* pill variant, for badges that sit alone above a headline */
-.eyebrow--badge {
-  gap: 0.5rem;
-  padding: 0.42rem 0.9rem 0.42rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.93);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-sm);
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  color: var(--ink-soft);
-}
-
-.eyebrow--badge::before {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--teal-deep);
-  box-shadow: 0 0 0 3px rgba(24, 154, 162, 0.22);
 }
 
 h1 {
@@ -4359,7 +4324,6 @@ a.contact__info:hover .contact__infoIcon {
 .cap--light h1,
 .cap--light h2,
 .cap--light .lede,
-.cap--light .eyebrow,
 .cap--light .cap__title {
   /* Off White — the board's own colour, and the text half of its dark
      combination. It is not "white": measured against Gold light
@@ -4497,17 +4461,3 @@ a.contact__info:hover .contact__infoIcon {
   50%      { transform: translateY(-3px); }
 }
 
-/* The badge is its own ground, so it must NOT follow the caption's ink.
-
-   .cap--light flips every text child to Off White for the dark half of
-   the film — correct for the heading and the lede, which sit on the
-   footage, and wrong for this one, which sits on a 95%-opaque white
-   pill. Off White on near-white is the invisible "SMART SPACES" and
-   "ONE TEAM" that showed up on the restaurant shots.
-
-   The dark halo goes too. Around dark type on a light pill it is not a
-   halo, it is a smudge. */
-.cap--light .eyebrow--badge {
-  color: #475569;
-  filter: none;
-}

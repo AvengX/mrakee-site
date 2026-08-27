@@ -41,7 +41,6 @@ const CAPTIONS = [
   {
     // Solid at rest, starts going the moment you scroll, gone by ~32vh.
     in: -0.05, out: 0.06, fade: 0.03, align: "center",
-    eyebrow: "Systems Integration",
     title: <>Integration made <span className="grad-text">Simple</span>.</>,
     body: "Re-engineering the way technology connects the future. Design. Integrate. Connect. Perform.",
     hero: true,
@@ -53,19 +52,16 @@ const CAPTIONS = [
   // they are in git at a229ad8 if those chapters come back.
   {
     in: 0.26, out: 0.44, align: "left",
-    eyebrow: "Digital Signage",
     title: <>Centrally Managed for<br />Seamless <span className="grad-text">Distribution</span>.</>,
     body: "Deliver the right message to the right audience at the right time — centrally managed for seamless distribution.",
   },
   {
     in: 0.62, out: 0.8, align: "right", ink: "light",
-    eyebrow: "Smart Spaces",
     title: <>Spaces that are<br />intuitive to use.</>,
     body: "Technology, engineering expertise and intentional design, brought together into one coordinated environment.",
   },
   {
     in: 0.86, out: 1.08, align: "center", ink: "light",
-    eyebrow: "One team",
     title: <>One Team, One Goal,<br />One Seamless experience.</>,
     body: "From concept, design and installation through to training, after care and on-going support.",
   },
@@ -169,11 +165,10 @@ export default function FilmStage() {
             className={`cap cap--${c.align}${c.ink === "light" ? " cap--light" : ""}`}
             style={{ opacity: 0, visibility: "hidden" }}
           >
-            {/* The hero runs without one: its headline is the first thing
-                on the page and a label above it was just furniture. The
-                chapter captions keep theirs — there the eyebrow is what
-                says which part of the film you are looking at. */}
-            {!c.hero && <p className="eyebrow eyebrow--badge">{c.eyebrow}</p>}
+            {/* No eyebrow on any caption. The pills were removed on
+                request; over the footage they read as chrome stuck on
+                the picture rather than as part of it, and the headline
+                already says which part of the film you are looking at. */}
             {c.hero ? <h1>{c.title}</h1> : <h2>{c.title}</h2>}
             <p className="lede">{c.body}</p>
           </div>
