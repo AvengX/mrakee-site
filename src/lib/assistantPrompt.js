@@ -17,7 +17,7 @@ import {
    · it cannot cite anything the client did not write.
 
    The refusals are the point. This client's brief was explicit about
-   inventing nothing, and a general-purpose model asked about an AV
+   inventing nothing, and a general-purpose model asked about a systems
    integrator will improvise happily. Pricing, timelines, staff numbers,
    past clients and certifications are all absent from the document, so
    they are all named here as things to decline.
@@ -26,7 +26,7 @@ import {
 const list = (xs) => xs.map((x) => `- ${x}`).join("\n");
 
 export function buildSystemPrompt() {
-  return `You are the assistant on the website of MRAKEE TECHNOLOGIES, an AV systems integration business.
+  return `You are the assistant on the website of MRAKEE TECHNOLOGIES, a systems integration business.
 
 Answer ONLY from the reference below. It is the company's own copy and it is everything you know.
 
@@ -82,7 +82,7 @@ export const QUICK_ASKS = [
   "Digital signage",
   "Classrooms",
   "Video walls",
-  "Hospitality AV",
+  "Hospitality",
   "How do you work?",
   "Which industries?",
 ];

@@ -107,7 +107,7 @@ export default function BrandPage() {
             <SplitWords words={["We", "believe", "Solutions", "are", "just", "the", { t: "beginning.", grad: true }]} />
             <p className="lede">
               We understand the importance that choosing the right technology
-              is only one part of a successful AV project. That's why we believe
+              is only one part of a successful project. That's why we believe
               in the following.
             </p>
           </Reveal>
@@ -143,7 +143,7 @@ export default function BrandPage() {
             <div style={{ maxWidth: "62ch", margin: "0 auto", textAlign: "center" }}>
               <p className="eyebrow" style={{ justifyContent: "center" }}>Our Experts</p>
               <SplitWords
-                words={["One", "Team,", "One", "Goal,", { t: "One", grad: true }, { t: "Seamless", grad: true }, { t: "AV", grad: true }, { t: "experience.", grad: true }]}
+                words={["One", "Team,", "One", "Goal,", { t: "One", grad: true }, { t: "Seamless", grad: true }, { t: "experience.", grad: true }]}
                 style={{ margin: "0 auto", textAlign: "center" }}
               />
               {EXPERTS.body.map((p) => (

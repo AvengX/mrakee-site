@@ -41,8 +41,8 @@ const CAPTIONS = [
   {
     // Solid at rest, starts going the moment you scroll, gone by ~32vh.
     in: -0.05, out: 0.06, fade: 0.03, align: "center",
-    eyebrow: "AV Systems Integration",
-    title: <>AV Integration made <span className="grad-text">Simple</span>.</>,
+    eyebrow: "Systems Integration",
+    title: <>Integration made <span className="grad-text">Simple</span>.</>,
     body: "Re-engineering the way technology connects the future. Design. Integrate. Connect. Perform.",
     hero: true,
   },
@@ -61,12 +61,12 @@ const CAPTIONS = [
     in: 0.62, out: 0.8, align: "right", ink: "light",
     eyebrow: "Smart Spaces",
     title: <>Spaces that are<br />intuitive to use.</>,
-    body: "AV technology, engineering expertise and intentional design, brought together into one coordinated environment.",
+    body: "Technology, engineering expertise and intentional design, brought together into one coordinated environment.",
   },
   {
     in: 0.86, out: 1.08, align: "center", ink: "light",
     eyebrow: "One team",
-    title: <>One Team, One Goal,<br />One Seamless AV experience.</>,
+    title: <>One Team, One Goal,<br />One Seamless experience.</>,
     body: "From concept, design and installation through to training, after care and on-going support.",
   },
 ];

@@ -13,7 +13,7 @@ import { canListen, canSpeak, listen, speak, stopSpeaking, SPEECH_ERRORS, ensure
    this client, where the result cards are the nine solution portfolios
    and the action is the enquiry form rather than walking directions.
 
-   Why a kiosk and not a corner bubble: for an AV integrator this is a
+   Why a kiosk and not a corner bubble: for a systems integrator this is a
    product demonstration as much as a support tool. A facilities manager
    does not need a bot to read nine portfolios aloud — but showing them
    the kind of interactive surface MRAKEE builds is worth having on the
