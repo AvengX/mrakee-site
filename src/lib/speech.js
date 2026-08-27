@@ -151,6 +151,42 @@ export function listen({ onPartial, onStart, lang = "en-IN" } = {}) {
   };
 }
 
+/* The assistant is drawn as a woman, so it should not answer in a man's
+   voice. There is no gender field in the Web Speech API -- SpeechSynthesisVoice
+   exposes name, lang, localService and default, and nothing else -- so
+   the only handle is the NAME, which is why this is a list rather than a
+   flag.
+ *
+ * The names are the ones the platforms actually ship: Heera and Kalpana
+ * are the Indian English women on Windows and Android, Veena is Apple's,
+ * and Google's are labelled plainly. Preference runs Indian-English
+ * female, then any English female, then Indian English of any voice,
+ * then any English at all -- so a machine with none of these still
+ * speaks rather than falling silent.
+ */
+const FEMALE_HINTS = [
+  "heera", "kalpana", "veena", "raveena", "priya", "isha", "neerja",
+  "female", "woman",
+  "samantha", "victoria", "karen", "moira", "tessa", "fiona", "serena",
+  "zira", "hazel", "susan", "linda", "catherine", "aria", "jenny", "sonia",
+  "google uk english female", "google us english",
+];
+
+function pickVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null; // the list loads late; the default is used
+  const female = (v) => FEMALE_HINTS.some((h) => v.name.toLowerCase().includes(h));
+  const inIN = (v) => v.lang === "en-IN";
+  const inEN = (v) => v.lang?.startsWith("en");
+  return (
+    voices.find((v) => inIN(v) && female(v)) ||
+    voices.find((v) => inEN(v) && female(v)) ||
+    voices.find(inIN) ||
+    voices.find(inEN) ||
+    null
+  );
+}
+
 /** Speak, and call back when the mouth should stop moving. */
 export function speak(text, { onEnd } = {}) {
   if (!canSpeak || !text) { onEnd?.(); return () => {}; }
@@ -161,19 +197,21 @@ export function speak(text, { onEnd } = {}) {
   u.rate = 1.02;
   u.pitch = 1;
 
-  // Prefer an Indian English voice when the machine has one, then any
-  // English voice, then whatever the default is.
-  const voices = window.speechSynthesis.getVoices();
-  u.voice =
-    voices.find((v) => v.lang === "en-IN") ||
-    voices.find((v) => v.lang?.startsWith("en")) ||
-    null;
+  u.voice = pickVoice();
 
   u.onend = () => onEnd?.();
   u.onerror = () => onEnd?.();
   window.speechSynthesis.speak(u);
 
   return () => window.speechSynthesis.cancel();
+}
+
+/* Chrome populates getVoices() asynchronously and returns an empty list
+   on the first call after load. Without this the first reply of a visit
+   speaks in the system default -- often male -- and only later replies
+   get the right voice. Touching the list on the event caches it. */
+if (typeof window !== "undefined" && window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 
 export function stopSpeaking() {
