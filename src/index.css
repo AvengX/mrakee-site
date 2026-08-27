@@ -4467,12 +4467,16 @@ a.contact__info:hover .contact__infoIcon {
    Sized by HEIGHT with width auto, so it can never be squashed: the
    crop is 1293x251 and that 5.15:1 ratio is the lockup's, not something
    this stylesheet gets to choose. It scales with the viewport because
-   TECHNOLOGIES is a fifth of the block's height — at the nav's 34px
-   that line is about 6px, which is how the logo is drawn, and on a wide
-   screen there is room to give it more. */
+   TECHNOLOGIES is a fifth of the block's height, which is how the logo
+   is drawn.
+
+   The height matches what the live text it replaced actually occupied:
+   16.32px of MRAKEE, a 2px gap, 8.32px of TECHNOLOGIES — 26.6px. Set
+   any larger and the artwork is not more legible, it is just a bigger
+   logo than the bar was designed around. */
 .logo__wordArt {
   display: block;
-  height: clamp(28px, 2.6vw, 40px);
+  height: clamp(22px, 1.85vw, 28px);
   width: auto;
   flex-shrink: 0;
   user-select: none;
@@ -4481,5 +4485,5 @@ a.contact__info:hover .contact__infoIcon {
 @media (max-width: 560px) {
   /* A 175px wordmark plus the mark plus a menu button does not fit a
      360px bar. The mark alone still identifies the site. */
-  .logo__wordArt { height: 26px; }
+  .logo__wordArt { height: 22px; }
 }
