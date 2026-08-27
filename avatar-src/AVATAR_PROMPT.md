@@ -110,3 +110,53 @@ SVG was built to avoid.
    and brows further, not the pose.
 3. Check the circular crop cut nothing off — chin, ears, shoulder line.
 4. Check all three against the card background in both light and dark.
+
+---
+
+# greeter.png — the standing namaste figure
+
+A different picture from the three above, not a different crop of them.
+The launcher shows the figure uncropped at 200-270px tall, so this is
+the only file where hands exist at all.
+
+## Prompt — regenerating the existing render in a namaste
+
+Feed the approved concierge render back as a reference and change ONE
+thing. Describing her again from scratch produces a different person who
+merely resembles her.
+
+> Same 3D character, same face, same hair, same navy uniform with the
+> gold trim and the small gold "M" pin, same lighting, same rendering
+> style — change only the hands and arms.
+>
+> She holds both palms pressed flat together in front of her chest in a
+> namaste greeting, fingers pointing upward, elbows relaxed and slightly
+> out. Warm, welcoming, looking directly at the viewer with the same
+> soft smile.
+>
+> Framing: full upper body from the top of the head to below the waist,
+> so the hands and the gesture are entirely inside the frame with clear
+> space around them. Portrait orientation, roughly 3:4.
+>
+> Background: fully transparent. No backdrop, no circle, no floor, no
+> shadow, no border — the figure alone on transparency, cut out cleanly
+> at the edges including between the arms and the body.
+
+## Checks before it goes in
+
+* **Transparent, actually.** Open it over a dark surface. Generators
+  routinely return a white or near-white background that looks
+  transparent on a white page and appears as a hard rectangle the moment
+  it sits on the film or a teal band. If it has a background, cut it out
+  before shipping it.
+* **The gap between the arms and the torso must be transparent too.**
+  It is the most commonly missed hole, and a filled one makes the
+  namaste read as a solid blob at small sizes.
+* **Look at it at 200px, not at full size.** If the hands are not
+  legible as a namaste there, the gesture needs to be larger in frame —
+  that is the only thing this file exists to show.
+* **Nothing critical in the bottom 10%.** The figure stands close to the
+  bottom of the window.
+
+Save as `public/assistant/greeter.png`. The launcher switches to it
+automatically.

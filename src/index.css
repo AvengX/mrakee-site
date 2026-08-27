@@ -4381,3 +4381,55 @@ a.contact__info:hover .contact__infoIcon {
 .cap--light .grad-text {
   background-image: linear-gradient(92deg, var(--gold-lite), var(--teal-lite));
 }
+
+/* ---- the greeter: the figure alone, floating ----
+
+   Only when public/assistant/greeter.png exists. Without it the
+   launcher stays the circular bust, so a missing asset never breaks the
+   site — it just looks like every other chat launcher until the figure
+   is dropped in.
+
+   No circle, no plate, no border, no shadow. The artwork's own alpha is
+   the whole silhouette, which is what "floating there, no BG" means and
+   also the only way a namaste survives: the gesture lives entirely
+   outside the crop a circular launcher would leave. */
+.dock__launcher--figure {
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.dock__launcher--figure:hover { transform: translateY(-4px) scale(1.02); }
+
+.dock__launcher--figure:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 8px;
+  border-radius: var(--r-sm);
+}
+
+/* The height lives on the IMAGE, not on the button or the span between
+   them. Sizing it with height:100% asks the image to resolve against a
+   parent whose own height is being derived from the image — a circular
+   dependency the browser breaks by using the intrinsic size, which is
+   how a 1024px-tall render ended up hanging off the viewport. */
+.dock__figure {
+  height: clamp(190px, 30vh, 340px);
+  width: auto;
+  max-width: min(46vw, 340px);
+  object-fit: contain;
+  display: block;
+}
+
+.dock__launcher--figure .dock__face { width: auto; height: auto; }
+
+@media (max-width: 520px) {
+  .dock__figure { height: clamp(150px, 22vh, 210px); max-width: 44vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock__launcher--figure:hover { transform: none; }
+}
