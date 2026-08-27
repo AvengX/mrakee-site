@@ -3020,6 +3020,39 @@ h3 {
 
 .kiosk__mute:hover { border-color: var(--line-strong); }
 
+/* Hands-free. Reads as a live control rather than a settings toggle,
+   because while it is on the microphone keeps reopening. */
+.kiosk__convo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--teal);
+  background: #fff;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: var(--teal-deep);
+  cursor: pointer;
+  transition: background 0.3s var(--ease-soft), color 0.3s var(--ease-soft);
+}
+
+.kiosk__convo:hover { background: rgba(0, 160, 160, 0.08); }
+
+.kiosk__convo.is-live {
+  background: var(--red);
+  border-color: var(--red);
+  color: #f7f8f6;
+}
+
+.kiosk__convo:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 2px;
+}
+
 .kiosk__mute:focus-visible,
 .kiosk__mic:focus-visible {
   outline: 2px solid var(--indigo);

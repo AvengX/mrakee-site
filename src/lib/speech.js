@@ -41,6 +41,7 @@ export function listen({ onPartial, onStart } = {}) {
   rec.maxAlternatives = 1;
 
   let finalText = "";
+  let lastInterim = "";
   let settled = false;
 
   const promise = new Promise((resolve, reject) => {
@@ -52,6 +53,7 @@ export function listen({ onPartial, onStart } = {}) {
         if (e.results[i].isFinal) finalText += t;
         else interim += t;
       }
+      if (interim.trim()) lastInterim = (finalText + interim).trim();
       onPartial?.((finalText + interim).trim());
     };
     rec.onerror = (e) => {
@@ -64,7 +66,13 @@ export function listen({ onPartial, onStart } = {}) {
     rec.onend = () => {
       if (settled) return;
       settled = true;
-      resolve(finalText.trim());
+      /* Fall back to the last interim transcript. Chrome does not always
+         promote the final phrase before firing onend — especially on a
+         short utterance — and resolving with "" there means the visitor
+         speaks, sees their words appear, and then watches them vanish
+         with nothing sent. That is the "it is not reading my voice"
+         failure, and it is a dropped result rather than a deaf mic. */
+      resolve((finalText.trim() || lastInterim).trim());
     };
   });
 

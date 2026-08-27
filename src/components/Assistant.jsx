@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Mic, MicOff, SendHorizontal, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { Mic, MicOff, SendHorizontal, RotateCcw, Volume2, VolumeX, Radio, Square } from "lucide-react";
 import { QUICK_ASKS } from "../lib/assistantPrompt";
 import { SOLUTIONS } from "../content/mrakee";
 import AssistantAvatar from "./AssistantAvatar";
@@ -46,6 +46,13 @@ export default function Assistant() {
      audio running past three seconds — which is the toggle below. */
   const [voice, setVoice] = useState(false);
   const [heard, setHeard] = useState("");
+  /* Hands-free mode: listen, answer, speak, listen again, until it is
+     stopped. Driven from refs rather than state because the loop is
+     rebuilt inside async callbacks, where a captured `convo` would be
+     whatever it was when the turn started. */
+  const [convo, setConvo] = useState(false);
+  const convoRef = useRef(false);
+  const silentRef = useRef(0);
 
   useEffect(() => {
     // keep the newest answer in view without yanking the whole page
@@ -100,9 +107,15 @@ export default function Assistant() {
       // being spoken, hold it until the voice actually stops rather
       // than guessing a duration.
       setState("answering");
-      if (voice && canSpeak) {
+      if ((voice || convoRef.current) && canSpeak) {
         speak(data.reply, {
-          onEnd: () => setState((st) => (st === "answering" ? "idle" : st)),
+          onEnd: () => {
+            setState((st) => (st === "answering" ? "idle" : st));
+            /* Only reopen the microphone once the voice has actually
+               stopped. Listening while it is still speaking means it
+               transcribes itself and answers its own reply. */
+            if (convoRef.current) setTimeout(() => startListening(), 400);
+          },
         });
       } else {
         setTimeout(() => setState((st) => (st === "answering" ? "idle" : st)), 2600);
@@ -129,12 +142,26 @@ export default function Assistant() {
       .then((text) => {
         micRef.current = null;
         setHeard("");
-        if (text) ask(text);
-        else setState("idle");
+        if (text) {
+          silentRef.current = 0;
+          ask(text);
+          return;
+        }
+        setState("idle");
+        /* Heard nothing. In hands-free mode try twice more, then stop —
+           an open microphone re-arming forever on an abandoned page is
+           both a battery drain and a thing nobody consented to. */
+        if (convoRef.current) {
+          silentRef.current += 1;
+          if (silentRef.current >= 3) endConversation();
+          else setTimeout(() => startListening(), 300);
+        }
       })
       .catch((err) => {
         micRef.current = null;
         setHeard("");
+        convoRef.current = false;
+        setConvo(false);
         setState(err.code === "not-allowed" ? "error" : "idle");
         if (err.code === "not-allowed") {
           setError({
@@ -147,12 +174,28 @@ export default function Assistant() {
 
   const stopListening = () => micRef.current?.stop();
 
+  function beginConversation() {
+    if (!canListen) return;
+    convoRef.current = true;
+    silentRef.current = 0;
+    setConvo(true);
+    setVoice(true);
+    startListening();
+  }
+
+  function endConversation() {
+    convoRef.current = false;
+    setConvo(false);
+    micRef.current?.abort();
+    stopSpeaking();
+    setState("idle");
+  }
+
   // never leave a microphone open or a voice talking to an empty page
-  useEffect(() => () => { micRef.current?.abort(); stopSpeaking(); }, []);
+  useEffect(() => () => { convoRef.current = false; micRef.current?.abort(); stopSpeaking(); }, []);
 
   const reset = () => {
-    stopSpeaking();
-    micRef.current?.abort();
+    endConversation();
     setTurns([]);
     setError(null);
     setState("idle");
@@ -175,14 +218,35 @@ export default function Assistant() {
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE Assistant</p>
             <p className="kiosk__hint">
-              {listening
+              {convo
+                ? state === "listening"
+                  ? "Listening — just speak."
+                  : state === "thinking"
+                  ? "Thinking…"
+                  : state === "answering"
+                  ? "Speaking — I'll listen again when I finish."
+                  : "Conversation on."
+                : listening
                 ? "Listening — ask about a room, a space or a solution."
                 : turns.length
                 ? "Ask me anything else about what we build."
                 : GREETING}
             </p>
           </div>
-          {voice && canSpeak && (
+          {canListen && (
+            <button
+              type="button"
+              className={`kiosk__convo${convo ? " is-live" : ""}`}
+              onClick={convo ? endConversation : beginConversation}
+              aria-pressed={convo}
+              title={convo ? "End the conversation" : "Talk to it hands-free"}
+            >
+              {convo
+                ? <><Square size={13} aria-hidden="true" />End</>
+                : <><Radio size={15} aria-hidden="true" />Talk</>}
+            </button>
+          )}
+          {voice && canSpeak && !convo && (
             <button
               type="button"
               className="kiosk__mute"
