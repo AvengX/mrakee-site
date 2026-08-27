@@ -83,7 +83,9 @@ export default function Assistant() {
           handoff: !!data.handoff,
         },
       ]);
-      setState("idle");
+      // hold the presenting pose while the answer is new, then settle
+      setState("answering");
+      setTimeout(() => setState((st) => (st === "answering" ? "idle" : st)), 2600);
     } catch (e) {
       setError(e.message);
       setState("error");
@@ -98,12 +100,13 @@ export default function Assistant() {
   };
 
   const speaking = state === "thinking";
+  const pose = state === "thinking" ? "thinking" : state === "answering" ? "answering" : "idle";
 
   return (
     <div className="kiosk">
       <div className="kiosk__frame">
         <div className="kiosk__head">
-          <AssistantAvatar state={speaking ? "thinking" : "idle"} />
+          <AssistantAvatar state={pose} />
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE Assistant</p>
             <p className="kiosk__hint">
