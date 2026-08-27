@@ -67,8 +67,13 @@
      rather than the cool blue-grey this used to be */
   --surface-soft: #eff1ed;
 
-  /* ---- Ink ---- */
-  --ink: #111827;
+  /* ---- Ink ----
+     Deep Teal, not near-black. The board calls teal "the primary brand
+     colour for trust & technology", and this is every heading on the
+     site. 5.96:1 on white — well inside AA, though a long way down from
+     the 17:1 the old near-black gave, so tinted surfaces were all
+     re-measured after the swap. */
+  --ink: #006f73;
   --ink-soft: #64748b; /* 4.76:1 on white */
   /* Micro labels are 10-13px, so this is *darker* than it looks like it
      wants to be. A lighter faint tone measured 3.7:1 — under AA for the
@@ -280,7 +285,19 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Nothing. The footage plays at full strength.
+  /* Light anchored to the EDGES, not a patch in the middle. The patch
+     was the "cloud" — a shape with its own outline sitting on the
+     picture. A gradient that starts at the frame edge and fades out
+     before the centre reads as lighting instead, which is why film
+     titling has always done it this way. The middle of the frame, where
+     the subject is, stays untouched. */
+  /* Tried an edge-anchored gradient here to replace the plate and
+     measured it: the captions sit at the vertical CENTRE, which is
+     exactly where an edge gradient has faded to zero. It contributed
+     nothing where the text is and put a wash top and bottom where there
+     is no text at all. Removed again.
+
+     Nothing. The footage plays at full strength.
      Every white layer that used to live here — a flat veil, a vignette
      and a top wash — existed to make the captions readable, and the
      price was a milky film. That cost is paid in the type instead now:
@@ -393,9 +410,12 @@ body {
   inset: -2.5rem -4rem;
   z-index: -1;
   pointer-events: none;
-  background: rgba(255, 255, 255, var(--cap-plate, 0.58));
-  -webkit-backdrop-filter: blur(20px) brightness(1.2) saturate(0.95);
-  backdrop-filter: blur(20px) brightness(1.2) saturate(0.95);
+  /* Removed on request — it read as a cloud sitting on the footage.
+     Everything in the note above still holds: the film is full of
+     screens and the type now has no ground of its own. Restore by
+     setting --cap-plate to 0.58 and putting the two backdrop-filter
+     lines back. */
+  background: none;
   /* Two gradients intersected, not one radial. A radial is an ellipse,
      and the corners of a rectangle of text fall outside an ellipse
      drawn through its edges — the ends of the first and last lines
@@ -466,6 +486,15 @@ body {
 /* Over footage the standard body ink is too quiet even on the scrim —
    slate-600 rather than slate-500 gives the supporting line the weight
    the headline already has. */
+/* The film is the one place the brand teal cannot go. Measured on the
+   footage, teal headings failed over 98-100% of their own area because
+   teal sits mid-luminance and the frames are bright. Dark ink here,
+   brand teal everywhere else on the site. */
+.cap h1,
+.cap h2 {
+  color: #10243a;
+}
+
 .cap .lede {
   /* slate-800. With the veils gone the supporting line sits on raw
      footage, where slate-700 measured 3.6:1 over the retail chapter.
@@ -497,7 +526,16 @@ body {
   .cap .eyebrow {
     justify-content: center;
   }
-  .cap .lede {
+  /* The film is the one place the brand teal cannot go. Measured on the
+   footage, teal headings failed over 98-100% of their own area because
+   teal sits mid-luminance and the frames are bright. Dark ink here,
+   brand teal everywhere else on the site. */
+.cap h1,
+.cap h2 {
+  color: #10243a;
+}
+
+.cap .lede {
     margin-left: auto;
     margin-right: auto;
   }
@@ -1539,6 +1577,187 @@ h3 {
   .stack__media {
     aspect-ratio: 16 / 10;
     min-height: 0;
+  }
+}
+
+/* ================================================================
+   SOLUTIONS — pinned horizontal rail
+   The section pins and the track slides sideways; see SolutionRail.jsx
+   for the measurement and the guards.
+   ================================================================ */
+.rail {
+  position: relative;
+  overflow: hidden; /* the track is wider than the page by design */
+}
+
+.rail__track {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  width: max-content;
+  padding-inline: clamp(1.5rem, 6vw, 4rem);
+  will-change: transform;
+}
+
+.rail__card {
+  flex: 0 0 clamp(300px, 34vw, 460px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background: #ffffff;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.rail__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.rail__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rail__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+.rail__no {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+  color: var(--teal-ink);
+  margin-bottom: 0.8rem;
+}
+
+.rail__no i {
+  display: block;
+  width: 22px;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.rail__card h3 {
+  font-size: clamp(1.2rem, 1.7vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.rail__quote {
+  margin-top: 0.7rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  color: var(--teal-ink);
+}
+
+.rail__lede {
+  margin-top: 0.7rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.rail__points {
+  list-style: none;
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.rail__points li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.rail__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--teal);
+  border-bottom: 2px solid var(--teal);
+  transform: rotate(-45deg);
+}
+
+.rail__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 1.2rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--teal-ink);
+  text-decoration: none;
+}
+
+.rail__link .arrow {
+  transition: transform 0.35s var(--ease);
+}
+
+.rail__link:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* How far along the run you are — the only cue that the section is
+   horizontal, since a pinned rail has no scrollbar of its own. */
+.rail__bar {
+  max-width: var(--maxw);
+  margin: clamp(1.5rem, 3vw, 2.5rem) auto 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.rail__bar i {
+  display: block;
+  width: 8%;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--teal));
+}
+
+/* Below the pin breakpoint the rail is a plain touch-scrollable row —
+   the gesture a phone already has, and no pin to eat the screen. */
+@media (max-width: 860px) {
+  .rail {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .rail__card {
+    flex-basis: min(82vw, 360px);
+    scroll-snap-align: center;
+  }
+  .rail__bar {
+    display: none;
   }
 }
 

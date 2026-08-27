@@ -3,7 +3,7 @@ import SplitWords from "./SplitWords";
 import Logo from "./Logo";
 import ContactCard from "./ContactCard";
 import ContactForm from "./ContactForm";
-import CardStack from "./CardStack";
+import SolutionRail from "./SolutionRail";
 import AboutShowcase from "./AboutShowcase";
 import IndustryShowcase from "./IndustryShowcase";
 import WhyScroll from "./WhyScroll";
@@ -58,10 +58,11 @@ export default function BrandPage() {
       </section>
 
       {/* ---------------- SOLUTIONS PORTFOLIO ----------------
-          A dealt deck: each portfolio pins under the nav and the next
-          arrives over it from the left, the right or from below.
-          band--clip is what hides them off the side of the page. */}
-      <section className="band band--rule band--clip" id="solutions">
+          A pinned horizontal rail, after goobaexport.com's products
+          section: the section pins and the nine portfolios travel
+          sideways as you scroll down. The rail sits outside band__inner
+          so the track can run past the column and off both edges. */}
+      <section className="band band--rule" id="solutions">
         <div className="band__inner">
           <Reveal className="band__head">
             <p className="eyebrow">Solutions Portfolio</p>
@@ -75,8 +76,9 @@ export default function BrandPage() {
             </p>
           </Reveal>
 
-          <CardStack items={SOLUTIONS} />
         </div>
+
+        <SolutionRail items={SOLUTIONS} />
       </section>
 
       {/* ---------------- INDUSTRIES ---------------- */}

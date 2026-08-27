@@ -153,23 +153,13 @@ export default function FilmStage() {
             className={`cap cap--${c.align}`}
             style={{ opacity: 0, visibility: "hidden" }}
           >
-            {/* The badge on every caption, not just the hero. Measured on
-                the footage, a bare teal eyebrow bottomed out at 2.08:1
-                even on the plate — it is small text, so it needs 4.5:1,
-                and the ink is lighter than the headline's. The pill is
-                93% white, which takes its own ground to near-white and
-                lets the label keep brand colour at full strength. */}
-            <p className="eyebrow eyebrow--badge">{c.eyebrow}</p>
+            {/* The hero runs without one: its headline is the first thing
+                on the page and a label above it was just furniture. The
+                chapter captions keep theirs — there the eyebrow is what
+                says which part of the film you are looking at. */}
+            {!c.hero && <p className="eyebrow eyebrow--badge">{c.eyebrow}</p>}
             {c.hero ? <h1>{c.title}</h1> : <h2>{c.title}</h2>}
             <p className="lede">{c.body}</p>
-            {c.hero && (
-              <div className="hero__cta">
-                <a className="btn btn--primary" href="#contact">
-                  Talk to Our Experts <span className="arrow" aria-hidden="true">→</span>
-                </a>
-                <a className="btn btn--ghost" href="#solutions">Explore Our Solutions</a>
-              </div>
-            )}
           </div>
         ))}
 
