@@ -55,9 +55,25 @@ export const SPEECH_ERRORS = {
  * getUserMedia settles only once the visitor has actually answered, so
  * awaiting it puts the prompt before the recording instead of during
  * it. The stream is stopped immediately — it was only ever the
- * question, not the capture; recognition opens its own. */
+ * question, not the capture; recognition opens its own.
+ *
+ * It is SKIPPED once permission is already granted, and that is not an
+ * optimisation. Opening the device and closing it again milliseconds
+ * before the recogniser asks for it is real churn on Windows audio
+ * drivers, and the recogniser can end up holding a stream that is not
+ * live yet. There is no prompt to get ahead of in that case, so the
+ * safe thing is to not touch the device at all. */
 export async function ensureMicPermission() {
   if (!navigator?.mediaDevices?.getUserMedia) return; // let start() report it
+
+  try {
+    const st = await navigator.permissions?.query({ name: "microphone" });
+    if (st?.state === "granted") return;
+  } catch {
+    /* Firefox and older Safari do not accept "microphone" as a
+       permission name. Fall through and ask properly. */
+  }
+
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   stream.getTracks().forEach((t) => t.stop());
 }
