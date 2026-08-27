@@ -4433,3 +4433,18 @@ a.contact__info:hover .contact__infoIcon {
 @media (prefers-reduced-motion: reduce) {
   .dock__launcher--figure:hover { transform: none; }
 }
+
+/* The badge is its own ground, so it must NOT follow the caption's ink.
+
+   .cap--light flips every text child to Off White for the dark half of
+   the film — correct for the heading and the lede, which sit on the
+   footage, and wrong for this one, which sits on a 95%-opaque white
+   pill. Off White on near-white is the invisible "SMART SPACES" and
+   "ONE TEAM" that showed up on the restaurant shots.
+
+   The dark halo goes too. Around dark type on a light pill it is not a
+   halo, it is a smudge. */
+.cap--light .eyebrow--badge {
+  color: #475569;
+  filter: none;
+}
