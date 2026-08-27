@@ -38,6 +38,7 @@
   --teal: #00a0a0; /* Teal  3.21:1 — large text and UI only */
   --teal-lite: #33c7c7; /* teal gradient start  2.07:1 — fills only */
   --teal-deep: #006f73; /* Deep Teal  5.96:1 — safe for body text */
+  --exec-dark: #0b1f2a;  /* Executive Dark — the board's dark ground/ink */
   --red: #c81010; /* Corporate Red  5.94:1 — safe for body text */
   --red-lite: #ff4d4d; /* red gradient start  3.27:1 */
 
@@ -507,7 +508,14 @@ body {
 .cap h1,
 .cap h2,
 .cap .eyebrow {
-  color: #111111; /* Premium Black, board combination 7 */
+  /* Executive Dark, not Premium Black. Both are on the board, but this
+     is the one the board pairs with Off White, and the site's theme is
+     teal-and-gold rather than neutral — a pure black caption reads as
+     un-branded on footage this warm. Measured over the area each
+     caption occupies: 5.73:1 opening and 4.71:1 solutions, against
+     6.40 and 5.27 for Premium Black. Both still clear AA, and the
+     halo below is doing work these numbers do not capture. */
+  color: var(--exec-dark);
 }
 
 /* Light held tight to the letterforms instead of a panel behind them.
@@ -586,7 +594,14 @@ body {
 .cap h1,
 .cap h2,
 .cap .eyebrow {
-  color: #111111; /* Premium Black, board combination 7 */
+  /* Executive Dark, not Premium Black. Both are on the board, but this
+     is the one the board pairs with Off White, and the site's theme is
+     teal-and-gold rather than neutral — a pure black caption reads as
+     un-branded on footage this warm. Measured over the area each
+     caption occupies: 5.73:1 opening and 4.71:1 solutions, against
+     6.40 and 5.27 for Premium Black. Both still clear AA, and the
+     halo below is doing work these numbers do not capture. */
+  color: var(--exec-dark);
 }
 
 /* Light held tight to the letterforms instead of a panel behind them.
@@ -4346,7 +4361,14 @@ a.contact__info:hover .contact__infoIcon {
 .cap--light .lede,
 .cap--light .eyebrow,
 .cap--light .cap__title {
-  color: #f7f8f6; /* Off White, the board's dark-combination text */
+  /* Off White — the board's own colour, and the text half of its dark
+     combination. It is not "white": measured against Gold light
+     (4.18:1, 52% failing) and Teal light (2.60:1, 67%) on these same
+     frames, both of which are brand colours and both of which lose.
+     Mid-luminance accents have nowhere to hide on video. The brand is
+     carried here by the gradient word instead, which takes the board's
+     bright gold-into-teal pair. */
+  color: #f7f8f6;
   filter: drop-shadow(0 0 2px rgba(11, 31, 42, 0.95))
     drop-shadow(0 1px 3px rgba(11, 31, 42, 0.85))
     drop-shadow(0 0 12px rgba(11, 31, 42, 0.7));
