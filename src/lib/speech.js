@@ -15,6 +15,8 @@
    one and never depends on either.
    ================================================================ */
 
+import { VOICE } from "./voiceConfig.js";
+
 const Recognition =
   typeof window !== "undefined"
     ? window.SpeechRecognition || window.webkitSpeechRecognition
@@ -151,69 +153,173 @@ export function listen({ onPartial, onStart, lang = "en-IN" } = {}) {
   };
 }
 
-/* The assistant is drawn as a woman, so it should not answer in a man's
-   voice. There is no gender field in the Web Speech API -- SpeechSynthesisVoice
-   exposes name, lang, localService and default, and nothing else -- so
-   the only handle is the NAME, which is why this is a list rather than a
-   flag.
- *
- * The names are the ones the platforms actually ship: Heera and Kalpana
- * are the Indian English women on Windows and Android, Veena is Apple's,
- * and Google's are labelled plainly. Preference runs Indian-English
- * female, then any English female, then Indian English of any voice,
- * then any English at all -- so a machine with none of these still
- * speaks rather than falling silent.
- */
-const FEMALE_HINTS = [
-  "heera", "kalpana", "veena", "raveena", "priya", "isha", "neerja",
-  "female", "woman",
-  "samantha", "victoria", "karen", "moira", "tessa", "fiona", "serena",
-  "zira", "hazel", "susan", "linda", "catherine", "aria", "jenny", "sonia",
-  "google uk english female", "google us english",
-];
+/* ----------------------------------------------------------------
+   SPEAKING
 
-function pickVoice() {
+   Two paths behind one call. `speak()` tries the server voice and falls
+   back to the browser's own on any failure, so the site keeps talking
+   whatever the key situation is.
+   ---------------------------------------------------------------- */
+
+let current = null; // the audio element or utterance in flight
+
+/* The browser fallback. There is no gender field on
+   SpeechSynthesisVoice, so the only handle on "female" is the name;
+   the ordered list lives in voiceConfig. */
+function pickBrowserVoice() {
   const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null; // the list loads late; the default is used
-  const female = (v) => FEMALE_HINTS.some((h) => v.name.toLowerCase().includes(h));
-  const inIN = (v) => v.lang === "en-IN";
-  const inEN = (v) => v.lang?.startsWith("en");
-  return (
-    voices.find((v) => inIN(v) && female(v)) ||
-    voices.find((v) => inEN(v) && female(v)) ||
-    voices.find(inIN) ||
-    voices.find(inEN) ||
-    null
-  );
+  if (!voices.length) return null; // list loads late; the default is used
+  const { lang, prefer } = VOICE.browser;
+  const rank = (v) => {
+    const n = v.name.toLowerCase();
+    const i = prefer.findIndex((h) => n.includes(h));
+    return i === -1 ? 999 : i;
+  };
+  const inLang = voices.filter((v) => v.lang === lang);
+  const inEn = voices.filter((v) => v.lang?.startsWith("en"));
+  const best = (xs) => xs.filter((v) => rank(v) < 999).sort((a, b) => rank(a) - rank(b))[0];
+  return best(inLang) || best(inEn) || inLang[0] || inEn[0] || null;
 }
 
-/** Speak, and call back when the mouth should stop moving. */
-export function speak(text, { onEnd } = {}) {
-  if (!canSpeak || !text) { onEnd?.(); return () => {}; }
+function speakInBrowser(text, onEnd) {
+  if (!canSpeak) { onEnd?.(); return; }
   window.speechSynthesis.cancel();
-
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-IN";
-  u.rate = 1.02;
-  u.pitch = 1;
-
-  u.voice = pickVoice();
-
+  u.lang = VOICE.browser.lang;
+  u.rate = VOICE.browser.rate;
+  u.pitch = VOICE.browser.pitch;
+  u.voice = pickBrowserVoice();
   u.onend = () => onEnd?.();
   u.onerror = () => onEnd?.();
+  current = { stop: () => window.speechSynthesis.cancel() };
   window.speechSynthesis.speak(u);
-
-  return () => window.speechSynthesis.cancel();
 }
 
-/* Chrome populates getVoices() asynchronously and returns an empty list
-   on the first call after load. Without this the first reply of a visit
-   speaks in the system default -- often male -- and only later replies
-   get the right voice. Touching the list on the event caches it. */
-if (typeof window !== "undefined" && window.speechSynthesis) {
-  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+/**
+ * Say something. Resolves nothing; call `onEnd` when the mouth should
+ * stop moving, and `onStart` when audio actually begins — which for the
+ * server path is after a network round trip, so the interface must not
+ * assume the two are simultaneous.
+ */
+export function speak(text, { onEnd, onStart } = {}) {
+  if (!text) { onEnd?.(); return () => {}; }
+  stopSpeaking();
+
+  let cancelled = false;
+  const done = () => { if (!cancelled) { cancelled = true; onEnd?.(); } };
+
+  if (VOICE.provider !== "server") {
+    onStart?.();
+    speakInBrowser(text, done);
+    return stopSpeaking;
+  }
+
+  fetch("/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, voice: VOICE.name, instructions: VOICE.instructions }),
+  })
+    .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+    .then((blob) => {
+      if (cancelled) return;
+      const url = URL.createObjectURL(blob);
+      const el = new Audio(url);
+      /* Revoked on both paths — an object URL held open per reply is a
+         leak that only shows up in a long conversation. */
+      const cleanup = () => { URL.revokeObjectURL(url); done(); };
+      el.onended = cleanup;
+      el.onerror = cleanup;
+      current = { stop: () => { el.pause(); URL.revokeObjectURL(url); } };
+      el.play().then(() => onStart?.()).catch(cleanup);
+    })
+    .catch(() => {
+      /* 503 means no key, anything else means the service is unhappy.
+         Either way the visitor should still hear an answer. */
+      if (cancelled) return;
+      onStart?.();
+      speakInBrowser(text, done);
+    });
+
+  return stopSpeaking;
 }
 
 export function stopSpeaking() {
+  if (current) { try { current.stop(); } catch { /* already gone */ } current = null; }
   if (canSpeak) window.speechSynthesis.cancel();
+}
+
+/* ----------------------------------------------------------------
+   BARGE-IN
+
+   Watch the microphone while the assistant is talking, and report the
+   moment the visitor starts. Nobody should have to sit through a reply
+   they have already heard enough of.
+
+   Why an AnalyserNode rather than just leaving SpeechRecognition
+   running: a recogniser open during playback transcribes the assistant
+   and answers its own reply. This only measures LOUDNESS, so it can
+   sit alongside playback and tell us when to stop it — the recogniser
+   opens afterwards, on a quiet room.
+
+   echoCancellation is what makes that possible at all. Without it the
+   assistant's own voice coming back through the speakers trips the
+   detector instantly and it interrupts itself on the first syllable.
+   With it the browser subtracts what it is playing from what it hears.
+   On speakers in a hard room this is imperfect; on headphones or a
+   laptop it is reliable.
+   ---------------------------------------------------------------- */
+
+export function watchForSpeech({ onSpeech, threshold = 0.055, sustainMs = 220 } = {}) {
+  let stop = () => {};
+  if (!navigator?.mediaDevices?.getUserMedia || typeof AudioContext === "undefined") {
+    return () => {};
+  }
+
+  let cancelled = false;
+  navigator.mediaDevices
+    .getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    })
+    .then((stream) => {
+      if (cancelled) { stream.getTracks().forEach((t) => t.stop()); return; }
+
+      const ctx = new AudioContext();
+      const src = ctx.createMediaStreamSource(stream);
+      const an = ctx.createAnalyser();
+      an.fftSize = 512;
+      src.connect(an);
+      const buf = new Float32Array(an.fftSize);
+
+      let loudSince = 0;
+      let raf = 0;
+      const tick = () => {
+        an.getFloatTimeDomainData(buf);
+        let sum = 0;
+        for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+        const rms = Math.sqrt(sum / buf.length);
+
+        /* Sustained, not instantaneous. A door closing or a cough is a
+           spike; speech stays above the floor for a couple of hundred
+           milliseconds. Requiring that is the difference between
+           barge-in and a hair trigger. */
+        if (rms > threshold) {
+          if (!loudSince) loudSince = performance.now();
+          else if (performance.now() - loudSince > sustainMs) { onSpeech?.(); stop(); return; }
+        } else {
+          loudSince = 0;
+        }
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+
+      stop = () => {
+        cancelAnimationFrame(raf);
+        stream.getTracks().forEach((t) => t.stop());
+        ctx.close().catch(() => {});
+        stop = () => {};
+      };
+    })
+    .catch(() => { /* no mic, or refused — barge-in is simply unavailable */ });
+
+  return () => { cancelled = true; stop(); };
 }

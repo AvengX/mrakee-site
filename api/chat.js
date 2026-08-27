@@ -31,7 +31,12 @@ const SYSTEM = buildSystemPrompt();
 const TITLES = SOLUTIONS.map((s) => s.t);
 
 const Answer = z.object({
-  reply: z.string().describe("Two or three sentences, plain and warm."),
+  reply: z
+    .string()
+    .describe(
+      "One to three sentences, spoken aloud to a visitor. Conversational, contractions, " +
+        "no opening filler like Certainly or Of course, no lists read out."
+    ),
   matches: z
     .array(z.string())
     .describe("Exact solution portfolio titles, at most three. Empty when none apply."),

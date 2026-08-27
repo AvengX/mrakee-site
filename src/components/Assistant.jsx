@@ -3,7 +3,7 @@ import { Mic, MicOff, SendHorizontal, RotateCcw, Volume2, VolumeX, Radio, Square
 import { QUICK_ASKS } from "../lib/assistantPrompt";
 import { SOLUTIONS } from "../content/mrakee";
 import AssistantAvatar from "./AssistantAvatar";
-import { canListen, canSpeak, listen, speak, stopSpeaking, SPEECH_ERRORS, ensureMicPermission } from "../lib/speech";
+import { canListen, canSpeak, listen, speak, stopSpeaking, SPEECH_ERRORS, ensureMicPermission, watchForSpeech } from "../lib/speech";
 
 /* ================================================================
    THE ASSISTANT — built as a kiosk, not a chat bubble
@@ -58,6 +58,8 @@ export default function Assistant({ compact = false }) {
      assistant while it is open — without this the recogniser would then
      start against an interface that is gone. */
   const micLive = useRef(false);
+  // Tears down the barge-in listener; set while the assistant is talking.
+  const bargeRef = useRef(null);
 
   useEffect(() => {
     // keep the newest answer in view without yanking the whole page
@@ -114,12 +116,30 @@ export default function Assistant({ compact = false }) {
       setState("answering");
       if ((voice || convoRef.current) && canSpeak) {
         speak(data.reply, {
+          onStart: () => {
+            /* Barge-in, and only in hands-free mode. If the visitor is
+               typing, audio they can already stop with the Sound button
+               does not need the microphone open on top. */
+            if (!convoRef.current) return;
+            bargeRef.current = watchForSpeech({
+              onSpeech: () => {
+                stopSpeaking();
+                stopBarge();
+                /* Straight into listening rather than waiting for the
+                   utterance to end — the whole point is not waiting. */
+                startListening();
+              },
+            });
+          },
           onEnd: () => {
+            stopBarge();
             setState((st) => (st === "answering" ? "idle" : st));
-            /* Only reopen the microphone once the voice has actually
-               stopped. Listening while it is still speaking means it
-               transcribes itself and answers its own reply. */
-            if (convoRef.current) setTimeout(() => startListening(), 400);
+            /* Reopen the microphone only once the voice has actually
+               stopped. A recogniser open during playback transcribes the
+               assistant and answers its own reply. */
+            if (convoRef.current && micLive.current === false) {
+              setTimeout(() => startListening(), 300);
+            }
           },
         });
       } else {
@@ -218,6 +238,10 @@ export default function Assistant({ compact = false }) {
     else setTimeout(() => startListening(), 300);
   }
 
+  function stopBarge() {
+    if (bargeRef.current) { bargeRef.current(); bargeRef.current = null; }
+  }
+
   function stopListening() {
     micLive.current = false;
     micRef.current?.stop();
@@ -233,6 +257,7 @@ export default function Assistant({ compact = false }) {
   }
 
   function endConversation() {
+    stopBarge();
     micLive.current = false;
     convoRef.current = false;
     setConvo(false);
