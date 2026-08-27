@@ -4461,3 +4461,25 @@ a.contact__info:hover .contact__infoIcon {
   50%      { transform: translateY(-3px); }
 }
 
+
+/* The wordmark as artwork rather than as type.
+
+   Sized by HEIGHT with width auto, so it can never be squashed: the
+   crop is 1293x251 and that 5.15:1 ratio is the lockup's, not something
+   this stylesheet gets to choose. It scales with the viewport because
+   TECHNOLOGIES is a fifth of the block's height — at the nav's 34px
+   that line is about 6px, which is how the logo is drawn, and on a wide
+   screen there is room to give it more. */
+.logo__wordArt {
+  display: block;
+  height: clamp(28px, 2.6vw, 40px);
+  width: auto;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+@media (max-width: 560px) {
+  /* A 175px wordmark plus the mark plus a menu button does not fit a
+     360px bar. The mark alone still identifies the site. */
+  .logo__wordArt { height: 26px; }
+}

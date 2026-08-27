@@ -19,12 +19,18 @@ import { useState } from "react";
  *   --logo-zoom    how much bigger than the box the image is drawn
  *   --logo-x/y     where the mark sits inside that
  *
- * The wordmark uses the *ink* variants of the brand colours. The true
- * gold and teal score 2.2:1 and 1.9:1 against white — fine as the fill
- * of a shape, illegible as 16px type.
+ * The wordmark is the artwork's own, cropped from the lockup and sized
+ * independently. The live-text version below is the fallback if that
+ * file is missing; it uses the *ink* variants of the brand colours,
+ * because the true gold and teal score 2.2:1 and 1.9:1 against white —
+ * fine as the fill of a shape, illegible as 16px type.
+ *
+ * The link keeps its aria-label, so removing the text from the DOM does
+ * not remove the name from the accessibility tree.
  */
 export default function Logo({ size = 36, showWordmark = true }) {
   const [artwork, setArtwork] = useState(true);
+  const [wordArt, setWordArt] = useState(true);
 
   return (
     <a href="#top" className="logo" aria-label="Mrakee Technologies — home">
@@ -85,12 +91,29 @@ export default function Logo({ size = 36, showWordmark = true }) {
         </svg>
       )}
 
-      {showWordmark && (
-        <span className="logo__word">
-          <span className="logo__name">MRAKEE</span>
-          <span className="logo__sub">TECHNOLOGIES</span>
-        </span>
-      )}
+      {showWordmark &&
+        (wordArt ? (
+          /* The artwork's own wordmark, on request — the live text could
+             not carry the gold triangle inside the A or the rules either
+             side of TECHNOLOGIES, so it never quite read as the logo.
+             Cropped out of the lockup and sized on its own, which is the
+             part that makes this work: inside the stacked lockup the
+             wordmark is a fifth of the height and would be about six
+             pixels of type at a nav's size. Given its own box it can be
+             as large as the bar allows. */
+          <img
+            className="logo__wordArt"
+            src="logo-word.png"
+            alt=""
+            onError={() => setWordArt(false)}
+            draggable="false"
+          />
+        ) : (
+          <span className="logo__word">
+            <span className="logo__name">MRAKEE</span>
+            <span className="logo__sub">TECHNOLOGIES</span>
+          </span>
+        ))}
     </a>
   );
 }
