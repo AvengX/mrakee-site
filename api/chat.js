@@ -139,8 +139,24 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     const status = err?.status;
+    const detail = String(err?.message || "");
+
     if (status === 401) {
-      return res.status(503).json({ error: "The assistant is not configured correctly." });
+      return res.status(503).json({
+        error: "The assistant is not configured correctly.",
+        detail: "The API key was rejected. Check ANTHROPIC_API_KEY in Vercel.",
+      });
+    }
+    /* Its own case rather than a generic 500. An empty account answers
+       with a 400 that looks like a malformed request, and the first time
+       it happened it cost a round-trip through the runtime logs to find
+       out the code was fine and the balance was zero. Say so here. */
+    if (status === 400 && /credit balance|purchase credits/i.test(detail)) {
+      return res.status(503).json({
+        error: "The assistant is temporarily unavailable.",
+        detail:
+          "The Anthropic account has no credit. Console -> Plans & Billing -> Purchase credits.",
+      });
     }
     if (status === 429 || status === 529) {
       return res.status(503).json({ error: "Busy right now — try again in a moment." });
