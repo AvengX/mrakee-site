@@ -50,6 +50,9 @@ export default function Assistant({ compact = false }) {
      as well: the rAF driver writes it up to 60 times a second and the
      ref is what the barge-in path zeroes without waiting for a render. */
   const [mouth, setMouth] = useState(0);
+  /* The current mouth SHAPE, when the provider gave us alignment.
+     null means no alignment and the amplitude path is driving. */
+  const [viseme, setViseme] = useState(null);
   /* Hands-free mode: listen, answer, speak, listen again, until it is
      stopped. Driven from refs rather than state because the loop is
      rebuilt inside async callbacks, where a captured `convo` would be
@@ -121,6 +124,7 @@ export default function Assistant({ compact = false }) {
       if ((voice || convoRef.current) && canSpeak) {
         speak(data.reply, {
           onMouth: setMouth,
+          onViseme: setViseme,
           onStart: () => {
             /* Barge-in, and only in hands-free mode. If the visitor is
                typing, audio they can already stop with the Sound button
@@ -135,6 +139,7 @@ export default function Assistant({ compact = false }) {
                    moving. */
                 stopSpeaking();
                 setMouth(0);
+                setViseme(null);
                 stopBarge();
                 /* Straight into listening rather than waiting for the
                    utterance to end — the whole point is not waiting. */
@@ -145,6 +150,7 @@ export default function Assistant({ compact = false }) {
           onEnd: () => {
             stopBarge();
             setMouth(0);
+            setViseme(null);
             setState((st) => (st === "answering" ? "idle" : st));
             /* Reopen the microphone only once the voice has actually
                stopped. A recogniser open during playback transcribes the
@@ -302,7 +308,7 @@ export default function Assistant({ compact = false }) {
     <div className={`kiosk${compact ? " kiosk--compact" : ""}`}>
       <div className="kiosk__frame">
         <div className="kiosk__head">
-          <AssistantAvatar state={pose} size={compact ? 44 : 84} mouth={mouth} />
+          <AssistantAvatar state={pose} size={compact ? 44 : 84} mouth={mouth} viseme={viseme} />
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE Assistant</p>
             <p className="kiosk__hint">

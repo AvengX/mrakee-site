@@ -17,7 +17,8 @@
 
 import { VOICE } from "./voiceConfig.js";
 import { analyseElement } from "./voice/audioAnalyzer.js";
-import { createLipSync, createSyntheticEnvelope } from "./voice/lipSync.js";
+import { createLipSync, createSyntheticEnvelope, createVisemePlayer } from "./voice/lipSync.js";
+import { buildTimeline } from "./voice/visemeMap.js";
 
 const Recognition =
   typeof window !== "undefined"
@@ -219,7 +220,7 @@ function speakInBrowser(text, onEnd, onMouth) {
  * server path is after a network round trip, so the interface must not
  * assume the two are simultaneous.
  */
-export function speak(text, { onEnd, onStart, onMouth } = {}) {
+export function speak(text, { onEnd, onStart, onMouth, onViseme } = {}) {
   if (!text) { onEnd?.(); return () => {}; }
   stopSpeaking();
 
@@ -248,10 +249,11 @@ export function speak(text, { onEnd, onStart, onMouth } = {}) {
       options: Object.fromEntries(remote.map((p) => [p, VOICE[p]])),
     }),
   })
-    .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
-    .then((blob) => {
+    .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+    .then((data) => {
       if (cancelled) return;
-      const url = URL.createObjectURL(blob);
+      const bytes = Uint8Array.from(atob(data.audio), (c) => c.charCodeAt(0));
+      const url = URL.createObjectURL(new Blob([bytes], { type: data.mime || "audio/mpeg" }));
       const el = new Audio(url);
       /* Revoked on both paths — an object URL held open per reply is a
          leak that only shows up in a long conversation. */
@@ -264,11 +266,32 @@ export function speak(text, { onEnd, onStart, onMouth } = {}) {
       el.play()
         .then(() => {
           onStart?.();
-          if (!onMouth) return;
-          /* THE REAL PATH. The analyser reads the very samples going to
-             the speakers, so the mouth cannot drift from the voice —
-             there is one stream and one decode. */
           endMouth();
+
+          /* PREFERRED: character alignment from the provider, replayed
+             against the audio's own clock. Only ElevenLabs returns it. */
+          const timeline = data.alignment ? buildTimeline(data.alignment) : [];
+          if (timeline.length && onViseme) {
+            const player = createVisemePlayer({ timeline, media: el, onChange: onViseme });
+            if (player.start()) {
+              mouth = player;
+              /* Openness still runs alongside it: the viseme says what
+                 SHAPE the mouth is, the amplitude says how far it is
+                 open, and together they beat either alone. */
+              if (onMouth) {
+                const driver = createLipSync({ onChange: onMouth });
+                driver.start();
+                const both = { stop: () => { player.stop(); driver.stop(); } };
+                mouth = both;
+                detach = analyseElement(el, (rms) => driver.push(rms));
+              }
+              return;
+            }
+          }
+
+          /* FALLBACK: no alignment, so drive openness from the audio
+             itself. Unchanged from before visemes existed. */
+          if (!onMouth) return;
           const driver = createLipSync({ onChange: onMouth });
           mouth = driver;
           driver.start();

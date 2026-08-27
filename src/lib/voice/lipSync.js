@@ -92,3 +92,47 @@ export function createSyntheticEnvelope({ onChange } = {}) {
     stop() { running = false; cancelAnimationFrame(raf); onChange?.(0); },
   };
 }
+
+/* ----------------------------------------------------------------
+   VISEME PLAYBACK
+
+   Driven by the audio element's own currentTime, not by a timer
+   started alongside it. That distinction is the whole point: a timer
+   drifts from the audio the moment the browser decides to buffer,
+   throttle a background tab, or start playback a few milliseconds
+   late. currentTime IS the audio's clock, so the mouth cannot slide
+   out of sync however the playback behaves.
+   ---------------------------------------------------------------- */
+export function createVisemePlayer({ timeline, media, onChange }) {
+  let raf = 0, running = false, idx = -1;
+
+  const loop = () => {
+    if (!running) return;
+    const t = media.currentTime;
+    /* Walk forward only — the timeline is ordered, so this is a cursor
+       rather than a search on every frame. */
+    let i = idx;
+    while (i + 1 < timeline.length && timeline[i + 1].t <= t) i++;
+    if (i !== idx) {
+      idx = i;
+      onChange?.(i < 0 ? "rest" : timeline[i].v);
+    }
+    raf = requestAnimationFrame(loop);
+  };
+
+  return {
+    start() {
+      if (running || !timeline?.length) return false;
+      running = true;
+      idx = -1;
+      onChange?.("rest");
+      raf = requestAnimationFrame(loop);
+      return true;
+    },
+    stop() {
+      running = false;
+      cancelAnimationFrame(raf);
+      onChange?.("rest"); // never leave a shape on screen after the audio
+    },
+  };
+}

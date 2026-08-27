@@ -37,7 +37,7 @@ const baseFor = (pose) =>
 const fileFor = (pose) => `${baseFor(pose)}.${resolvedExt}`;
 let resolvedExt = EXTS[0];
 
-export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0 }) {
+export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, viseme = null }) {
   const pose = POSES.includes(state) ? state : "idle";
   const [custom, setCustom] = useState(null);
 
@@ -105,7 +105,26 @@ export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0 }
            and this asset has neither. */
         <span className="avatar__stack" style={{ width: size, height: size }}>
           <img src={fileFor("idle")} alt="" width={size} height={size} />
-          {pose === "answering" && (
+
+          {/* VISEME PATH. Ten mouth shapes cut from these same two
+              renders, so every pixel outside the mouth is identical and
+              swapping between them cannot shift the face. The shape
+              comes from the provider's character alignment; the CSS
+              crossfade below is what stops it flicking. */}
+          {pose === "answering" && viseme && viseme !== "rest" && (
+            <img
+              className="avatar__viseme"
+              src={`assistant/visemes/${viseme}.webp`}
+              alt=""
+              width={size}
+              height={size}
+            />
+          )}
+
+          {/* AMPLITUDE PATH, for providers that send no alignment and
+              for the browser voice. Suppressed while a viseme is
+              showing so the two never fight over the same mouth. */}
+          {pose === "answering" && !viseme && (
             <img
               className="avatar__mouthFrame"
               src={fileFor("answering")}

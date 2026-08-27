@@ -55,8 +55,16 @@ async function speakElevenLabs(text, opts) {
   if (!key) return null;
 
   const id = await elevenVoiceId(key, opts?.voiceId);
+
+  /* THE with-timestamps VARIANT, which is the whole reason the voice
+     can be lip-synced properly. It returns the audio AND where every
+     character of the text falls inside it.
+     
+     CHARACTER alignment, not phoneme alignment — the API does not
+     expose phonemes. The grapheme-to-viseme approximation lives in
+     visemeMap.js and is honest about being one. */
   const r = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${id}?output_format=mp3_44100_128`,
+    `https://api.elevenlabs.io/v1/text-to-speech/${id}/with-timestamps?output_format=mp3_44100_128`,
     {
       method: "POST",
       headers: { "xi-api-key": key, "Content-Type": "application/json" },
@@ -68,7 +76,16 @@ async function speakElevenLabs(text, opts) {
     }
   );
   if (!r.ok) throw new Error(`elevenlabs ${r.status} ${(await r.text()).slice(0, 200)}`);
-  return { buf: Buffer.from(await r.arrayBuffer()), type: "audio/mpeg" };
+
+  const data = await r.json();
+  return {
+    audio: data.audio_base64,
+    type: "audio/mpeg",
+    /* normalized_alignment follows the text as the model actually spoke
+       it — expanded numbers and abbreviations — so it lines up with the
+       audio where the raw alignment can drift. */
+    alignment: data.normalized_alignment || data.alignment || null,
+  };
 }
 
 async function speakOpenAI(text, opts) {
@@ -87,7 +104,13 @@ async function speakOpenAI(text, opts) {
     }),
   });
   if (!r.ok) throw new Error(`openai ${r.status} ${(await r.text()).slice(0, 200)}`);
-  return { buf: Buffer.from(await r.arrayBuffer()), type: "audio/mpeg" };
+  /* No alignment: OpenAI's speech endpoint returns audio only. That
+     path falls back to amplitude-driven mouth openness on the client. */
+  return {
+    audio: Buffer.from(await r.arrayBuffer()).toString("base64"),
+    type: "audio/mpeg",
+    alignment: null,
+  };
 }
 
 const PROVIDERS = { elevenlabs: speakElevenLabs, openai: speakOpenAI };
@@ -113,10 +136,18 @@ export default async function handler(req, res) {
     try {
       const out = await PROVIDERS[name](text, options[name]);
       if (!out) { tried.push(`${name}:no-key`); continue; }
-      res.setHeader("Content-Type", out.type);
+      /* One JSON shape for every provider, so the client never has to
+         branch on which one answered. Base64 costs a third more bytes
+         than raw audio and buys a single code path plus somewhere to
+         put the alignment. */
       res.setHeader("Cache-Control", "no-store");
       res.setHeader("X-TTS-Provider", name);
-      return res.status(200).send(out.buf);
+      return res.status(200).json({
+        provider: name,
+        mime: out.type,
+        audio: out.audio,
+        alignment: out.alignment,
+      });
     } catch (e) {
       /* A provider that is configured but failing should not take the
          voice down — fall through to the next one, and to the browser

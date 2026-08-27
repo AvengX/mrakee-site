@@ -4526,3 +4526,26 @@ a.contact__info:hover .contact__infoIcon {
 @media (prefers-reduced-motion: reduce) {
   .avatar .avatar__stack { animation: none; }
 }
+
+/* The viseme frame. A short crossfade so shapes blend rather than cut —
+   90ms is under a syllable at normal speech, so it softens the change
+   without letting the mouth lag behind the voice. Longer and it turns
+   to mush; shorter and it flickers. */
+.avatar__viseme {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  animation: viseme-in 90ms linear;
+  will-change: opacity;
+}
+
+@keyframes viseme-in {
+  from { opacity: 0.25; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The mouth still moves — it is speech, not decoration — but the
+     crossfade is dropped so nothing dissolves. */
+  .avatar__viseme { animation: none; }
+}
