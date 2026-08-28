@@ -12,26 +12,21 @@
    mute and adding a key needs no code change.
    ================================================================ */
 
-/* Environment variable names are case-sensitive and exact in Node, so
-   ELEVENLABS_API_KEY and eleven_labs_key are simply different variables
-   -- which cost a deployment and two rounds of diagnosis to discover.
-   The canonical names are the ones in README.md; this accepts the
-   obvious spellings of them as well, because a key that is present but
-   spelled differently should not read as "no key at all".
+/* EXACT NAMES ONLY.
+   
+   A previous version matched on a normalised name so that spellings like
+   eleven_labs_key would also resolve. That is removed on request: an
+   alias makes a misconfigured variable look configured, and the name a
+   deployment depends on should be the one written down in README.md and
+   nothing else. A key under any other name now reads as absent, which
+   is what it is. */
+const KEYS = {
+  elevenlabs: "ELEVENLABS_API_KEY",
+  openai: "OPENAI_API_KEY",
+  anthropic: "ANTHROPIC_API_KEY",
+};
 
-   Matching is on the NORMALISED name: lowercased, with everything that
-   is not a letter or digit removed, and a trailing "apikey" or "key"
-   ignored. So ELEVENLABS_API_KEY, eleven_labs_key, ElevenLabsKey and
-   ELEVEN-LABS-API-KEY all resolve to the same provider. */
-function envKey(provider) {
-  const want = provider.replace(/[^a-z0-9]/gi, "").toLowerCase();
-  for (const [name, value] of Object.entries(process.env)) {
-    if (!value) continue;
-    const n = name.toLowerCase().replace(/[^a-z0-9]/g, "").replace(/(api)?key$/, "");
-    if (n === want) return value;
-  }
-  return null;
-}
+const envKey = (provider) => process.env[KEYS[provider]] || null;
 
 const MAX_CHARS = 900;
 const WINDOW_MS = 60_000;
@@ -198,5 +193,13 @@ export default async function handler(req, res) {
     (k) => /eleven|tts|voice|speech/i.test(k) && !(k in configured)
   );
 
-  return res.status(503).json({ error: "tts-unavailable", tried, configured, lookalikes });
+  return res.status(503).json({
+    error: "tts-unavailable",
+    /* Which resolution rule this build uses. Lets a deploy be confirmed
+       live without spending an upstream call to find out. */
+    keyLookup: "exact",
+    tried,
+    configured,
+    lookalikes,
+  });
 }
