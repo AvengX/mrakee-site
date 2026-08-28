@@ -59,6 +59,10 @@ async function elevenVoiceId(key, configured) {
   if (cachedElevenVoice) return cachedElevenVoice;
 
   const r = await fetch("https://api.elevenlabs.io/v1/voices", { headers: { "xi-api-key": key } });
+  /* 401 here means the key was found but ElevenLabs rejected it, which
+     is a different problem from a missing key and points at the value
+     rather than the name or the deployment. */
+  if (r.status === 401) throw new Error("key rejected by ElevenLabs (401) - check the value, not the name");
   if (!r.ok) throw new Error(`voices ${r.status}`);
   const { voices = [] } = await r.json();
 
