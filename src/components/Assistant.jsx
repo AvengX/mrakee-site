@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Mic, MicOff, SendHorizontal, RotateCcw, Volume2, VolumeX, Radio, Square } from "lucide-react";
+import { Mic, MicOff, SendHorizontal, RotateCcw, Volume2, VolumeX, Sparkles, Square } from "lucide-react";
 import { QUICK_ASKS } from "../lib/assistantPrompt";
 import { SOLUTIONS } from "../content/mrakee";
 import AssistantAvatar from "./AssistantAvatar";
@@ -294,7 +294,7 @@ export default function Assistant({ compact = false }) {
             it gets the room: a portrait, not a profile chip. Square
             source shown square, rounded rather than circular, because a
             circle crops her shoulders and reads as a chat icon. */}
-        <div className="kiosk__stage">
+        <div className={`kiosk__stage kiosk__stage--${state}`}>
           <AssistantAvatar
             className="avatar--hero"
             state={pose}
@@ -321,7 +321,10 @@ export default function Assistant({ compact = false }) {
         </div>
 
         {!turns.length && !session && (
-          <p className="kiosk__greeting">{GREETING}</p>
+          <div className="kiosk__welcome">
+            <p className="kiosk__welcomeLead">Hi, I&rsquo;m your MRAKEE AI assistant.</p>
+            <p className="kiosk__welcomeSub">Ask me about our solutions, services or the spaces we build.</p>
+          </div>
         )}
 
         <div
@@ -406,7 +409,7 @@ export default function Assistant({ compact = false }) {
         <div className="kiosk__controls">
           {!session && canListen && (
             <button type="button" className="kiosk__start" onClick={startSession}>
-              <Radio size={16} aria-hidden="true" />
+              <Sparkles size={16} aria-hidden="true" />
               Talk to us
             </button>
           )}

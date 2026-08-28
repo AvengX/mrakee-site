@@ -4832,3 +4832,2376 @@ a.contact__info:hover .contact__infoIcon {
 }
 .kiosk--compact .kiosk__chips::-webkit-scrollbar { display: none; }
 .kiosk--compact .kiosk__chips button { flex-shrink: 0; }
+
+/* ================================================================
+   THE CONCIERGE PANEL
+
+   A redesign of the assistant's surface only. Nothing here reaches the
+   voice system: no state, no timing, no lip-sync, no audio. The avatar
+   asset is untouched and the mouth stays exactly where the existing
+   implementation puts it.
+
+   The aim is a premium receptionist rather than a chat window, and the
+   way to get there is atmosphere and restraint — one hero, soft light,
+   slow motion — rather than more controls.
+   ================================================================ */
+
+.dock__panel {
+  width: clamp(430px, 34vw, 500px);
+  max-width: calc(100vw - 1.8rem);
+  /* The cap has to clear the nav, and the panel does not start at the
+     bottom of the window: the launcher sits below it inside the dock.
+     So the budget is the viewport minus the nav bar, minus the
+     launcher and its gap, minus both margins. Measured at 1440x900,
+     760px put the panel's top edge at y=38 with the nav bar occupying
+     14-69 — straight through it. */
+  height: min(760px, calc(100dvh - 12rem));
+  border-radius: 26px;
+  /* Glass, but quietly: a wash of white over the page rather than a
+     frosted slab. Prefixes first — the minifier treats the two as
+     aliases and keeps whichever comes last. */
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  backdrop-filter: blur(22px) saturate(1.15);
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 32px 70px rgba(11, 31, 42, 0.22),
+    0 2px 10px rgba(11, 31, 42, 0.07);
+}
+
+.kiosk--compact .kiosk__frame {
+  background: transparent;
+  position: relative;
+  isolation: isolate;
+}
+
+/* The atmosphere: two soft lights, teal high on the left and gold low
+   on the right, sitting behind everything. Radial and very wide, so
+   they read as light in a room rather than as shapes on a page. */
+.kiosk--compact .kiosk__frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(58% 42% at 22% 12%, rgba(0, 160, 160, 0.16), transparent 70%),
+    radial-gradient(52% 40% at 86% 74%, rgba(216, 163, 42, 0.14), transparent 72%),
+    linear-gradient(180deg, #ffffff 0%, var(--bg-soft) 100%);
+  pointer-events: none;
+}
+
+/* ---- header: who this is, and nothing else ---- */
+.kiosk--compact .kiosk__head {
+  border-bottom: 1px solid rgba(11, 31, 42, 0.06);
+  background: transparent;
+  padding: 0.95rem 3rem 0.95rem 1.15rem;
+}
+
+.kiosk__name { letter-spacing: 0.02em; }
+.kiosk__role { letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.64rem; }
+
+/* ---- the stage ---- */
+.kiosk__stage {
+  position: relative;
+  background: none;
+  padding: 1.4rem 1rem 1rem;
+  gap: 0.9rem;
+}
+
+/* The halo. Behind her, wider than she is, and soft enough to have no
+   edge — a glow rather than a ring. Rings and orbits are the thing that
+   makes an interface look like a HUD. */
+.kiosk__stage::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(112%, 420px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 160, 160, 0.22) 0%,
+    rgba(0, 160, 160, 0.09) 38%,
+    rgba(216, 163, 42, 0.07) 58%,
+    transparent 72%
+  );
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.kiosk__stage > * { position: relative; z-index: 1; }
+
+/* It breathes while she is working, and rests when she is not. Twelve
+   seconds and eight percent: slow and small enough that it registers as
+   presence rather than as animation. */
+@keyframes halo-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.78; }
+  50%      { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+.kiosk__stage--listening::before,
+.kiosk__stage--thinking::before,
+.kiosk__stage--answering::before {
+  animation: halo-breathe 12s ease-in-out infinite;
+}
+
+.kiosk__stage--answering::before { animation-duration: 7s; }
+.kiosk__stage--thinking::before {
+  background: radial-gradient(
+    circle,
+    rgba(216, 163, 42, 0.22) 0%,
+    rgba(216, 163, 42, 0.09) 40%,
+    transparent 70%
+  );
+}
+
+.avatar--hero {
+  box-shadow:
+    0 20px 44px rgba(11, 31, 42, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.7);
+  border-radius: 24px;
+}
+
+/* ---- status ---- */
+.kiosk__status {
+  gap: 0.55rem;
+  padding: 0.34rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(11, 31, 42, 0.07);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/* Gold when it is waiting, teal when it is working — and the word
+   beside it always says which, so the colour is never carrying the
+   meaning alone. */
+.kiosk__status--idle .kiosk__pulse { background: var(--gold); }
+
+/* ---- welcome ---- */
+.kiosk__welcome {
+  text-align: center;
+  padding: 0.1rem 1.6rem 0.7rem;
+  flex-shrink: 0;
+}
+
+.kiosk__welcomeLead {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.kiosk__welcomeSub {
+  margin: 0.3rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ---- conversation: the newest answer leads, the rest recede ---- */
+.kiosk--compact .kiosk__answer > p {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.kiosk--compact .kiosk__log > *:not(:nth-last-child(-n + 2)) { opacity: 0.55; }
+
+.kiosk--compact .kiosk__ask {
+  background: rgba(0, 111, 115, 0.08);
+  border: 1px solid rgba(0, 111, 115, 0.12);
+}
+
+/* ---- controls ---- */
+.kiosk__controls { padding: 0.7rem 1rem 0.2rem; gap: 0.6rem; }
+
+.kiosk__start {
+  background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+  border: 0;
+  padding: 0.68rem 1.5rem;
+  font-size: 0.86rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 24px rgba(0, 111, 115, 0.28);
+  transition: transform 0.2s var(--ease-soft), box-shadow 0.2s var(--ease-soft);
+}
+
+.kiosk__start:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0, 111, 115, 0.34);
+}
+
+.kiosk__ctrl {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(11, 31, 42, 0.1);
+  padding: 0.55rem 1.05rem;
+}
+
+/* A soft ring while it is live, so the microphone reads as open without
+   a red dot or a waveform. */
+@keyframes mic-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 160, 160, 0.28); }
+  50%      { box-shadow: 0 0 0 7px rgba(0, 160, 160, 0); }
+}
+
+.kiosk__mic.is-live { animation: mic-glow 2.6s ease-out infinite; }
+
+/* ---- input ---- */
+.kiosk--compact .kiosk__bar {
+  border-radius: 999px;
+  border: 1px solid rgba(11, 31, 42, 0.09);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 6px 18px rgba(11, 31, 42, 0.06);
+  padding: 0.3rem 0.3rem 0.3rem 0.35rem;
+}
+
+.kiosk--compact .kiosk__bar:focus-within {
+  border-color: rgba(0, 160, 160, 0.45);
+  box-shadow: 0 6px 22px rgba(0, 160, 160, 0.14);
+}
+
+/* ---- entrance ---- */
+@keyframes stage-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+.dock__panel.is-open .kiosk__stage { animation: stage-in 0.5s var(--ease-soft) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk__stage::before,
+  .kiosk__mic.is-live,
+  .dock__panel.is-open .kiosk__stage { animation: none !important; }
+}
+
+/* ---- responsive sizing, driven by the viewport rather than fixed px ----
+
+   The avatar is the hero, so it is the last thing to give way. Order of
+   collapse on a short window: disclaimer, then chips, then the welcome
+   copy, then padding, then the avatar. Controls and input never move. */
+
+.avatar--hero {
+  width: clamp(200px, 29vh, 300px) !important;
+  height: clamp(200px, 29vh, 300px) !important;
+  max-width: min(70vw, 300px);
+  max-height: none;
+}
+
+@media (max-height: 849px) {
+  .avatar--hero { width: clamp(170px, 24vh, 250px) !important; height: clamp(170px, 24vh, 250px) !important; }
+  .kiosk__stage { padding: 1rem 1rem 0.75rem; gap: 0.7rem; }
+  .kiosk__welcomeSub { display: none; }
+}
+
+@media (max-height: 760px) {
+  .avatar--hero { width: clamp(150px, 22vh, 215px) !important; height: clamp(150px, 22vh, 215px) !important; }
+  .kiosk__stage { padding: 0.7rem 1rem 0.55rem; gap: 0.5rem; }
+  .kiosk__welcome { display: none; }
+  .kiosk__status { font-size: 0.78rem; padding: 0.28rem 0.7rem; }
+}
+
+@media (max-height: 620px) {
+  .avatar--hero { width: clamp(130px, 19vh, 170px) !important; height: clamp(130px, 19vh, 170px) !important; }
+  .kiosk__stage { padding: 0.5rem 1rem 0.4rem; }
+  .kiosk--compact .kiosk__head { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+}
+
+/* ---- phone: nearly the whole screen, but inset so it reads as a card ---- */
+@media (max-width: 520px) {
+  .dock { right: 0; left: 0; bottom: 0; }
+  .dock__panel {
+    width: calc(100vw - 1rem);
+    max-width: none;
+    height: calc(100dvh - 1rem);
+    margin: 0.5rem;
+    border-radius: 22px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .avatar--hero { width: clamp(150px, 23vh, 215px) !important; height: clamp(150px, 23vh, 215px) !important; }
+}
+
+/* The site's gold nav CTA is deliberately NOT hidden while the panel is
+   open. It was, briefly. But it is the client's main conversion button,
+   and suppressing it to solve an overlap is fixing a layout problem by
+   removing someone else's feature — the panel simply stops at the nav
+   instead. */
+
+.kiosk__send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.kiosk__mic:focus-visible,
+.kiosk__send:focus-visible,
+.kiosk__chips button:focus-visible,
+.kiosk__reset:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 2px;
+}
+
+.kiosk__fine {
+  padding: 0.85rem 1.4rem 1.3rem;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--ink-faint);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .kiosk__head { flex-wrap: wrap; }
+  .kiosk__log { max-height: 52vh; padding: 1.1rem; }
+  .kiosk__ask, .kiosk__answer { max-width: 100%; }
+  /* 16px, or iOS zooms the page when the field is focused */
+  .kiosk__bar input { font-size: 16px; }
+}
+
+/* ================================================================
+   FAQ — questions on two moving rows
+   Still not an accordion: six short answers behind six clicks is worse
+   than reading them. See FaqMarquee.jsx for the loop and for why it can
+   always be stopped.
+   ================================================================ */
+.faqm {
+  display: grid;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.faqm__row {
+  overflow: hidden;
+  /* the ends fade out rather than being cut off, so a card leaving does
+     not vanish at a hard edge */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 7%,
+    #000 93%,
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.faqm__track {
+  display: flex;
+  width: max-content;
+  animation: faqm-slide var(--dur, 60s) linear infinite;
+}
+
+.faqm__row[data-dir="right"] .faqm__track {
+  animation-direction: reverse;
+}
+
+/* Exactly half, because the track holds exactly two identical sets —
+   at -50% the second copy sits where the first began and the loop has
+   no seam to see. */
+@keyframes faqm-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Moving content that cannot be stopped is a WCAG 2.2.2 failure, and
+   hover alone covers neither a touch screen nor a keyboard — the button
+   is the mechanism that counts. :focus-within cannot fire today, since
+   a card holds a heading and a paragraph and nothing focusable; it is
+   here so the rows still behave if a card ever gains a link. */
+.faqm.is-paused .faqm__track,
+.faqm__row:hover .faqm__track,
+.faqm__row:focus-within .faqm__track {
+  animation-play-state: paused;
+}
+
+.faqm__set {
+  display: flex;
+  align-items: stretch;
+  gap: 1.75rem;
+  padding-inline: 0.875rem;
+  list-style: none;
+}
+
+.faqm__card {
+  /* One set has to be WIDER than the row or the same question shows up
+     twice on screen. Three of these beat the 1200px column at every
+     width the site has. */
+  flex: 0 0 clamp(300px, 32vw, 400px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.6rem 1.5rem;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  /* opaque: these pass over each other and over the page's atmosphere */
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.faqm__card h3 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.faqm__card p {
+  font-size: 0.94rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.faqm__toggle {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.8);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease-soft), background 0.3s var(--ease-soft);
+}
+
+.faqm__toggle:hover {
+  border-color: var(--line-strong);
+  background: #ffffff;
+}
+
+.faqm__toggle:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 2px;
+}
+
+.faqm__toggleIcon {
+  width: 9px;
+  height: 11px;
+  background: var(--gold-ink);
+}
+
+.faqm__toggleIcon[data-state="pause"] {
+  /* two bars */
+  clip-path: polygon(0 0, 3px 0, 3px 11px, 0 11px, 0 0, 6px 0, 9px 0, 9px 11px, 6px 11px);
+}
+
+.faqm__toggleIcon[data-state="play"] {
+  clip-path: polygon(0 0, 9px 50%, 0 100%);
+}
+
+/* Reduced motion gets the questions, not a slower marquee. */
+.faqm--still {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+  list-style: none;
+}
+
+.faqm--still .faqm__card {
+  flex: 1 1 auto;
+}
+
+/* ================================================================
+   OUR EXPERTISE — pinned cards on a dashed trail
+   The trail's path is measured from the cards; see ExpertiseTrail.jsx
+   for why it cannot be written down.
+   ================================================================ */
+.xp {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.xp__trail {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+  /* The width/height ATTRIBUTES are presentation attributes, which beat
+     `inset: 0` — so between a viewport shrinking and the redraw landing
+     the svg keeps its old pixel width and pushes the page sideways.
+     These two lines win over the attributes, and the viewBox then just
+     scales for the frame or two that they disagree. */
+  width: 100%;
+  height: 100%;
+}
+
+.xp__trail path {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 8 6;
+}
+
+/* Runs for everyone, including under a reduced-motion preference, and
+   that is a deliberate call rather than an oversight. This is a 2px
+   dashed line creeping along at 4px/s: the amplitude is a couple of
+   pixels and it covers no area. The preference exists for motion that
+   can unsettle — parallax, large-area slides, zooms — and the things on
+   this site that qualify DO honour it: the card stack's arrivals, the
+   Why column's fade and drift, the FAQ marquee. Suppressing this one as
+   well bought nobody anything and left the trail looking broken.
+   -140 is ten whole dashes (8 + 6), so the loop has no jump. */
+.xp__trail path {
+  animation: xp-march 3s linear infinite;
+}
+
+@keyframes xp-march {
+  to {
+    stroke-dashoffset: -140;
+  }
+}
+
+.xp__list {
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+.xp__item {
+  width: min(330px, 100%);
+}
+
+/* The zig-zag. Odd cards hug the left, even the right, and the trail
+   swings between them. */
+.xp__item:nth-child(even) {
+  align-self: flex-end;
+}
+
+.xp__card {
+  padding: 0.55rem;
+  border-radius: 26px;
+  border: 1px solid var(--line);
+  background: #ffffff; /* opaque: the trail passes behind these */
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease);
+}
+
+.xp__item:nth-child(odd) .xp__card {
+  transform: rotate(1.6deg);
+}
+
+.xp__item:nth-child(even) .xp__card {
+  transform: rotate(-1.6deg);
+}
+
+/* Straightens under the cursor — the tilt is what makes it worth
+   straightening. */
+.xp__card:hover {
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow: var(--shadow-xl, var(--shadow-lg));
+}
+
+.xp__pin {
+  display: grid;
+  place-items: center;
+  margin: 0.25rem auto 0.7rem;
+  color: var(--gold-ink);
+}
+
+.xp__item:nth-child(even) .xp__pin {
+  color: var(--teal-ink);
+}
+
+.xp__tint {
+  padding: 1.15rem 1.2rem 1.3rem;
+  border-radius: 17px;
+  border: 1px solid var(--gold-lite);
+  background: rgba(255, 224, 138, 0.13);
+}
+
+.xp__item:nth-child(even) .xp__tint {
+  border-color: var(--teal-lite);
+  background: rgba(51, 199, 199, 0.12);
+}
+
+.xp__no {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-ink);
+  margin-bottom: 0.85rem;
+}
+
+.xp__item:nth-child(even) .xp__no {
+  color: var(--teal-ink);
+}
+
+.xp__card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  text-wrap: balance;
+  margin-bottom: 0.45rem;
+}
+
+.xp__card p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  /* Darker than --ink-soft, which measured 4.35:1 against the teal
+     tint — the tint is a shade deeper than the page it was chosen for.
+     This reads 5.1:1 there and better on the gold. */
+  color: #5b6a80;
+}
+
+@media (max-width: 860px) {
+  /* Square and stacked. A dashed line between two edges of a phone is a
+     scribble, and a tilted card on a narrow screen just loses corners. */
+  .xp__item {
+    width: 100%;
+  }
+  .xp__item:nth-child(even) {
+    align-self: auto;
+  }
+  .xp__item:nth-child(odd) .xp__card,
+  .xp__item:nth-child(even) .xp__card {
+    transform: none;
+  }
+  .xp__list {
+    gap: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp__card {
+    transition: none;
+  }
+}
+
+/* ================================================================
+   PRODUCT PILLARS
+   ================================================================ */
+.split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.1rem;
+}
+
+.pillar {
+  position: relative;
+  isolation: isolate; /* keeps the -1 glow above the pillar's own bg */
+  overflow: hidden;
+  border-radius: var(--r);
+  padding: 2.2rem 1.9rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease),
+    border-color 0.5s var(--ease);
+}
+
+/* the top rule wipes in from the left on hover rather than sitting
+   there fully drawn — same detail, more life */
+.pillar::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--teal));
+  transform: scaleX(0.24);
+  transform-origin: left;
+  transition: transform 0.7s var(--ease);
+}
+
+.pillar:hover {
+  transform: translateY(-6px);
+  border-color: rgba(99, 91, 255, 0.2);
+  box-shadow: var(--shadow-lg);
+}
+
+.pillar:hover::after {
+  transform: scaleX(1);
+}
+
+.pillar__no {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.pillar h3 {
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.pillar p {
+  margin-top: 0.7rem;
+  color: var(--ink-soft);
+  line-height: 1.62;
+  font-size: 0.95rem;
+}
+
+.pillar ul {
+  list-style: none;
+  margin-top: 1.3rem;
+}
+
+.pillar li {
+  padding: 0.55rem 0 0.55rem 1.5rem;
+  position: relative;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--line);
+}
+
+.pillar li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.1rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+}
+
+/* ================================================================
+   CONTACT
+   Adapted from a shadcn/Tailwind card. Same structure — split card,
+   contact rail, corner registration marks — rebuilt on this site's
+   tokens, since there is no Tailwind here to inherit from.
+   ================================================================ */
+.contact {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background: radial-gradient(90% 120% at 12% 0%, rgba(99, 91, 255, 0.09), transparent 55%),
+    radial-gradient(80% 120% at 92% 100%, rgba(212, 163, 57, 0.11), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.94));
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 900px) {
+  .contact {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Registration marks. Decorative, so they sit outside the card's
+   rounded corners rather than trying to align with them. */
+.contact__mark {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  color: var(--ink-faint);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.contact__mark--tl {
+  top: -10px;
+  left: -10px;
+}
+.contact__mark--tr {
+  top: -10px;
+  right: -10px;
+}
+.contact__mark--bl {
+  bottom: -10px;
+  left: -10px;
+}
+.contact__mark--br {
+  bottom: -10px;
+  right: -10px;
+}
+
+@media (max-width: 620px) {
+  .contact__mark {
+    display: none; /* they land on the viewport edge and read as damage */
+  }
+}
+
+.contact__body {
+  padding: clamp(1.75rem, 4vw, 3.25rem);
+}
+
+.contact__body h2 {
+  max-width: 14ch;
+}
+
+.contact__infos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 520px) {
+  .contact__infos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact__info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.6rem;
+  margin-left: -0.6rem;
+  border-radius: var(--r-sm);
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.3s var(--ease-soft);
+}
+
+.contact__info--wide {
+  grid-column: 1 / -1;
+}
+
+a.contact__info:hover {
+  background: rgba(15, 23, 42, 0.035);
+}
+
+.contact__infoIcon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--teal-ink);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.4s var(--ease), color 0.3s var(--ease-soft);
+}
+
+a.contact__info:hover .contact__infoIcon {
+  transform: translateY(-2px);
+  color: var(--indigo);
+}
+
+.contact__infoLabel {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.2rem;
+}
+
+.contact__infoValue {
+  display: block;
+  font-size: 0.94rem;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+/* ---- the form side ---------------------------------------------- */
+/* ---- ruled rows beside the form, from the reference ---- */
+.contact__steps {
+  margin-top: 2.25rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--line);
+}
+
+.contact__stepsLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-faint);
+  margin-bottom: 0.4rem;
+}
+
+.contact__steps ul {
+  list-style: none;
+}
+
+.contact__steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.contact__steps b {
+  display: block;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.contact__stepIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  margin-top: 0.1rem;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--teal-ink);
+}
+
+.contact__form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-left: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(247, 249, 252, 0.7), rgba(241, 245, 249, 0.6));
+  border-radius: 0 var(--r-lg) var(--r-lg) 0;
+}
+
+/* The reference sets a photograph behind this column. Ours is knocked
+   right back: the form card sits on top of it and the card's own
+   contrast has to survive whatever the picture is doing underneath. */
+.contact__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.16;
+  filter: saturate(0.7);
+}
+
+.contact__formInner {
+  position: relative;
+  width: 100%;
+  padding: clamp(1.25rem, 2.5vw, 1.9rem);
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  /* opaque, because it is over a photograph */
+  background: #ffffff;
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 900px) {
+  .contact__form {
+    border-left: none;
+    border-top: 1px solid var(--line);
+    border-radius: 0 0 var(--r-lg) var(--r-lg);
+  }
+}
+
+.form {
+  width: 100%;
+}
+
+.form__head {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-faint);
+  margin-bottom: 1.4rem;
+}
+
+.field {
+  margin-bottom: 0.95rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--ink);
+}
+
+.field__req {
+  color: var(--gold-ink);
+  margin-left: 0.15rem;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+  transition: border-color 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft),
+    background 0.25s var(--ease-soft);
+}
+
+/* The Project Type picker. Same box as the text inputs, with room kept
+   on the right for the native caret so a long portfolio name does not
+   run underneath it. */
+.field__select {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft);
+}
+
+.field__select:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.16);
+}
+
+@media (max-width: 760px) {
+  /* 16px, or iOS zooms the page the moment it is focused */
+  .field__select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.55;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.16);
+}
+
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
+  border-color: var(--red);
+}
+
+.field input[aria-invalid="true"]:focus,
+.field textarea[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.14);
+}
+
+/* Two things, both only true on a phone: a 40px control is under the
+   comfortable touch target, and iOS Safari zooms the whole page when a
+   focused input's text is below 16px — which then leaves the visitor
+   scrolled sideways on a page that has no horizontal scroll. */
+@media (max-width: 760px) {
+  .field input,
+  .field textarea {
+    font-size: 16px;
+    padding: 0.8rem 0.85rem;
+  }
+}
+
+.field__err {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--red);
+}
+
+.field__err a {
+  color: inherit;
+}
+
+/* Off-screen rather than display:none — a bot that skips hidden inputs
+   walks straight past a display:none honeypot. */
+/* ---- phone: dialling code + national number ---- */
+.phone {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.6rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.97);
+  transition: border-color 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft);
+}
+
+.phone:focus-within {
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.16);
+}
+
+.phone.is-bad {
+  border-color: var(--red);
+}
+
+.phone.is-ok {
+  border-color: var(--teal);
+}
+
+/* Native, and deliberately: <select> gives type-ahead free, so "ind"
+   jumps to India in a list of fifty-two, and a phone opens its own
+   wheel instead of a scrolling div. Its own text and its own caret are
+   left alone — a select that has been styled until it stops looking
+   like one stops being recognised as one. The trigger may truncate the
+   country name; the code stays legible and the open list is complete. */
+.phone__country {
+  flex: 0 0 auto;
+  width: 8.5rem;
+  padding: 0.7rem 0.4rem 0.7rem 0.7rem;
+  border: none;
+  border-right: 1px solid var(--line);
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.phone__country:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: -2px;
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+}
+
+.phone__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* .field input's own border and background would double up here */
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.phone__input:focus {
+  outline: none;
+}
+
+.phone__state {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--red);
+}
+
+.phone.is-ok .phone__state {
+  color: var(--teal-ink);
+}
+
+.phone__note {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--red);
+}
+
+.phone__note.is-ok {
+  color: var(--teal-ink);
+}
+
+/* Side by side, the country picker leaves 80px for the number on a
+   375px screen, which cannot hold "98765 43210". Stacked, each gets a
+   full row — and the country name stops being truncated as a bonus.
+   16px on both controls, or iOS zooms the page the moment one is
+   focused. */
+@media (max-width: 560px) {
+  .phone {
+    flex-wrap: wrap;
+    padding-right: 0;
+  }
+  .phone__country {
+    width: 100%;
+    min-height: 44px;
+    font-size: 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    border-radius: var(--r-sm) var(--r-sm) 0 0;
+  }
+  /* basis 0, not 100%: at 100% the input fills the second row on its
+     own and pushes the tick onto a third one, floating under the
+     number with nothing beside it. */
+  .phone__input {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+  }
+  .phone__state {
+    padding-right: 0.6rem;
+  }
+}
+
+.field--trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form__submit {
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.form__fine {
+  margin-top: 0.85rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- sent ------------------------------------------------------- */
+.contact__done {
+  width: 100%;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.contact__doneIcon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 1.15rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal-lite), var(--teal));
+  color: #06312a;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08), 0 10px 24px rgba(24, 154, 162, 0.32);
+}
+
+.contact__done h3 {
+  font-size: 1.15rem;
+  font-weight: 650;
+  margin-bottom: 0.55rem;
+}
+
+.contact__done p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin-bottom: 1.3rem;
+}
+
+.contact__done a {
+  color: var(--teal-ink);
+}
+
+/* ================================================================
+   FOOTER — light
+   ================================================================ */
+.footer {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(247, 249, 252, 0.6), rgba(241, 245, 249, 0.95));
+  color: var(--ink-soft);
+  padding: clamp(3.5rem, 6vw, 5rem) clamp(1.5rem, 6vw, 4rem) 2rem;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--maxw), 88%);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-strong) 20%, var(--line-strong) 80%, transparent);
+}
+
+.footer__inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  gap: 2.5rem;
+}
+
+@media (max-width: 820px) {
+  .footer__inner {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.footer h4 {
+  color: var(--ink);
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 1.1rem;
+}
+
+.footer ul {
+  list-style: none;
+}
+
+.footer li {
+  margin-bottom: 0.6rem;
+  font-size: 0.92rem;
+}
+
+.footer a {
+  position: relative;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 0.26s var(--ease-soft);
+}
+
+.footer a:hover {
+  color: var(--teal-ink);
+}
+
+.footer__bottom {
+  max-width: var(--maxw);
+  margin: 3rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+}
+
+/* ================================================================
+   Reduced motion is deliberately NOT gated site-wide.
+   The user runs Windows with animation effects switched off, which
+   sets prefers-reduced-motion: reduce — and every reveal on this page
+   starts from opacity 0. Gating them there would hand them a blank
+   page. Only the scroll behaviour is softened.
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ================================================================
+   THE DOCKED ASSISTANT
+   ================================================================ */
+
+.dock {
+  position: fixed;
+  right: clamp(0.9rem, 2vw, 1.5rem);
+  bottom: clamp(0.9rem, 2vw, 1.5rem);
+  z-index: 9996;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.85rem;
+  /* The wrapper must not swallow clicks on the page it floats over —
+     only the launcher and the panel inside it take pointer events. */
+  pointer-events: none;
+}
+
+.dock > * { pointer-events: auto; }
+
+/* ---- the launcher ---- */
+
+.dock__launcher {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: #ffffff;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(11, 31, 42, 0.22);
+  transition: transform 0.22s var(--ease-soft), box-shadow 0.22s var(--ease-soft);
+}
+
+.dock__launcher:hover { transform: translateY(-2px) scale(1.04); }
+.dock__launcher:active { transform: translateY(0) scale(0.98); }
+
+.dock__launcher:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
+
+/* Open state drops the avatar for a plain close affordance, and the
+   circle becomes brand teal so it reads as "this is the thing that is
+   open" rather than as a second, different control. */
+.dock__launcher.is-open {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+  color: #ffffff;
+}
+
+.dock__face {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- the panel ---- */
+
+.dock__panel {
+  position: relative;
+  width: min(400px, calc(100vw - 1.8rem));
+  /* dvh, not vh: on a phone vh includes the browser chrome that is not
+     actually there, so the panel would run under the address bar. */
+  height: min(580px, calc(100dvh - 8.5rem));
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(11, 31, 42, 0.28);
+  transform-origin: bottom right;
+  opacity: 0;
+  transform: scale(0.92) translateY(12px);
+  transition: opacity 0.2s var(--ease-soft), transform 0.24s var(--ease-soft);
+}
+
+.dock__panel.is-open {
+  opacity: 1;
+  transform: none;
+}
+
+.dock__close {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s;
+}
+
+.dock__close:hover { color: var(--ink); border-color: var(--line-strong); }
+.dock__close:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+/* ---- the kiosk, compacted into the panel ----
+   The section version is 780px wide with room to breathe. None of those
+   measurements survive a 400px column, so the compact variant is not a
+   scale-down but its own set of spacings. */
+
+.kiosk--compact { max-width: none; height: 100%; }
+
+.kiosk--compact .kiosk__frame {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.kiosk--compact .kiosk__head {
+  gap: 0.7rem;
+  padding: 0.9rem 2.6rem 0.9rem 1rem; /* right padding clears the close button */
+  flex-wrap: wrap;
+}
+
+.kiosk--compact .kiosk__name { font-size: 0.9rem; }
+.kiosk--compact .kiosk__hint { font-size: 0.76rem; }
+
+/* The log takes whatever the header and the input bar leave, rather
+   than a viewport fraction — inside a fixed-height panel a vh cap
+   either overflows it or leaves dead space under it. */
+.kiosk--compact .kiosk__log {
+  flex: 1;
+  max-height: none;
+  min-height: 0;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.kiosk--compact .kiosk__chips { padding: 0 1rem 0.6rem; }
+.kiosk--compact .kiosk__chips button { font-size: 0.72rem; }
+.kiosk--compact .kiosk__bar { margin: 0 0.8rem 0.8rem; }
+.kiosk--compact .kiosk__cardImg { width: 46px; height: 46px; }
+
+/* ---- phone: a sheet, not a floating card ----
+   A 400px card on a 360px screen is a card with its edges cut off. */
+
+@media (max-width: 520px) {
+  .dock { left: 0; right: 0; bottom: 0; align-items: stretch; gap: 0; }
+
+  .dock__panel {
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    transform-origin: bottom center;
+  }
+
+  .dock__launcher {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  /* Hidden behind a full-screen sheet — it would otherwise sit on top
+     of the conversation with nothing to toggle back to. */
+  .dock__panel.is-open ~ .dock__launcher { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock__panel { transition: opacity 0.15s linear; transform: none; }
+  .dock__launcher { transition: none; }
+  .dock__launcher:hover { transform: none; }
+}
+
+/* ---- captions on the dark half of the film ----
+
+   The hero clip changes ground halfway through: a glass-walled airport,
+   then a restaurant lit for evening. Premium Black measures 2.11:1 over
+   the "Smart Spaces" caption and 3.02:1 over the closing one, with 89%
+   and 76% of that area below AA — so those two flip to Off White, which
+   measures 9.02:1 and 5.01:1 on the same frames.
+
+   The halo has to flip with the ink. It is doing the same job in both
+   directions — holding a ground tight to the letterforms — but a white
+   halo behind white type is invisible, and would leave the type naked on
+   the lit patches the restaurant does have. */
+.cap--light h1,
+.cap--light h2,
+.cap--light .lede,
+.cap--light .cap__title {
+  /* Off White — the board's own colour, and the text half of its dark
+     combination. It is not "white": measured against Gold light
+     (4.18:1, 52% failing) and Teal light (2.60:1, 67%) on these same
+     frames, both of which are brand colours and both of which lose.
+     Mid-luminance accents have nowhere to hide on video. The brand is
+     carried here by the gradient word instead, which takes the board's
+     bright gold-into-teal pair. */
+  color: #f7f8f6;
+  filter: drop-shadow(0 0 2px rgba(11, 31, 42, 0.95))
+    drop-shadow(0 1px 3px rgba(11, 31, 42, 0.85))
+    drop-shadow(0 0 12px rgba(11, 31, 42, 0.7));
+}
+
+/* The gradient word takes the board's BRIGHT accent pair on this ground,
+   the gold and teal gradient STARTS rather than the darkened inks — the
+   same flip the dark hero scrim used, and the same pair the logo uses on
+   its dark variant. */
+.cap--light .grad-text {
+  background-image: linear-gradient(92deg, var(--gold-lite), var(--teal-lite));
+}
+
+/* ---- the greeter: the figure alone, floating ----
+
+   Only when public/assistant/greeter.png exists. Without it the
+   launcher stays the circular bust, so a missing asset never breaks the
+   site — it just looks like every other chat launcher until the figure
+   is dropped in.
+
+   No circle, no plate, no border, no shadow. The artwork's own alpha is
+   the whole silhouette, which is what "floating there, no BG" means and
+   also the only way a namaste survives: the gesture lives entirely
+   outside the crop a circular launcher would leave. */
+.dock__launcher--figure {
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.dock__launcher--figure:hover { transform: translateY(-4px) scale(1.02); }
+
+.dock__launcher--figure:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 8px;
+  border-radius: var(--r-sm);
+}
+
+/* The height lives on the IMAGE, not on the button or the span between
+   them. Sizing it with height:100% asks the image to resolve against a
+   parent whose own height is being derived from the image — a circular
+   dependency the browser breaks by using the intrinsic size, which is
+   how a 1024px-tall render ended up hanging off the viewport. */
+/* She is a still render, so if nothing moves her she is furniture. Two
+   loops, deliberately at odds with each other so the result never
+   settles into a visible cycle:
+
+   · breathe, 4.4s — a slow rise and fall of a few pixels with a hair of
+     scale, which is what a standing person does.
+   · sway, 7.1s — a fraction of a degree either way, pivoting at her
+     feet rather than her centre, because a figure standing on a page
+     rotates about the ground and not about its middle.
+
+   The periods are coprime enough that the pair takes about half a
+   minute to repeat, and the amplitudes are small on purpose: this has
+   to read as alive at the edge of vision, not as a thing demanding to
+   be looked at while someone is reading. */
+@keyframes greeter-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-7px) scale(1.014); }
+}
+
+@keyframes greeter-sway {
+  0%, 100% { transform: rotate(-0.5deg); }
+  50%      { transform: rotate(0.5deg); }
+}
+
+/* The entrance is the greeting: she rises into place once, on arrival. */
+@keyframes greeter-enter {
+  from { opacity: 0; transform: translateY(26px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+.dock__launcher--figure {
+  animation: greeter-sway 7.1s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+.dock__figure {
+  animation:
+    greeter-enter 0.7s var(--ease-soft) both,
+    greeter-breathe 4.4s ease-in-out 0.7s infinite;
+  height: clamp(190px, 30vh, 340px);
+  width: auto;
+  max-width: min(46vw, 340px);
+  object-fit: contain;
+  display: block;
+}
+
+.dock__launcher--figure .dock__face { width: auto; height: auto; }
+
+@media (max-width: 520px) {
+  .dock__figure { height: clamp(150px, 22vh, 210px); max-width: 44vw; }
+}
+
+/* Reduced motion keeps her breathing, and that is a deliberate call
+   rather than an oversight.
+
+   Killing it outright is what this project already got wrong once, when
+   the Why panel froze on 01 for anyone with the preference set -- and
+   the machine this client reviews on reports `reduce`, so "no animation
+   under reduced motion" means the client never sees it at all. The
+   precedent set there was that motion of a couple of pixels is not what
+   the preference is protecting people from, and the dashed trail was
+   left running for everyone on the same reasoning.
+
+   So the breathe stays, at half the travel and half again the duration.
+   The SWAY goes: it is a rotation, and rotation is the one that
+   actually provokes vestibular symptoms. */
+@media (prefers-reduced-motion: reduce) {
+  .dock__launcher--figure:hover { transform: none; }
+  .dock__launcher--figure { animation: none; }
+  .dock__figure {
+    animation:
+      greeter-enter 0.4s linear both,
+      greeter-breathe-soft 6.5s ease-in-out 0.4s infinite;
+  }
+}
+
+@keyframes greeter-breathe-soft {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+
+/* The wordmark as artwork rather than as type.
+
+   Sized by HEIGHT with width auto, so it can never be squashed: the
+   crop is 1293x251 and that 5.15:1 ratio is the lockup's, not something
+   this stylesheet gets to choose. It scales with the viewport because
+   TECHNOLOGIES is a fifth of the block's height, which is how the logo
+   is drawn.
+
+   The height matches what the live text it replaced actually occupied:
+   16.32px of MRAKEE, a 2px gap, 8.32px of TECHNOLOGIES — 26.6px. Set
+   any larger and the artwork is not more legible, it is just a bigger
+   logo than the bar was designed around. */
+.logo__wordArt {
+  display: block;
+  height: clamp(22px, 1.85vw, 28px);
+  width: auto;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+@media (max-width: 560px) {
+  /* A 175px wordmark plus the mark plus a menu button does not fit a
+     360px bar. The mark alone still identifies the site. */
+  .logo__wordArt { height: 22px; }
+}
+
+/* ---- the avatar's two stacked frames ----
+
+   Closed-mouth underneath, open-mouth over it at an opacity the audio
+   sets. They are the same head in the same position, so what the eye
+   sees is a mouth opening rather than two pictures dissolving. */
+.avatar__stack {
+  position: relative;
+  display: block;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar__stack img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* Nothing animates opacity on a face layer any more — a face drawn at
+   partial opacity shows the face beneath it, which is what put two
+   mouths on screen. The hint is left off deliberately. */
+
+/* Breathing, for the still avatar. Two pixels over four seconds: enough
+   that the face is not frozen, not enough to notice as animation. */
+@keyframes avatar-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-1.5px) scale(1.008); }
+}
+
+.avatar .avatar__stack { animation: avatar-breathe 4.2s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar .avatar__stack { animation: none; }
+}
+
+/* The viseme frame. A short crossfade so shapes blend rather than cut —
+   90ms is under a syllable at normal speech, so it softens the change
+   without letting the mouth lag behind the voice. Longer and it turns
+   to mush; shorter and it flickers. */
+/* NO OPACITY ANIMATION, and that is the fix rather than an omission.
+
+   This used to fade in from 0.25. The viseme images are complete,
+   opaque faces, so any opacity below 1 painted the base face through
+   them — the baked smile showing inside the open mouth, plus ghosted
+   eyes, since idle and answering differ there too. A crossfade between
+   two faces cannot look like one face.
+
+   Smoothness comes from the shape sequence instead. Visemes change
+   every 50-150ms, which is fast enough that a hard swap reads as
+   movement; it is how drawn animation has always worked. */
+.avatar__viseme {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+}
+
+/* Muted: the session is still live, the input is not. Distinct from
+   both idle and listening, because "connected but not hearing you" is a
+   state a visitor has to be able to see at a glance. */
+.kiosk__mic.is-muted {
+  color: var(--red);
+  border-color: var(--red);
+  background: rgba(200, 16, 16, 0.08);
+}
+
+.kiosk__mic.is-muted:hover { background: rgba(200, 16, 16, 0.14); }
+
+/* ================================================================
+   VOICE MODE LAYOUT
+
+   The panel was a chat window with a 44px avatar in a 160px header —
+   7.6% of the panel given to the thing the whole feature is about. It
+   is now a portrait first and a transcript second.
+   ================================================================ */
+
+/* Taller and a little wider, because an avatar, a status, a transcript
+   and a control row do not fit in 400x580. Capped against the viewport
+   so it can never run under the nav: 100dvh minus the nav's height and
+   both margins. */
+.dock__panel {
+  width: min(420px, calc(100vw - 1.8rem));
+  height: min(720px, calc(100dvh - 7.5rem));
+}
+
+/* ---- header: identity, nothing else ---- */
+.kiosk--compact .kiosk__head {
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 2.6rem 0.85rem 1rem;
+  flex-wrap: nowrap;
+}
+
+.kiosk__role {
+  margin: 2px 0 0;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+/* A status dot in the header, since the avatar no longer lives there.
+   Colour alone never carries it — the word is under the avatar. */
+.kiosk__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--ink-faint);
+}
+
+.kiosk__dot--listening { background: var(--teal); box-shadow: 0 0 0 3px rgba(0, 160, 160, 0.2); }
+.kiosk__dot--thinking  { background: var(--gold); box-shadow: 0 0 0 3px rgba(216, 163, 42, 0.22); }
+.kiosk__dot--answering { background: var(--teal-deep); box-shadow: 0 0 0 3px rgba(0, 111, 115, 0.22); }
+.kiosk__dot--error     { background: var(--red); }
+
+/* ---- the stage ---- */
+.kiosk__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 1rem 0.9rem;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(0, 160, 160, 0.05), transparent);
+}
+
+/* Rounded, not circular. A circle crops her shoulders and reads as a
+   chat icon; the source is square and is shown square. */
+.avatar--hero,
+.avatar--hero .avatar__stack,
+.avatar--hero .avatar__stack img,
+.avatar--hero img {
+  border-radius: var(--r-lg);
+}
+
+.avatar--hero {
+  box-shadow: 0 14px 34px rgba(11, 31, 42, 0.16);
+  max-width: min(72vw, 260px);
+  max-height: min(38vh, 260px);
+}
+
+.avatar--hero .avatar__stack { width: 100% !important; height: 100% !important; }
+
+.kiosk__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+}
+
+.kiosk__pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+  flex-shrink: 0;
+}
+
+/* Only while something is actually happening — a dot that never stops
+   is a distraction, and it would be lying when the session is idle. */
+.kiosk__status--listening .kiosk__pulse { animation: kiosk-pulse 1.4s ease-in-out infinite; }
+.kiosk__status--thinking .kiosk__pulse  { background: var(--gold); animation: kiosk-pulse 0.9s ease-in-out infinite; }
+.kiosk__status--answering .kiosk__pulse { background: var(--teal-deep); animation: kiosk-pulse 0.7s ease-in-out infinite; }
+.kiosk__status--idle .kiosk__pulse { background: var(--ink-faint); }
+
+@keyframes kiosk-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.55); opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk__status .kiosk__pulse { animation: none !important; }
+}
+
+/* ---- transcript: secondary, and it takes what is left ---- */
+.kiosk--compact .kiosk__log {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  padding: 0.7rem 1rem;
+  gap: 0.7rem;
+  font-size: 0.86rem;
+}
+
+/* ---- controls, at the foot ---- */
+.kiosk__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem 0;
+  flex-shrink: 0;
+}
+
+.kiosk__ctrl,
+.kiosk__start {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+
+.kiosk__ctrl:hover { color: var(--ink); border-color: var(--line-strong); }
+
+.kiosk__start {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+  color: #fff;
+  padding: 0.58rem 1.1rem;
+}
+
+.kiosk__start:hover { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+.kiosk__ctrl.is-muted { color: var(--red); border-color: var(--red); background: rgba(200, 16, 16, 0.07); }
+
+.kiosk__ctrl--end { color: var(--red); border-color: rgba(200, 16, 16, 0.4); }
+.kiosk__ctrl--end:hover { color: #fff; background: var(--red); border-color: var(--red); }
+
+/* ---- phone: near full screen, inside the safe area ---- */
+@media (max-width: 520px) {
+  .dock__panel {
+    width: 100%;
+    height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .avatar--hero { max-height: min(34vh, 220px); max-width: min(60vw, 220px); }
+  .kiosk__stage { padding: 0.9rem 1rem 0.7rem; }
+}
+
+/* The greeting is a sentence, not a status. It sits in the transcript
+   area where a sentence belongs; the line under the avatar stays short
+   enough to read at a glance. */
+.kiosk__greeting {
+  margin: 0;
+  padding: 0.2rem 1.15rem 0.6rem;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.avatar--hero { max-height: min(42vh, 300px); max-width: min(74vw, 300px); }
+
+/* Mobile cap, last so it wins: the desktop max-height rule above is
+   later in the file than the phone breakpoint and was overriding it. */
+@media (max-width: 520px) {
+  .avatar--hero { max-height: min(32vh, 215px); max-width: min(58vw, 215px); }
+}
+
+/* ================================================================
+   HEIGHT BREAKPOINTS
+
+   The panel was sized on width alone, so on a short laptop window the
+   avatar kept its 250px, the transcript collapsed to nothing, and the
+   controls and input were pushed past the bottom edge. Height is the
+   axis that was actually constrained.
+
+   The order things give way in is deliberate: the disclaimer goes
+   first, then the greeting, then padding, then the avatar. Mute, End
+   and the input never move — a voice control you cannot reach is worse
+   than a small face.
+   ================================================================ */
+
+/* The frame is the scroll boundary: it must be allowed to shrink so the
+   transcript inside it is what overflows, not the panel. */
+.kiosk--compact .kiosk__frame { min-height: 0; }
+.kiosk--compact .kiosk__log { overflow-y: auto; }
+
+/* Controls and input are pinned by never being allowed to shrink. */
+.kiosk__controls,
+.kiosk--compact .kiosk__bar,
+.kiosk--compact .kiosk__head,
+.kiosk--compact .kiosk__stage { flex-shrink: 0; }
+
+/* The quick-ask chips are the largest optional block in the panel: 144px
+   of wrapped buttons. They are a convenience for typing, and they were
+   what pushed the input past the bottom edge on short windows — the
+   measured overflow at 1024x600 was 17px, and the chips were 144 of it. */
+
+/* ---- compact: 761-849px tall ---- */
+@media (max-height: 849px) {
+  .avatar--hero { max-height: min(30vh, 210px); max-width: min(74vw, 210px); }
+  .kiosk__stage { padding: 0.75rem 1rem 0.6rem; gap: 0.5rem; }
+  .kiosk--compact .kiosk__head { padding-top: 0.7rem; padding-bottom: 0.7rem; }
+  .kiosk__greeting { padding: 0.1rem 1.15rem 0.45rem; font-size: 0.8rem; }
+  .kiosk__fine { font-size: 0.66rem; padding-top: 0.35rem; padding-bottom: 0.35rem; }
+  /* One row that scrolls sideways instead of four that wrap. */
+  .kiosk--compact .kiosk__chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0.4rem;
+  }
+  .kiosk--compact .kiosk__chips::-webkit-scrollbar { display: none; }
+  .kiosk--compact .kiosk__chips button { flex-shrink: 0; }
+}
+
+/* ---- short: 621-760px. 760 rather than 700 because a 720px window
+        overflowed by 7px with the greeting and disclaimer still in. ---- */
+@media (max-height: 760px) {
+  .avatar--hero { max-height: min(26vh, 175px); max-width: min(60vw, 175px); }
+  .kiosk__stage { padding: 0.55rem 1rem 0.45rem; gap: 0.35rem; }
+  .kiosk__status { font-size: 0.8rem; }
+  /* In priority order, these are what a visitor can lose without
+     losing the assistant. Controls and input never move. */
+  .kiosk__greeting { display: none; }
+  .kiosk__fine { display: none; }
+  .kiosk--compact .kiosk__chips { display: none; }
+  .kiosk--compact .kiosk__log { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+}
+
+/* ---- very short: a netbook, or a laptop with devtools open ---- */
+@media (max-height: 620px) {
+  .avatar--hero { max-height: min(24vh, 140px); max-width: min(50vw, 140px); }
+  .kiosk__stage { padding: 0.4rem 1rem 0.35rem; }
+  .kiosk--compact .kiosk__head { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+}
+
+/* One scrolling row at every size, not only on short windows. Wrapped,
+   the chips are 144px of the panel; in a row they are about 44. That
+   difference is what was still clipping the disclaimer off the bottom
+   at 1440x900, where content summed to 766 in a 720 frame. */
+.kiosk--compact .kiosk__chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 0.4rem;
+}
+.kiosk--compact .kiosk__chips::-webkit-scrollbar { display: none; }
+.kiosk--compact .kiosk__chips button { flex-shrink: 0; }
+
+/* ================================================================
+   THE CONCIERGE PANEL
+
+   A redesign of the assistant's surface only. Nothing here reaches the
+   voice system: no state, no timing, no lip-sync, no audio. The avatar
+   asset is untouched and the mouth stays exactly where the existing
+   implementation puts it.
+
+   The aim is a premium receptionist rather than a chat window, and the
+   way to get there is atmosphere and restraint — one hero, soft light,
+   slow motion — rather than more controls.
+   ================================================================ */
+
+.dock__panel {
+  width: clamp(430px, 34vw, 500px);
+  max-width: calc(100vw - 1.8rem);
+  /* The cap has to clear the nav, and the panel does not start at the
+     bottom of the window: the launcher sits below it inside the dock.
+     So the budget is the viewport minus the nav bar, minus the
+     launcher and its gap, minus both margins. Measured at 1440x900,
+     760px put the panel's top edge at y=38 with the nav bar occupying
+     14-69 — straight through it. */
+  height: min(760px, calc(100dvh - 12rem));
+  border-radius: 26px;
+  /* Glass, but quietly: a wash of white over the page rather than a
+     frosted slab. Prefixes first — the minifier treats the two as
+     aliases and keeps whichever comes last. */
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  backdrop-filter: blur(22px) saturate(1.15);
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 32px 70px rgba(11, 31, 42, 0.22),
+    0 2px 10px rgba(11, 31, 42, 0.07);
+}
+
+.kiosk--compact .kiosk__frame {
+  background: transparent;
+  position: relative;
+  isolation: isolate;
+}
+
+/* The atmosphere: two soft lights, teal high on the left and gold low
+   on the right, sitting behind everything. Radial and very wide, so
+   they read as light in a room rather than as shapes on a page. */
+.kiosk--compact .kiosk__frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(58% 42% at 22% 12%, rgba(0, 160, 160, 0.16), transparent 70%),
+    radial-gradient(52% 40% at 86% 74%, rgba(216, 163, 42, 0.14), transparent 72%),
+    linear-gradient(180deg, #ffffff 0%, var(--bg-soft) 100%);
+  pointer-events: none;
+}
+
+/* ---- header: who this is, and nothing else ---- */
+.kiosk--compact .kiosk__head {
+  border-bottom: 1px solid rgba(11, 31, 42, 0.06);
+  background: transparent;
+  padding: 0.95rem 3rem 0.95rem 1.15rem;
+}
+
+.kiosk__name { letter-spacing: 0.02em; }
+.kiosk__role { letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.64rem; }
+
+/* ---- the stage ---- */
+.kiosk__stage {
+  position: relative;
+  background: none;
+  padding: 1.4rem 1rem 1rem;
+  gap: 0.9rem;
+}
+
+/* The halo. Behind her, wider than she is, and soft enough to have no
+   edge — a glow rather than a ring. Rings and orbits are the thing that
+   makes an interface look like a HUD. */
+.kiosk__stage::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(112%, 420px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 160, 160, 0.22) 0%,
+    rgba(0, 160, 160, 0.09) 38%,
+    rgba(216, 163, 42, 0.07) 58%,
+    transparent 72%
+  );
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.kiosk__stage > * { position: relative; z-index: 1; }
+
+/* It breathes while she is working, and rests when she is not. Twelve
+   seconds and eight percent: slow and small enough that it registers as
+   presence rather than as animation. */
+@keyframes halo-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.78; }
+  50%      { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+.kiosk__stage--listening::before,
+.kiosk__stage--thinking::before,
+.kiosk__stage--answering::before {
+  animation: halo-breathe 12s ease-in-out infinite;
+}
+
+.kiosk__stage--answering::before { animation-duration: 7s; }
+.kiosk__stage--thinking::before {
+  background: radial-gradient(
+    circle,
+    rgba(216, 163, 42, 0.22) 0%,
+    rgba(216, 163, 42, 0.09) 40%,
+    transparent 70%
+  );
+}
+
+.avatar--hero {
+  box-shadow:
+    0 20px 44px rgba(11, 31, 42, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.7);
+  border-radius: 24px;
+}
+
+/* ---- status ---- */
+.kiosk__status {
+  gap: 0.55rem;
+  padding: 0.34rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(11, 31, 42, 0.07);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/* Gold when it is waiting, teal when it is working — and the word
+   beside it always says which, so the colour is never carrying the
+   meaning alone. */
+.kiosk__status--idle .kiosk__pulse { background: var(--gold); }
+
+/* ---- welcome ---- */
+.kiosk__welcome {
+  text-align: center;
+  padding: 0.1rem 1.6rem 0.7rem;
+  flex-shrink: 0;
+}
+
+.kiosk__welcomeLead {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.kiosk__welcomeSub {
+  margin: 0.3rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ---- conversation: the newest answer leads, the rest recede ---- */
+.kiosk--compact .kiosk__answer > p {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.kiosk--compact .kiosk__log > *:not(:nth-last-child(-n + 2)) { opacity: 0.55; }
+
+.kiosk--compact .kiosk__ask {
+  background: rgba(0, 111, 115, 0.08);
+  border: 1px solid rgba(0, 111, 115, 0.12);
+}
+
+/* ---- controls ---- */
+.kiosk__controls { padding: 0.7rem 1rem 0.2rem; gap: 0.6rem; }
+
+.kiosk__start {
+  background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+  border: 0;
+  padding: 0.68rem 1.5rem;
+  font-size: 0.86rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 24px rgba(0, 111, 115, 0.28);
+  transition: transform 0.2s var(--ease-soft), box-shadow 0.2s var(--ease-soft);
+}
+
+.kiosk__start:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0, 111, 115, 0.34);
+}
+
+.kiosk__ctrl {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(11, 31, 42, 0.1);
+  padding: 0.55rem 1.05rem;
+}
+
+/* A soft ring while it is live, so the microphone reads as open without
+   a red dot or a waveform. */
+@keyframes mic-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 160, 160, 0.28); }
+  50%      { box-shadow: 0 0 0 7px rgba(0, 160, 160, 0); }
+}
+
+.kiosk__mic.is-live { animation: mic-glow 2.6s ease-out infinite; }
+
+/* ---- input ---- */
+.kiosk--compact .kiosk__bar {
+  border-radius: 999px;
+  border: 1px solid rgba(11, 31, 42, 0.09);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 6px 18px rgba(11, 31, 42, 0.06);
+  padding: 0.3rem 0.3rem 0.3rem 0.35rem;
+}
+
+.kiosk--compact .kiosk__bar:focus-within {
+  border-color: rgba(0, 160, 160, 0.45);
+  box-shadow: 0 6px 22px rgba(0, 160, 160, 0.14);
+}
+
+/* ---- entrance ---- */
+@keyframes stage-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+.dock__panel.is-open .kiosk__stage { animation: stage-in 0.5s var(--ease-soft) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk__stage::before,
+  .kiosk__mic.is-live,
+  .dock__panel.is-open .kiosk__stage { animation: none !important; }
+}
+
+/* ---- responsive sizing, driven by the viewport rather than fixed px ----
+
+   The avatar is the hero, so it is the last thing to give way. Order of
+   collapse on a short window: disclaimer, then chips, then the welcome
+   copy, then padding, then the avatar. Controls and input never move. */
+
+.avatar--hero {
+  width: clamp(200px, 29vh, 300px) !important;
+  height: clamp(200px, 29vh, 300px) !important;
+  max-width: min(70vw, 300px);
+  max-height: none;
+}
+
+@media (max-height: 849px) {
+  .avatar--hero { width: clamp(170px, 24vh, 250px) !important; height: clamp(170px, 24vh, 250px) !important; }
+  .kiosk__stage { padding: 1rem 1rem 0.75rem; gap: 0.7rem; }
+  .kiosk__welcomeSub { display: none; }
+}
+
+@media (max-height: 760px) {
+  .avatar--hero { width: clamp(150px, 22vh, 215px) !important; height: clamp(150px, 22vh, 215px) !important; }
+  .kiosk__stage { padding: 0.7rem 1rem 0.55rem; gap: 0.5rem; }
+  .kiosk__welcome { display: none; }
+  .kiosk__status { font-size: 0.78rem; padding: 0.28rem 0.7rem; }
+}
+
+@media (max-height: 620px) {
+  .avatar--hero { width: clamp(130px, 19vh, 170px) !important; height: clamp(130px, 19vh, 170px) !important; }
+  .kiosk__stage { padding: 0.5rem 1rem 0.4rem; }
+  .kiosk--compact .kiosk__head { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+}
+
+/* ---- phone: nearly the whole screen, but inset so it reads as a card ---- */
+@media (max-width: 520px) {
+  .dock { right: 0; left: 0; bottom: 0; }
+  .dock__panel {
+    width: calc(100vw - 1rem);
+    max-width: none;
+    height: calc(100dvh - 1rem);
+    margin: 0.5rem;
+    border-radius: 22px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .avatar--hero { width: clamp(150px, 23vh, 215px) !important; height: clamp(150px, 23vh, 215px) !important; }
+}
+
