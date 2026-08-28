@@ -277,11 +277,25 @@ export default function Assistant({ compact = false }) {
             avatar moved to the stage below, where it can be seen, and
             the actions moved to the foot. */}
         <div className="kiosk__head">
-          <span className={`kiosk__dot kiosk__dot--${state}`} aria-hidden="true" />
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE AI</p>
-            <p className="kiosk__role">{session ? "Conversation active" : "Voice assistant"}</p>
+            <p className="kiosk__role">Voice assistant</p>
           </div>
+          {/* The live state sits in the header, where the concept puts
+              it — a glance target that does not move as the transcript
+              grows. It is a label, not a control. */}
+          {session && (
+            <span className={`kiosk__live kiosk__live--${state}`}>
+              <span className={`kiosk__dot kiosk__dot--${state}`} aria-hidden="true" />
+              {muted
+                ? "Muted"
+                : state === "thinking"
+                ? "Thinking"
+                : state === "answering"
+                ? "Speaking"
+                : "Listening"}
+            </span>
+          )}
           {turns.length > 0 && !session && (
             <button type="button" className="kiosk__reset" onClick={reset} title="Clear the conversation">
               <RotateCcw size={15} aria-hidden="true" />
@@ -295,6 +309,7 @@ export default function Assistant({ compact = false }) {
             source shown square, rounded rather than circular, because a
             circle crops her shoulders and reads as a chat icon. */}
         <div className={`kiosk__stage kiosk__stage--${state}`}>
+          <span className="kiosk__waves" aria-hidden="true" />
           <AssistantAvatar
             className="avatar--hero"
             state={pose}
@@ -302,22 +317,44 @@ export default function Assistant({ compact = false }) {
             mouth={mouth}
             viseme={viseme}
           />
-          <p className={`kiosk__status kiosk__status--${state}`}>
-            <span className="kiosk__pulse" aria-hidden="true" />
-            {session
-              ? muted
-                ? "Muted"
-                : state === "listening"
-                ? "Listening…"
-                : state === "thinking"
-                ? "Thinking…"
-                : state === "answering"
-                ? "Speaking…"
-                : "Connected"
-              : turns.length
-              ? "Ask me anything else"
-              : "Ready when you are"}
-          </p>
+          {/* A card rather than a line, so the state has a second
+              sentence to say what to do about it. Two levels: what is
+              happening, and what the visitor should do. */}
+          <div className={`kiosk__state kiosk__state--${state}`}>
+            <span className="kiosk__wave" aria-hidden="true">
+              <i /><i /><i /><i />
+            </span>
+            <span className="kiosk__stateText">
+              <strong>
+                {session
+                  ? muted
+                    ? "Muted"
+                    : state === "listening"
+                    ? "Listening"
+                    : state === "thinking"
+                    ? "Thinking"
+                    : state === "answering"
+                    ? "Speaking"
+                    : "Connected"
+                  : turns.length
+                  ? "Ask me anything else"
+                  : "Ready when you are"}
+              </strong>
+              <span>
+                {session
+                  ? muted
+                    ? "Unmute when you want to talk."
+                    : state === "listening"
+                    ? "Go ahead, I'm listening…"
+                    : state === "thinking"
+                    ? "One moment…"
+                    : state === "answering"
+                    ? "Talk over me any time."
+                    : "Connected."
+                  : "Start a conversation or type below."}
+              </span>
+            </span>
+          </div>
         </div>
 
         {!turns.length && !session && (

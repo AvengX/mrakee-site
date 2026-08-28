@@ -7205,3 +7205,164 @@ a.contact__info:hover .contact__infoIcon {
   .avatar--hero { width: clamp(150px, 23vh, 215px) !important; height: clamp(150px, 23vh, 215px) !important; }
 }
 
+
+/* ================================================================
+   CONCIERGE SURFACE, second pass — taking the concept's composition
+   without its proportions. The concept is a wide landscape panel; the
+   brief specifies 430-500px, so what carries over is the atmosphere:
+   a luminous ring behind her, gold light moving low across the stage,
+   the live state in the header, and a state card that says what to do
+   rather than only what is happening.
+   ================================================================ */
+
+/* ---- header ---- */
+.kiosk--compact .kiosk__head { gap: 0.7rem; }
+
+.kiosk__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+  padding: 0.34rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(0, 160, 160, 0.22);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--teal-deep);
+  white-space: nowrap;
+}
+
+.kiosk__live--thinking { border-color: rgba(216, 163, 42, 0.3); color: var(--gold-ink); }
+
+/* ---- the ring ----
+   The concept's signature. A single soft ring behind her, gold fading
+   to nothing, sitting inside the existing glow. It does not rotate:
+   a spinning ring is the thing that turns a receptionist into a HUD. */
+.kiosk__stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(96%, 340px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1.5px solid rgba(216, 163, 42, 0.34);
+  box-shadow:
+    0 0 34px rgba(216, 163, 42, 0.16),
+    inset 0 0 34px rgba(216, 163, 42, 0.1);
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes ring-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.72; }
+  50%      { transform: translate(-50%, -50%) scale(1.035); opacity: 1; }
+}
+
+.kiosk__stage--listening::after,
+.kiosk__stage--answering::after { animation: ring-breathe 9s ease-in-out infinite; }
+.kiosk__stage--thinking::after  { border-color: rgba(216, 163, 42, 0.5); }
+
+/* ---- gold light, low and slow ----
+   Two wide, very flat ellipses drifting under her, which is what the
+   concept's light ribbons read as at a glance. Flat and blurred, so
+   they are light rather than lines. */
+.kiosk__stage {
+  overflow: hidden;
+  border-bottom: 1px solid rgba(11, 31, 42, 0.05);
+}
+
+.kiosk__waves {
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  bottom: -6%;
+  height: 46%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(60% 100% at 30% 100%, rgba(216, 163, 42, 0.24), transparent 68%),
+    radial-gradient(52% 100% at 76% 100%, rgba(0, 160, 160, 0.16), transparent 70%);
+  filter: blur(2px);
+}
+
+/* ---- state card ---- */
+.kiosk__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 1.1rem 0.6rem 0.85rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(11, 31, 42, 0.06);
+  box-shadow: 0 10px 26px rgba(11, 31, 42, 0.09);
+  max-width: 92%;
+}
+
+.kiosk__stateText { display: flex; flex-direction: column; min-width: 0; text-align: left; }
+.kiosk__stateText strong { font-size: 0.9rem; font-weight: 600; color: var(--ink); line-height: 1.25; }
+.kiosk__stateText span { font-size: 0.76rem; color: var(--ink-soft); line-height: 1.35; }
+
+/* Four bars, not a real waveform. A live spectrum would be a technical
+   graphic and would have to be driven from the audio; this is a small
+   sign of life beside the words that carry the meaning. */
+.kiosk__wave { display: inline-flex; align-items: center; gap: 3px; height: 20px; flex-shrink: 0; }
+.kiosk__wave i {
+  width: 3px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--teal);
+  display: block;
+}
+
+@keyframes wave-bar {
+  0%, 100% { height: 6px;  opacity: 0.55; }
+  50%      { height: 17px; opacity: 1; }
+}
+
+.kiosk__state--listening .kiosk__wave i,
+.kiosk__state--answering .kiosk__wave i { animation: wave-bar 1.25s ease-in-out infinite; }
+.kiosk__state--listening .kiosk__wave i:nth-child(2) { animation-delay: 0.18s; }
+.kiosk__state--listening .kiosk__wave i:nth-child(3) { animation-delay: 0.36s; }
+.kiosk__state--listening .kiosk__wave i:nth-child(4) { animation-delay: 0.1s; }
+.kiosk__state--answering .kiosk__wave i:nth-child(2) { animation-delay: 0.12s; }
+.kiosk__state--answering .kiosk__wave i:nth-child(3) { animation-delay: 0.26s; }
+.kiosk__state--answering .kiosk__wave i:nth-child(4) { animation-delay: 0.06s; }
+.kiosk__state--thinking .kiosk__wave i { background: var(--gold); }
+.kiosk__state--idle .kiosk__wave i { background: var(--gold); opacity: 0.6; }
+
+/* ---- welcome: a greeting with a gold rule, as in the concept ---- */
+.kiosk__welcome { text-align: center; }
+
+.kiosk__welcomeLead { font-size: 1.06rem; }
+
+.kiosk__welcomeLead::after {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 2px;
+  margin: 0.5rem auto 0.45rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--teal));
+}
+
+/* ---- controls: mute carries the live glow, End a quiet red ---- */
+.kiosk__ctrl:not(.is-muted):not(.kiosk__ctrl--end) { color: var(--teal-deep); border-color: rgba(0, 160, 160, 0.26); }
+
+@keyframes ctrl-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 160, 160, 0.22); }
+  50%      { box-shadow: 0 0 0 8px rgba(0, 160, 160, 0); }
+}
+
+.kiosk__stage--listening ~ .kiosk__controls .kiosk__ctrl:not(.is-muted):not(.kiosk__ctrl--end) {
+  animation: ctrl-glow 2.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk__stage::after,
+  .kiosk__wave i,
+  .kiosk__ctrl { animation: none !important; }
+}
