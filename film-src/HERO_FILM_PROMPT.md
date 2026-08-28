@@ -1,141 +1,212 @@
-# Hero film — replacement clip prompt
+# Hero film prompt — v3
 
-The current `sources/hero.mp4` has three problems. Two are fixable by
-reshooting, one is a legal risk:
+Changed from v2 on client feedback: the kiosk was cut in half by the
+frame edge, the background displays read as small and distant, the kiosk
+screen showed a departures list, and no screen used the brand palette.
 
-1. **Fake text.** The flight board's rows are gibberish — `CAI6A4`,
-   `AAI3AAIAA`. That is the generator, not the encode: the same glyphs
-   are in the untouched 1920x1080 source. Video models cannot draw small
-   body text, so the answer is to not ask them for any.
-2. **CHANEL storefronts** are visible roughly 2.8–5.6s. Someone else's
-   trademark in a client's hero film.
-3. Screens sit where the captions sit, which is why the captions need a
-   frosted plate behind them.
+**Read this first — it is why the kiosk moves inward.** The build
+pipeline crops the right 12% of every frame to remove the generator
+watermark (CROP in build_film.py). Anything in the right third is
+therefore half gone before the site ever loads it. That is exactly what
+happened to the departures kiosk.
 
 ---
 
-## The prompt
+**Format:** 10 seconds, 1920x1080, 24fps, 16:9.
+Three environments connected by **seamless foreground occlusion wipes**.
 
-Paste as one block into Google Flow / Veo.
+**Global visual rules:**
+Maintain identical camera speed, camera height, lens perspective,
+exposure, white balance, colour grade, motion blur and lighting
+consistency throughout. The camera performs one continuous leftward
+tracking movement. **No cuts between scenes.** Every scene change
+happens while a nearby foreground object completely blocks the lens,
+then reveals the next environment.
 
-> Cinematic corporate brand film, one continuous slow camera move
-> through a bright modern airport terminal into an adjoining commercial
-> concourse. Freestanding self-service kiosks and large-format wall
-> displays throughout. Every screen shows oversized graphics only: one
-> large wayfinding arrow, one big abstract data visualisation in teal
-> and amber, smooth motion-graphic colour gradients, simple large icons.
-> No paragraphs, no lists, no tables, no timetable rows, no small text
-> anywhere. Completely unbranded environment — no company names, no
-> logos, no storefront signage, no shop fascias. Natural daylight
-> through a full-height glass curtain wall, polished pale stone floor,
-> warm neutral palette, teal and amber light spilling from the screens.
-> Shallow depth of field, gentle handheld drift, no cuts, no text
-> overlays. Photoreal, cinematic colour grade, 16:9.
+## BRAND PALETTE — every screen in this film
 
-**Negative / avoid list:**
-
-> small text, body text, paragraphs, tabular data, timetable rows,
-> flight schedule, price lists, menus, subtitles, captions, watermarks,
-> logos, brand names, storefront signage, shop names, cluttered signage,
-> crowds, motion blur, cuts, transitions
-
----
-
-## Settings to ask for
-
-| | |
+| Role | Colour |
 |---|---|
-| Length | **10 seconds** — the caption timings are cut to 10s |
-| Resolution | **1920x1080** minimum |
-| Frame rate | **24 fps** (the build samples at 24) |
-| Aspect | 16:9, no letterbox |
+| Primary screen background | Deep Teal #006f73 |
+| Secondary panels and tiles | Teal #00a0a0 |
+| Highlights, icons, key figures | Premium Gold #d8a32a |
+| Text and icons on dark panels | Off White #f7f8f6 |
+| Deepest panel and bezel | Executive Dark #0b1f2a |
+| Alerts only, sparingly | Corporate Red #c81010 |
 
-## Composition constraints from the build pipeline
+Screens read as **teal panels with gold accents and off-white text**. No
+blue corporate dashboards, no white-on-black airport boards, no purple,
+no orange.
 
-* **Keep everything important in the left 88% of frame.** The build
-  crops `iw*0.88` from the left edge to remove the Veo watermark, so the
-  right 12% is discarded. Anything you care about on the right is lost.
-* **Keep clear of the top and bottom 6%** — the same crop takes a 16:9
-  slice out of the middle, losing 65px top and bottom of a 1080 frame.
-* **Leave quiet ground for the captions.** Four sit over this clip; each
-  wants a low-detail area at roughly:
+## THE KIOSK SCREEN — a self-service interface, not a departures list
 
-  | at | position | caption |
-  |---|---|---|
-  | 0.2s | centre | AV Integration made Simple. |
-  | 3.5s | left third | Centrally Managed for Seamless Distribution. |
-  | 7.1s | right third | Spaces that are intuitive to use. |
-  | 9.5s | centre | One Team, One Goal, One Seamless AV experience. |
+The main kiosk displays a **touch self-service home screen**: a grid of
+**four large tiles**, each with one big simple icon and **one or two
+words underneath in large type**.
 
-  A wall, a floor, or an out-of-focus window in those places at those
-  moments. If the reshoot gives clean ground there, the caption plate can
-  be dialled back or dropped — `--cap-plate` in index.css is the one
-  number.
+* Tiles are large, filling most of the screen, generously spaced.
+* Icons are big, simple and pictographic — an aeroplane, a location pin,
+  a headset, a speech bubble.
+* Labels are one or two words at large size. Nothing at body-text size.
+* Tiles in Teal #00a0a0 and Deep Teal #006f73 on an Off White #f7f8f6
+  ground, with one tile picked out in Premium Gold #d8a32a.
+* A slim header strip at the top in Executive Dark #0b1f2a.
 
-## If a screen must carry a word
+**Do not put a dense departures table on the main kiosk.** Rows of small
+flight times render as unreadable scribble at this resolution — the
+previous clip proved it, and the illegible rows are visible in the
+finished film. Large tiles with big icons are the only signage content
+that survives. This applies to every close screen in this film.
 
-Two words maximum, set very large, filling most of the panel. Short
-words survive; "Flight Schedule" came through fine while the rows below
-it did not. Expect to accept whatever spelling it gives you.
+## Opening Frame — Critical
 
-## Rebuilding after you have the clip
+The opening frame must work as a standalone still photograph.
 
-Replace the file, keeping the name `film-src/sources/hero.mp4`, then:
+A tall portrait digital signage kiosk stands **fully inside the frame**,
+screen facing directly toward the camera, showing the four-tile
+interface above.
 
-    python film-src/build_film.py
+**Placement, strict:** the kiosk occupies roughly the **55%-80% band of
+the frame width** — right of centre, with clear empty space between its
+right edge and the frame edge. The entire kiosk, both side bezels and
+its floor stand, visible with room to spare. **No part of the kiosk may
+touch or cross the right 15% of the frame.**
 
-It re-cuts all 239 frames at 1690x950 and rewrites the manifest. Check
-the printed scroll fractions afterwards — if the arc lands differently,
-the caption windows in `FilmStage.jsx` (`in` / `out`) need moving to
-match what the footage is showing at that moment.
+Behind it, a bright premium modern airport concourse with:
 
----
+* Glass curtain wall
+* Pale polished flooring
+* Soft natural daylight
+* Realistic architectural details
+* **A LARGE video wall on the rear wall** — wide and tall, spanning a
+  substantial part of the background, unmistakably a big installed
+  screen rather than a distant sign. Simple bold teal-and-gold panels
+  with a few large words, no fine detail.
 
-## Making the on-screen content legible
+The **left and centre remain spacious, calm and uncluttered**.
 
-Asking a video model for "clear" or "sharp" or "readable" text does
-nothing — it produces confident gibberish at any setting. The only
-lever is to ask for content that is legible by construction.
+No people or crowds.
 
-Append to whichever prompt you use:
+## Scene 1 — Airport | 0-3.2s
 
-> **On-screen content — large graphics only.** Every display and kiosk
-> screen shows one of: a single oversized wayfinding arrow; one very
-> large icon; a bold abstract chart with thick bars and no labels; a
-> smooth teal-and-amber gradient motion graphic; or two words maximum
-> set very large, filling most of the panel in heavy uppercase. Nothing
-> else on any screen. No paragraphs, no lists, no tables, no timetable
-> rows, no menus, no price lists, no small captions, no fine print, no
-> numbers in columns. Screens are clean, high-contrast and uncluttered,
-> like a modern airport wayfinding sign rather than a departures board.
+The camera begins a **smooth, perfectly steady tracking movement from
+right to left at constant speed**.
 
-Avoid list:
+The kiosk stays fully in frame throughout, never sliding under the right
+edge. The large rear video wall stays prominent. Additional displays
+glow through the concourse, all in the brand palette, all with large
+simple content.
 
-> small text, body text, fine print, paragraphs, lists, tables,
-> timetable rows, departure boards, flight schedules, menus, price
-> lists, columns of numbers, subtitles, captions, cluttered screens,
-> dense information displays
+## Transition 1 — Continuous Foreground Occlusion Wipe | 3.2-3.8s
 
-### What survives, measured against the current footage
+**Critical.** The camera **does not stop, accelerate, rotate or cut**.
+It continues tracking left at **exactly the same constant speed**.
 
-"Flight Schedule" and the "MRAKEE TECHNOLOGIES" wordmark on the closing
-kiosks both rendered legibly; the rows under the flight title did not.
+A large structural column very close to the camera enters the foreground
+and gradually fills the entire frame, completely occluding the view for
+roughly half a second.
 
-| survives | fails |
-|---|---|
-| 1–2 words, huge, uppercase | anything at body-text size |
-| big arrows, icons, symbols | rows, columns, tables |
-| large numerals (24/7, 01) | strings of digits, times, prices |
-| bold shapes and gradients | logos of real brands |
+While the lens is hidden, the environment changes seamlessly from
+airport to hotel lobby. As the column continues left and exits frame,
+the lobby is revealed naturally.
 
-Even survivors get misspelled. Pick words where a wrong letter costs
-nothing — WELCOME, ARRIVALS, GATE. The client's own name is not one of
-them: a mangled MRAKEE is worse than no wordmark at all.
+The viewer should feel the camera simply travelled behind a column and
+emerged in a different building. **No visible cut whatsoever.**
 
-### The route that always works
+## Scene 2 — Hotel Lobby | 3.8-6.3s
 
-Screens show abstract motion graphics in brand colours; real text is
-overlaid in HTML on top. Crisp at any resolution, editable without
-regenerating video, legible on a phone. This is what the original
-six-chapter prompts in PROMPTS.md did, and why they carried a blanket
-"no text, no lettering, no words, no numbers" constraint.
+Same leftward tracking, **no change in speed or direction**.
+
+* Warm timber architecture
+* Elegant reception desk
+* **A LARGE digital display wall behind the reception desk** — wide,
+  tall, unmistakably a big installed screen, showing a simple welcome
+  layout in teal and gold with a few large words
+* A tall portrait welcome kiosk, **fully within frame**, same four-tile
+  interface style
+* Premium contemporary materials, warm natural interior lighting
+
+Keep the **left third open**. Keep every screen clear of the right 15%.
+
+## Transition 2 — Continuous Foreground Occlusion Wipe | 6.3-6.9s
+
+**Absolutely no cut.** Same speed, same direction.
+
+A tall planted screen, architectural partition or timber divider passes
+**extremely close to the lens**, gradually filling the frame. While the
+lens is occluded the environment changes to the restaurant. The object
+clears frame, revealing it.
+
+No flash, no brightness shift, no fade, no dissolve, no temporal
+discontinuity.
+
+## Scene 3 — Restaurant | 6.9-8.5s
+
+Same constant leftward tracking.
+
+* **A LARGE menu display wall above the counter** — a wide bank of big
+  screens reading as one large display, Deep Teal with Premium Gold
+  headings and Off White text. Big category headings and large item
+  names only. **No small print, no dense price columns.**
+* Warm evening ambience
+* Realistic food-service counter
+* A table-side ordering screen, fully in frame
+* Warm timber and architectural finishes
+
+Keep the **right third open and uncluttered**.
+
+## Ending — 8.5-10s
+
+The camera slows **smoothly and naturally** to a complete stop.
+
+A single portrait kiosk settles **slightly left of centre**, entirely
+within frame with clear space on all sides.
+
+The screen resolves to the **MRAKEE TECHNOLOGIES logo**: the gold and
+teal M mark above the MRAKEE wordmark, on an Off White #f7f8f6 screen.
+Large, clean, centred, filling most of the display.
+
+Hold completely still for the **final full second**.
+
+## Composition & Safe Area
+
+All kiosks and displays must remain:
+
+* Clear of the top 8%
+* Clear of the bottom 8%
+* **Clear of the outermost 15% on the right — that strip is trimmed in
+  post and anything there is destroyed**
+
+Any screen whose content matters sits **entirely within the left 85%**.
+
+## Environment
+
+All locations completely **unbranded**, except the final MRAKEE
+TECHNOLOGIES logo reveal. No real airport, hotel or restaurant names, no
+storefront brands, no recognisable corporate identities.
+
+## Motion & Transition Priority
+
+**The entire video must feel like one uninterrupted camera shot.**
+
+Camera tracking, foreground object enters, full lens occlusion,
+environment changes invisibly, foreground object exits, new environment
+revealed, identical camera motion continues.
+
+## Strict Avoid List
+
+No flash. No white flash. No light bloom. No lens flare. No exposure
+change. No brightness change. No colour-grade change. No fade to white.
+No fade to black. No cross-dissolve. No jump cut. No hard cut. No glitch
+transition. No speed ramp. No acceleration during transitions. No whip
+pan. No camera shake. No zoom snap. No artificial motion blur. No
+teleporting between environments. No visible scene morphing. No crowds.
+No brand logos except the final MRAKEE TECHNOLOGIES logo. No storefront
+signage. No watermarks. No text overlays.
+
+**New in v3:**
+
+* No kiosk cropped by the frame edge.
+* No dense tables, timetables or price lists on any screen.
+* No small text of any kind on any screen.
+* No blue, purple or orange interface colours.
