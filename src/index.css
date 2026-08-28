@@ -4753,3 +4753,85 @@ a.contact__info:hover .contact__infoIcon {
 @media (max-width: 520px) {
   .avatar--hero { max-height: min(32vh, 215px); max-width: min(58vw, 215px); }
 }
+
+/* ================================================================
+   HEIGHT BREAKPOINTS
+
+   The panel was sized on width alone, so on a short laptop window the
+   avatar kept its 250px, the transcript collapsed to nothing, and the
+   controls and input were pushed past the bottom edge. Height is the
+   axis that was actually constrained.
+
+   The order things give way in is deliberate: the disclaimer goes
+   first, then the greeting, then padding, then the avatar. Mute, End
+   and the input never move — a voice control you cannot reach is worse
+   than a small face.
+   ================================================================ */
+
+/* The frame is the scroll boundary: it must be allowed to shrink so the
+   transcript inside it is what overflows, not the panel. */
+.kiosk--compact .kiosk__frame { min-height: 0; }
+.kiosk--compact .kiosk__log { overflow-y: auto; }
+
+/* Controls and input are pinned by never being allowed to shrink. */
+.kiosk__controls,
+.kiosk--compact .kiosk__bar,
+.kiosk--compact .kiosk__head,
+.kiosk--compact .kiosk__stage { flex-shrink: 0; }
+
+/* The quick-ask chips are the largest optional block in the panel: 144px
+   of wrapped buttons. They are a convenience for typing, and they were
+   what pushed the input past the bottom edge on short windows — the
+   measured overflow at 1024x600 was 17px, and the chips were 144 of it. */
+
+/* ---- compact: 761-849px tall ---- */
+@media (max-height: 849px) {
+  .avatar--hero { max-height: min(30vh, 210px); max-width: min(74vw, 210px); }
+  .kiosk__stage { padding: 0.75rem 1rem 0.6rem; gap: 0.5rem; }
+  .kiosk--compact .kiosk__head { padding-top: 0.7rem; padding-bottom: 0.7rem; }
+  .kiosk__greeting { padding: 0.1rem 1.15rem 0.45rem; font-size: 0.8rem; }
+  .kiosk__fine { font-size: 0.66rem; padding-top: 0.35rem; padding-bottom: 0.35rem; }
+  /* One row that scrolls sideways instead of four that wrap. */
+  .kiosk--compact .kiosk__chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0.4rem;
+  }
+  .kiosk--compact .kiosk__chips::-webkit-scrollbar { display: none; }
+  .kiosk--compact .kiosk__chips button { flex-shrink: 0; }
+}
+
+/* ---- short: 621-760px. 760 rather than 700 because a 720px window
+        overflowed by 7px with the greeting and disclaimer still in. ---- */
+@media (max-height: 760px) {
+  .avatar--hero { max-height: min(26vh, 175px); max-width: min(60vw, 175px); }
+  .kiosk__stage { padding: 0.55rem 1rem 0.45rem; gap: 0.35rem; }
+  .kiosk__status { font-size: 0.8rem; }
+  /* In priority order, these are what a visitor can lose without
+     losing the assistant. Controls and input never move. */
+  .kiosk__greeting { display: none; }
+  .kiosk__fine { display: none; }
+  .kiosk--compact .kiosk__chips { display: none; }
+  .kiosk--compact .kiosk__log { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+}
+
+/* ---- very short: a netbook, or a laptop with devtools open ---- */
+@media (max-height: 620px) {
+  .avatar--hero { max-height: min(24vh, 140px); max-width: min(50vw, 140px); }
+  .kiosk__stage { padding: 0.4rem 1rem 0.35rem; }
+  .kiosk--compact .kiosk__head { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+}
+
+/* One scrolling row at every size, not only on short windows. Wrapped,
+   the chips are 144px of the panel; in a row they are about 44. That
+   difference is what was still clipping the disclaimer off the bottom
+   at 1440x900, where content summed to 766 in a 720 frame. */
+.kiosk--compact .kiosk__chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 0.4rem;
+}
+.kiosk--compact .kiosk__chips::-webkit-scrollbar { display: none; }
+.kiosk--compact .kiosk__chips button { flex-shrink: 0; }
