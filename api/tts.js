@@ -12,6 +12,27 @@
    mute and adding a key needs no code change.
    ================================================================ */
 
+/* Environment variable names are case-sensitive and exact in Node, so
+   ELEVENLABS_API_KEY and eleven_labs_key are simply different variables
+   -- which cost a deployment and two rounds of diagnosis to discover.
+   The canonical names are the ones in README.md; this accepts the
+   obvious spellings of them as well, because a key that is present but
+   spelled differently should not read as "no key at all".
+
+   Matching is on the NORMALISED name: lowercased, with everything that
+   is not a letter or digit removed, and a trailing "apikey" or "key"
+   ignored. So ELEVENLABS_API_KEY, eleven_labs_key, ElevenLabsKey and
+   ELEVEN-LABS-API-KEY all resolve to the same provider. */
+function envKey(provider) {
+  const want = provider.replace(/[^a-z0-9]/gi, "").toLowerCase();
+  for (const [name, value] of Object.entries(process.env)) {
+    if (!value) continue;
+    const n = name.toLowerCase().replace(/[^a-z0-9]/g, "").replace(/(api)?key$/, "");
+    if (n === want) return value;
+  }
+  return null;
+}
+
 const MAX_CHARS = 900;
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 30; // roughly a continuous conversation, not a scraper
@@ -51,7 +72,7 @@ async function elevenVoiceId(key, configured) {
 }
 
 async function speakElevenLabs(text, opts) {
-  const key = process.env.ELEVENLABS_API_KEY;
+  const key = envKey("elevenlabs");
   if (!key) return null;
 
   const id = await elevenVoiceId(key, opts?.voiceId);
@@ -89,7 +110,7 @@ async function speakElevenLabs(text, opts) {
 }
 
 async function speakOpenAI(text, opts) {
-  const key = process.env.OPENAI_API_KEY;
+  const key = envKey("openai");
   if (!key) return null;
 
   const r = await fetch("https://api.openai.com/v1/audio/speech", {
@@ -165,9 +186,9 @@ export default async function handler(req, res) {
      to be one of them, which is what catches ELEVEN_LABS_API_KEY and
      friends. No value is ever read or returned. */
   const configured = {
-    ELEVENLABS_API_KEY: !!process.env.ELEVENLABS_API_KEY,
-    OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
-    ANTHROPIC_API_KEY: !!process.env.ANTHROPIC_API_KEY,
+    elevenlabs: !!envKey("elevenlabs"),
+    openai: !!envKey("openai"),
+    anthropic: !!envKey("anthropic"),
   };
   const lookalikes = Object.keys(process.env).filter(
     (k) => /eleven|tts|voice|speech/i.test(k) && !(k in configured)
