@@ -106,3 +106,27 @@ export function buildTimeline({ characters, character_start_times_seconds, chara
   }
   return out;
 }
+
+/* ----------------------------------------------------------------
+   Openness (0..1) to a mouth SHAPE.
+
+   The amplitude path used to cross-fade avatar-answering over
+   avatar-idle at the openness value. Both are complete, opaque faces,
+   so any opacity between 0 and 1 painted BOTH — the baked smile showing
+   through the open mouth, which is the double mouth. It ghosted the
+   eyes too, since those two renders differ there as well.
+
+   Compositing two faces is the mistake. This picks ONE of the viseme
+   images already anchored to her mouth, and it is drawn fully opaque,
+   so there is exactly one mouth on screen at every moment.
+
+   The thresholds are a vowel ladder rather than arbitrary: a mouth
+   opens through roughly these shapes as a voice gets louder.
+   ---------------------------------------------------------------- */
+export function visemeForOpenness(v) {
+  if (v < 0.10) return null;   // closed: the base face already has that
+  if (v < 0.28) return "LDNT";
+  if (v < 0.48) return "E";
+  if (v < 0.70) return "O";
+  return "A";
+}

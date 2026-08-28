@@ -4509,10 +4509,9 @@ a.contact__info:hover .contact__infoIcon {
   border-radius: 50%;
 }
 
-/* No transition on opacity. The value already arrives smoothed, at
-   frame rate, from the lip-sync driver — a CSS transition on top of
-   that adds a second lag and the mouth falls behind the voice. */
-.avatar__mouthFrame { will-change: opacity; }
+/* Nothing animates opacity on a face layer any more — a face drawn at
+   partial opacity shows the face beneath it, which is what put two
+   mouths on screen. The hint is left off deliberately. */
 
 /* Breathing, for the still avatar. Two pixels over four seconds: enough
    that the face is not frozen, not enough to notice as animation. */
@@ -4531,23 +4530,21 @@ a.contact__info:hover .contact__infoIcon {
    90ms is under a syllable at normal speech, so it softens the change
    without letting the mouth lag behind the voice. Longer and it turns
    to mush; shorter and it flickers. */
+/* NO OPACITY ANIMATION, and that is the fix rather than an omission.
+
+   This used to fade in from 0.25. The viseme images are complete,
+   opaque faces, so any opacity below 1 painted the base face through
+   them — the baked smile showing inside the open mouth, plus ghosted
+   eyes, since idle and answering differ there too. A crossfade between
+   two faces cannot look like one face.
+
+   Smoothness comes from the shape sequence instead. Visemes change
+   every 50-150ms, which is fast enough that a hard swap reads as
+   movement; it is how drawn animation has always worked. */
 .avatar__viseme {
   position: absolute;
   inset: 0;
   opacity: 1;
-  animation: viseme-in 90ms linear;
-  will-change: opacity;
-}
-
-@keyframes viseme-in {
-  from { opacity: 0.25; }
-  to   { opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* The mouth still moves — it is speech, not decoration — but the
-     crossfade is dropped so nothing dissolves. */
-  .avatar__viseme { animation: none; }
 }
 
 /* Muted: the session is still live, the input is not. Distinct from

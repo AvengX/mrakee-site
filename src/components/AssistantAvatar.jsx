@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { visemeForOpenness } from "../lib/voice/visemeMap.js";
 
 /* ================================================================
    The assistant's face.
@@ -122,16 +123,21 @@ export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, 
           )}
 
           {/* AMPLITUDE PATH, for providers that send no alignment and
-              for the browser voice. Suppressed while a viseme is
-              showing so the two never fight over the same mouth. */}
-          {pose === "answering" && !viseme && (
+              for the browser voice.
+
+              It picks a viseme by loudness and draws it FULLY OPAQUE.
+              It used to cross-fade the whole answering face over the
+              idle one at the openness value, and because both are
+              complete opaque faces, every intermediate opacity painted
+              two mouths at once — the baked smile showing through the
+              open one. One face at a time, always. */}
+          {pose === "answering" && !viseme && visemeForOpenness(open) && (
             <img
-              className="avatar__mouthFrame"
-              src={fileFor("answering")}
+              className="avatar__viseme"
+              src={`assistant/visemes/${visemeForOpenness(open)}.webp`}
               alt=""
               width={size}
               height={size}
-              style={{ opacity: open }}
             />
           )}
           {pose !== "answering" && custom !== fileFor("idle") && (
