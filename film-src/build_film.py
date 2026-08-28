@@ -44,19 +44,28 @@ FPS = 24
 #
 # So resolution was the lever and quality was not: q90 costs another
 # 11 MB to gain 0.2%, and scaling beyond the source actively loses.
-WIDTH = 1690
+# NATIVE. Was 1690 wide, which was the source cropped to remove the
+# watermark; the crop is gone (see CROP below) so this is now the source's
+# own 1920x1080 and `scale` is an identity operation. Nothing is resampled
+# at any point between the mp4 and the browser.
+WIDTH = 1920
 HEIGHT = 1080       # forced, so the 1080p and 720p sources land identically
 XFADE = 5           # frames of crossfade between chapters (~0.4s)
-QUALITY = 82
+QUALITY = 90        # raised with the resolution: full quality was asked for
 
-# Watermark sits at x 89.3-92.7%, y 81.6-88.8% of frame in every clip, so
-# keeping 88% of the WIDTH is what clears it. The height used to be trimmed
-# to match, "restoring 16:9" — but the canvas is cover-fit, so it crops
-# whatever does not fit anyway and the frame's aspect never mattered. That
-# trim was discarding 130 rows of source for nothing, and height is exactly
-# what constrains a 100vh stage on a tall window: on a phone the cover-fit
-# upscale drops from 1.71x to 1.50x by keeping them.
-CROP = "crop=iw*0.88:ih:0:0"
+# NO CROP. It existed only to cut the generator's watermark off the right
+# edge, and it cost 12% of the width of every frame to do it — which is
+# also what sliced the kiosk in half in the last clip.
+#
+# The watermark is now covered rather than cut: the assistant's greeter
+# figure is fixed to the bottom-right of every page and sits over it. In
+# this clip the sparkle centres on frame (1740, 898), which is 90.6% across
+# and 83.1% down. Verified against the greeter's own rectangle at four
+# viewport sizes rather than assumed — see the note in the commit.
+#
+# The trade is deliberate: full frame and full width, and one asset doing
+# double duty, instead of throwing away real picture on every frame.
+CROP = None
 
 # (keyword, label, start, duration) — segments chosen from the QC sheets
 CHAPTERS = [
@@ -88,7 +97,7 @@ def extract(src, start, dur, dest):
     os.makedirs(dest, exist_ok=True)
     subprocess.run(
         [EXE, "-y", "-ss", str(start), "-t", str(dur), "-i", src,
-         "-vf", f"{CROP},scale={WIDTH}:{HEIGHT},fps={FPS}",
+         "-vf", f"{CROP + ',' if CROP else ''}scale={WIDTH}:{HEIGHT},fps={FPS}",
          "-start_number", "0", os.path.join(dest, "%04d.png")],
         capture_output=True, check=True,
     )

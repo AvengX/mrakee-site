@@ -1,7 +1,7 @@
 {
   "count": 239,
   "fps": 24,
-  "width": 1690,
+  "width": 1920,
   "height": 1080,
   "pattern": "frames/film/%04d.webp",
   "chapters": [
