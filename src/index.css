@@ -4549,3 +4549,14 @@ a.contact__info:hover .contact__infoIcon {
      crossfade is dropped so nothing dissolves. */
   .avatar__viseme { animation: none; }
 }
+
+/* Muted: the session is still live, the input is not. Distinct from
+   both idle and listening, because "connected but not hearing you" is a
+   state a visitor has to be able to see at a glance. */
+.kiosk__mic.is-muted {
+  color: var(--red);
+  border-color: var(--red);
+  background: rgba(200, 16, 16, 0.08);
+}
+
+.kiosk__mic.is-muted:hover { background: rgba(200, 16, 16, 0.14); }

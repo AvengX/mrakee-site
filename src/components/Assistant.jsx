@@ -3,7 +3,8 @@ import { Mic, MicOff, SendHorizontal, RotateCcw, Volume2, VolumeX, Radio, Square
 import { QUICK_ASKS } from "../lib/assistantPrompt";
 import { SOLUTIONS } from "../content/mrakee";
 import AssistantAvatar from "./AssistantAvatar";
-import { canListen, canSpeak, listen, speak, stopSpeaking, SPEECH_ERRORS, ensureMicPermission, watchForSpeech } from "../lib/speech";
+import { canListen, canSpeak, speak, stopSpeaking, SPEECH_ERRORS } from "../lib/speech";
+import { createVoiceSession } from "../lib/voice/session.js";
 
 /* ================================================================
    THE ASSISTANT — built as a kiosk, not a chat bubble
@@ -38,7 +39,6 @@ export default function Assistant({ compact = false }) {
   const [error, setError] = useState(null);
   const logRef = useRef(null);
   const inputRef = useRef(null);
-  const micRef = useRef(null);
   /* Speaking replies aloud is OFF until someone actually uses the
      microphone. If you type, it stays silent; if you talk to it, it
      talks back. Sound that starts on its own is the fastest way to make
@@ -53,20 +53,29 @@ export default function Assistant({ compact = false }) {
   /* The current mouth SHAPE, when the provider gave us alignment.
      null means no alignment and the amplitude path is driving. */
   const [viseme, setViseme] = useState(null);
-  /* Hands-free mode: listen, answer, speak, listen again, until it is
-     stopped. Driven from refs rather than state because the loop is
-     rebuilt inside async callbacks, where a captured `convo` would be
-     whatever it was when the turn started. */
-  const [convo, setConvo] = useState(false);
-  const convoRef = useRef(false);
-  const silentRef = useRef(0);
-  /* True from the moment the mic is asked for until it is stopped. The
-     permission prompt is awaited, and a visitor can dismiss the whole
-     assistant while it is open — without this the recogniser would then
-     start against an interface that is gone. */
-  const micLive = useRef(false);
-  // Tears down the barge-in listener; set while the assistant is talking.
-  const bargeRef = useRef(null);
+  /* THE SESSION, which is a different thing from the turn.
+
+     sessionActive says the microphone is open and the conversation is
+     running. `state` says what is happening in THIS turn — listening,
+     thinking, answering. A session survives every one of those; only
+     End ends it.
+
+     Mirrored into refs because the turn loop is rebuilt inside async
+     callbacks, where a captured value would be whatever it was when the
+     turn started rather than what it is now. */
+  const [session, setSession] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const sessionRef = useRef(null);
+  const sessionOn = useRef(false);
+  /* ask() through a ref, and this is load-bearing rather than tidy.
+     The session's callbacks are created ONCE, when the session starts,
+     so a direct reference to ask() would be the one from that render —
+     capturing `turns` as it was then. Every later turn would rebuild
+     the transcript from the first render's history and overwrite
+     everything since. Measured: five utterances, one turn in the log. */
+  const askRef = useRef(null);
+
+  askRef.current = ask;
 
   useEffect(() => {
     // keep the newest answer in view without yanking the whole page
@@ -78,6 +87,12 @@ export default function Assistant({ compact = false }) {
     if (!question || state === "thinking") return;
 
     stopSpeaking();
+    /* Recognition off while the answer is being fetched. The microphone
+       stays open, but a recogniser left running here picks up room
+       noise and the tail of the visitor's own sentence, and queues a
+       second question nobody asked. It comes back on when the reply
+       finishes speaking. */
+    sessionRef.current?.pause();
     const history = [...turns, { role: "user", content: question }];
     setTurns(history);
     setDraft("");
@@ -121,42 +136,43 @@ export default function Assistant({ compact = false }) {
       // being spoken, hold it until the voice actually stops rather
       // than guessing a duration.
       setState("answering");
-      if ((voice || convoRef.current) && canSpeak) {
+      if ((voice || sessionOn.current) && canSpeak) {
         speak(data.reply, {
           onMouth: setMouth,
           onViseme: setViseme,
           onStart: () => {
-            /* Barge-in, and only in hands-free mode. If the visitor is
-               typing, audio they can already stop with the Sound button
-               does not need the microphone open on top. */
-            if (!convoRef.current) return;
-            bargeRef.current = watchForSpeech({
-              onSpeech: () => {
-                /* Order matters. stopSpeaking() tears the lip-sync
-                   driver down first and it emits a final 0, but the
-                   mouth is zeroed here too so there is no frame in
-                   which the audio has stopped and the face is still
-                   moving. */
-                stopSpeaking();
-                setMouth(0);
-                setViseme(null);
-                stopBarge();
-                /* Straight into listening rather than waiting for the
-                   utterance to end — the whole point is not waiting. */
-                startListening();
-              },
+            const s = sessionRef.current;
+            if (!s) return;
+            /* Recognition off, microphone still open. This is the line
+               that stops the assistant answering itself: left running,
+               it transcribes its own voice and replies to that,
+               forever. The stream stays live underneath, which is what
+               lets barge-in watch the same device without a second
+               getUserMedia. */
+            s.pause();
+            s.watchBargeIn(() => {
+              stopSpeaking();
+              setMouth(0);
+              setViseme(null);
+              s.stopBargeIn();
+              /* Straight back to listening rather than waiting for the
+                 sentence to finish — not waiting is the entire point. */
+              setState("listening");
+              s.listen();
             });
           },
           onEnd: () => {
-            stopBarge();
             setMouth(0);
             setViseme(null);
-            setState((st) => (st === "answering" ? "idle" : st));
-            /* Reopen the microphone only once the voice has actually
-               stopped. A recogniser open during playback transcribes the
-               assistant and answers its own reply. */
-            if (convoRef.current && micLive.current === false) {
-              setTimeout(() => startListening(), 300);
+            const s = sessionRef.current;
+            s?.stopBargeIn();
+            /* THE FIX. The audio finishing is the cue to listen again,
+               not the cue to stop. No click between turns. */
+            if (sessionOn.current && s) {
+              setState("listening");
+              s.listen();
+            } else {
+              setState((st) => (st === "answering" ? "idle" : st));
             }
           },
         });
@@ -169,127 +185,74 @@ export default function Assistant({ compact = false }) {
     }
   }
 
-  async function startListening(lang) {
-    if (!canListen || state === "thinking") return;
-    stopSpeaking();
+  /* ---- the session ---- */
+
+  async function startSession() {
+    if (sessionOn.current) return;
     setError(null);
     setHeard("");
+    setVoice(true);
+
+    const s = createVoiceSession({
+      onPartial: setHeard,
+      onUtterance: (text) => {
+        setHeard("");
+        askRef.current?.(text);
+      },
+      onListening: () => {
+        /* Only claim to be listening if that is actually what is
+           happening. Recognition restarting mid-answer must not
+           overwrite "Speaking". */
+        setState((st) => (st === "thinking" || st === "answering" ? st : "listening"));
+      },
+      onError: ({ code, message }) => {
+        /* A session that has genuinely stopped must never leave the
+           interface saying "Listening". */
+        if (code === "not-allowed" || code === "audio-capture" || code === "recognition-unstable") {
+          endSession();
+          setState("error");
+          setError({ text: SPEECH_ERRORS[code] || message, offerEnquiry: false });
+        }
+      },
+    });
+
+    sessionRef.current = s;
+    const ok = await s.start(); // the ONLY permission request of the session
+    if (!ok) { sessionRef.current = null; return; }
+
+    sessionOn.current = true;
+    setSession(true);
     setState("listening");
-    setVoice(true);
-    micLive.current = true;
-
-    /* Settle the permission question first, so the prompt cannot eat
-       the visitor's first sentence. Once granted this resolves without
-       a prompt, so it costs a tick on every later turn and a round of
-       confusion only on the first. */
-    try {
-      await ensureMicPermission();
-    } catch (e) {
-      micLive.current = false;
-      endConversation();
-      setState("error");
-      setError({
-        text: SPEECH_ERRORS[e?.name === "NotFoundError" ? "audio-capture" : "not-allowed"],
-        offerEnquiry: false,
-      });
-      return;
-    }
-    if (!micLive.current) return; // stopped while the prompt was open
-
-    const session = listen({ onPartial: setHeard, lang });
-    micRef.current = session;
-    session.start();
-
-    session.promise
-      .then((text) => {
-        micRef.current = null;
-        setHeard("");
-        if (text) {
-          silentRef.current = 0;
-          ask(text);
-          return;
-        }
-        setState("idle");
-        heardNothing();
-      })
-      .catch((err) => {
-        micRef.current = null;
-        setHeard("");
-
-        /* The visitor pressed stop. Not a failure, and not something to
-           tell them about — they know. */
-        if (err.code === "aborted") { setState("idle"); return; }
-
-        /* en-IN is not in every browser's voice pack. Fall back once to
-           en-US rather than reporting a failure the visitor cannot act
-           on. */
-        if (err.code === "language-not-supported" && lang !== "en-US") {
-          startListening("en-US");
-          return;
-        }
-
-        /* Silence is not an error condition, whatever the spec calls
-           it: Chrome raises no-speech for a pause as ordinary as
-           thinking about the question. It takes the same path as an
-           empty result. */
-        if (err.code === "no-speech") { setState("idle"); heardNothing(); return; }
-
-        endConversation();
-        setState("error");
-        setError({
-          text: SPEECH_ERRORS[err.code] || "The microphone could not be started. You can still type your question.",
-          offerEnquiry: false,
-        });
-      });
+    s.listen();
   }
 
-  /* Nothing came back. Say so — a microphone that opens, closes and
-     leaves no trace is indistinguishable from one that is broken, which
-     is exactly how this read to the client. */
-  function heardNothing() {
-    if (!convoRef.current) {
-      setError({ text: SPEECH_ERRORS["no-speech"], offerEnquiry: false });
-      return;
-    }
-    silentRef.current += 1;
-    if (silentRef.current >= 3) endConversation();
-    else setTimeout(() => startListening(), 300);
-  }
-
-  function stopBarge() {
-    if (bargeRef.current) { bargeRef.current(); bargeRef.current = null; }
-  }
-
-  function stopListening() {
-    micLive.current = false;
-    micRef.current?.stop();
-  }
-
-  function beginConversation() {
-    if (!canListen) return;
-    convoRef.current = true;
-    silentRef.current = 0;
-    setConvo(true);
-    setVoice(true);
-    startListening(undefined);
-  }
-
-  function endConversation() {
-    stopBarge();
-    setMouth(0);
-    micLive.current = false;
-    convoRef.current = false;
-    setConvo(false);
-    micRef.current?.abort();
+  function endSession() {
+    sessionOn.current = false;
+    setSession(false);
+    setMuted(false);
+    sessionRef.current?.stop(); // the only place the device is released
+    sessionRef.current = null;
     stopSpeaking();
+    setMouth(0);
+    setViseme(null);
+    setHeard("");
     setState("idle");
   }
 
+  /* Mute stops the input, not the session. The stream stays open, the
+     conversation stays alive, and unmuting resumes without another
+     permission prompt. */
+  function toggleMute() {
+    const s = sessionRef.current;
+    if (!s) return;
+    setMuted(s.setMuted(!s.muted));
+  }
+
   // never leave a microphone open or a voice talking to an empty page
-  useEffect(() => () => { convoRef.current = false; micRef.current?.abort(); stopSpeaking(); }, []);
+  useEffect(() => () => { sessionOn.current = false; sessionRef.current?.stop(); stopSpeaking(); }, []);
 
   const reset = () => {
-    endConversation();
+    endSession();
     setTurns([]);
     setError(null);
     setState("idle");
@@ -312,16 +275,16 @@ export default function Assistant({ compact = false }) {
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE Assistant</p>
             <p className="kiosk__hint">
-              {convo
-                ? state === "listening"
-                  ? "Listening — just speak."
+              {session
+                ? muted
+                  ? "Muted — unmute when you want to talk."
+                  : state === "listening"
+                  ? "Listening — just talk, no need to press anything."
                   : state === "thinking"
                   ? "Thinking…"
                   : state === "answering"
-                  ? "Speaking — I'll listen again when I finish."
-                  : "Conversation on."
-                : listening
-                ? "Listening — ask about a room, a space or a solution."
+                  ? "Speaking — talk over me any time."
+                  : "Connected."
                 : turns.length
                 ? "Ask me anything else about what we build."
                 : GREETING}
@@ -330,17 +293,17 @@ export default function Assistant({ compact = false }) {
           {canListen && (
             <button
               type="button"
-              className={`kiosk__convo${convo ? " is-live" : ""}`}
-              onClick={convo ? endConversation : beginConversation}
-              aria-pressed={convo}
-              title={convo ? "End the conversation" : "Talk to it hands-free"}
+              className={`kiosk__convo${session ? " is-live" : ""}`}
+              onClick={session ? endSession : startSession}
+              aria-pressed={session}
+              title={session ? "End the conversation" : "Start a voice conversation"}
             >
-              {convo
+              {session
                 ? <><Square size={13} aria-hidden="true" />End</>
-                : <><Radio size={15} aria-hidden="true" />Talk</>}
+                : <><Radio size={15} aria-hidden="true" />Talk to us</>}
             </button>
           )}
-          {voice && canSpeak && !convo && (
+          {voice && canSpeak && !session && (
             <button
               type="button"
               className="kiosk__mute"
@@ -451,16 +414,28 @@ export default function Assistant({ compact = false }) {
               recognition — Firefox has none and iOS Safari is
               unreliable — so the control does not appear and vanish
               between machines. The typed path never depends on it. */}
+          {/* One control, two jobs, and never "record one sentence".
+              With no session it starts one; during a session it mutes
+              and unmutes, which leaves the session and the microphone
+              stream alive. */}
           <button
             type="button"
-            className={`kiosk__mic${listening ? " is-live" : ""}`}
-            onClick={listening ? stopListening : startListening}
-            disabled={!canListen || state === "thinking"}
-            title={canListen ? (listening ? "Stop listening" : "Ask by voice") : "Voice input is not supported in this browser"}
-            aria-label={listening ? "Stop listening" : "Ask by voice"}
-            aria-pressed={listening}
+            className={`kiosk__mic${session && !muted ? " is-live" : ""}${muted ? " is-muted" : ""}`}
+            onClick={session ? toggleMute : startSession}
+            disabled={!canListen}
+            title={
+              !canListen
+                ? "Voice input is not supported in this browser"
+                : session
+                ? muted ? "Unmute the microphone" : "Mute the microphone"
+                : "Start a voice conversation"
+            }
+            aria-label={
+              session ? (muted ? "Unmute the microphone" : "Mute the microphone") : "Start a voice conversation"
+            }
+            aria-pressed={session && !muted}
           >
-            {canListen ? <Mic size={18} aria-hidden="true" /> : <MicOff size={18} aria-hidden="true" />}
+            {!canListen || muted ? <MicOff size={18} aria-hidden="true" /> : <Mic size={18} aria-hidden="true" />}
           </button>
           <input
             ref={inputRef}
