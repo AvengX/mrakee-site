@@ -161,7 +161,11 @@ export default async function handler(req, res) {
          voice down — fall through to the next one, and to the browser
          if there is none. */
       console.error("tts", name, e.message);
-      tried.push(`${name}:${e.message.slice(0, 60)}`);
+      /* 60 characters truncated the upstream body to
+         {"detail":{"type":"authentication_error","co -- cutting off the
+         reason at exactly the point it becomes useful, and costing a
+         round trip to discover. */
+      tried.push(`${name}: ${e.message.slice(0, 400)}`);
     }
   }
 
