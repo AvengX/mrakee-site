@@ -11,6 +11,8 @@ Frames land in public/frames/film/. Memory-safe: frames are streamed one at
 a time rather than held as a list of decoded images.
 """
 import glob, json, os, shutil, subprocess, sys
+import numpy as np
+import cv2
 import imageio_ffmpeg
 from PIL import Image
 
@@ -93,6 +95,55 @@ CHAPTERS = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# The generator's sparkle, painted out rather than cropped off.
+#
+# Cropping cost 12% of the width of every frame and is what sliced the
+# kiosk in half in an earlier clip. This removes the mark instead of the
+# picture: cv2.inpaint reconstructs the covered pixels from the ring of
+# real pixels around them, which on the soft backgrounds the mark happens
+# to sit on is invisible.
+#
+# The mask was derived rather than drawn. The mark is static and the scene
+# is not, so averaging (frame - medianBlur(frame)) across the film leaves
+# the sparkle and cancels everything else; the shape that survives is
+# filled and dilated by 13px, because the mark has a soft edge and
+# inpainting has to start on pixels that are genuinely clean.
+MASK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "watermark_mask.png")
+_mask = None
+_box = None
+
+
+def _load_mask():
+    global _mask, _box
+    if _mask is not None:
+        return
+    m = cv2.imread(MASK_PATH, cv2.IMREAD_GRAYSCALE)
+    if m is None:
+        raise SystemExit(f"watermark mask missing: {MASK_PATH}")
+    ys, xs = np.where(m > 0)
+    pad = 40  # inpainting needs real pixels around the hole to work from
+    _box = (max(0, xs.min() - pad), max(0, ys.min() - pad),
+            min(m.shape[1], xs.max() + pad), min(m.shape[0], ys.max() + pad))
+    _mask = m
+
+
+def dewatermark(im):
+    """Paint the sparkle out of a PIL image, in place of cropping it off."""
+    _load_mask()
+    x0, y0, x1, y1 = _box
+    a = np.asarray(im.convert("RGB"))
+    if a.shape[0] != _mask.shape[0] or a.shape[1] != _mask.shape[1]:
+        return im  # not the geometry the mask was measured on; leave it alone
+    # Inpaint only the window around the mark: the same result as running
+    # it on the whole frame, a fraction of the work.
+    win = np.ascontiguousarray(a[y0:y1, x0:x1])
+    fixed = cv2.inpaint(win, _mask[y0:y1, x0:x1], 4, cv2.INPAINT_TELEA)
+    out = a.copy()
+    out[y0:y1, x0:x1] = fixed
+    return Image.fromarray(out)
+
+
 def extract(src, start, dur, dest):
     os.makedirs(dest, exist_ok=True)
     subprocess.run(
@@ -159,6 +210,7 @@ def main():
             )
         else:
             im = Image.open(item).convert("RGB")
+        im = dewatermark(im)
         im.save(os.path.join(OUTDIR, f"{idx:04d}.webp"), "WEBP", quality=QUALITY)
         im.close()
 
