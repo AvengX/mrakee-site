@@ -37,7 +37,7 @@ const baseFor = (pose) =>
 const fileFor = (pose) => `${baseFor(pose)}.${resolvedExt}`;
 let resolvedExt = EXTS[0];
 
-export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, viseme = null }) {
+export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, viseme = null, className = "" }) {
   const pose = POSES.includes(state) ? state : "idle";
   const [custom, setCustom] = useState(null);
 
@@ -85,7 +85,7 @@ export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, 
 
   return (
     <span
-      className={`avatar avatar--${state}`}
+      className={`avatar avatar--${state}${className ? " " + className : ""}`}
       style={{ width: size, height: size }}
       aria-hidden="true"
     >

@@ -270,62 +270,59 @@ export default function Assistant({ compact = false }) {
   return (
     <div className={`kiosk${compact ? " kiosk--compact" : ""}`}>
       <div className="kiosk__frame">
+        {/* HEADER: identity only. It used to carry the avatar, the
+            status line, Talk to us, Sound and Start again all at once
+            — 160px of stacked controls, with its own "Talk to us"
+            sitting directly under the site's gold one in the nav. The
+            avatar moved to the stage below, where it can be seen, and
+            the actions moved to the foot. */}
         <div className="kiosk__head">
-          <AssistantAvatar state={pose} size={compact ? 44 : 84} mouth={mouth} viseme={viseme} />
+          <span className={`kiosk__dot kiosk__dot--${state}`} aria-hidden="true" />
           <div className="kiosk__intro">
-            <p className="kiosk__name">MRAKEE Assistant</p>
-            <p className="kiosk__hint">
-              {session
-                ? muted
-                  ? "Muted — unmute when you want to talk."
-                  : state === "listening"
-                  ? "Listening — just talk, no need to press anything."
-                  : state === "thinking"
-                  ? "Thinking…"
-                  : state === "answering"
-                  ? "Speaking — talk over me any time."
-                  : "Connected."
-                : turns.length
-                ? "Ask me anything else about what we build."
-                : GREETING}
-            </p>
+            <p className="kiosk__name">MRAKEE AI</p>
+            <p className="kiosk__role">{session ? "Conversation active" : "Voice assistant"}</p>
           </div>
-          {canListen && (
-            <button
-              type="button"
-              className={`kiosk__convo${session ? " is-live" : ""}`}
-              onClick={session ? endSession : startSession}
-              aria-pressed={session}
-              title={session ? "End the conversation" : "Start a voice conversation"}
-            >
-              {session
-                ? <><Square size={13} aria-hidden="true" />End</>
-                : <><Radio size={15} aria-hidden="true" />Talk to us</>}
-            </button>
-          )}
-          {voice && canSpeak && !session && (
-            <button
-              type="button"
-              className="kiosk__mute"
-              onClick={() => {
-                stopSpeaking();
-                setVoice((v) => !v);
-                setState((st) => (st === "answering" ? "idle" : st));
-              }}
-              aria-pressed={!voice}
-              title={voice ? "Stop speaking answers" : "Speak answers aloud"}
-            >
-              {voice ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />}
-              {voice ? "Sound on" : "Sound off"}
-            </button>
-          )}
-          {turns.length > 0 && (
-            <button type="button" className="kiosk__reset" onClick={reset}>
+          {turns.length > 0 && !session && (
+            <button type="button" className="kiosk__reset" onClick={reset} title="Clear the conversation">
               <RotateCcw size={15} aria-hidden="true" />
               Start again
             </button>
           )}
         </div>
+
+        {/* THE STAGE. The avatar is the point of a voice assistant, so
+            it gets the room: a portrait, not a profile chip. Square
+            source shown square, rounded rather than circular, because a
+            circle crops her shoulders and reads as a chat icon. */}
+        <div className="kiosk__stage">
+          <AssistantAvatar
+            className="avatar--hero"
+            state={pose}
+            size={compact ? 250 : 300}
+            mouth={mouth}
+            viseme={viseme}
+          />
+          <p className={`kiosk__status kiosk__status--${state}`}>
+            <span className="kiosk__pulse" aria-hidden="true" />
+            {session
+              ? muted
+                ? "Muted"
+                : state === "listening"
+                ? "Listening…"
+                : state === "thinking"
+                ? "Thinking…"
+                : state === "answering"
+                ? "Speaking…"
+                : "Connected"
+              : turns.length
+              ? "Ask me anything else"
+              : "Ready when you are"}
+          </p>
+        </div>
+
+        {!turns.length && !session && (
+          <p className="kiosk__greeting">{GREETING}</p>
+        )}
 
         <div
           className="kiosk__log"
@@ -402,6 +399,51 @@ export default function Assistant({ compact = false }) {
             ))}
           </ul>
         )}
+
+        {/* THE CONTROLS, at the foot where a phone call puts them,
+            rather than crowded into the header over the avatar. Mute
+            and End only exist while a session does. */}
+        <div className="kiosk__controls">
+          {!session && canListen && (
+            <button type="button" className="kiosk__start" onClick={startSession}>
+              <Radio size={16} aria-hidden="true" />
+              Talk to us
+            </button>
+          )}
+          {session && (
+            <>
+              <button
+                type="button"
+                className={`kiosk__ctrl${muted ? " is-muted" : ""}`}
+                onClick={toggleMute}
+                aria-pressed={muted}
+              >
+                {muted ? <MicOff size={15} aria-hidden="true" /> : <Mic size={15} aria-hidden="true" />}
+                {muted ? "Unmute" : "Mute"}
+              </button>
+              <button type="button" className="kiosk__ctrl kiosk__ctrl--end" onClick={endSession}>
+                <Square size={13} aria-hidden="true" />
+                End
+              </button>
+            </>
+          )}
+          {voice && canSpeak && !session && (
+            <button
+              type="button"
+              className="kiosk__ctrl"
+              onClick={() => {
+                stopSpeaking();
+                setVoice((v) => !v);
+                setState((st) => (st === "answering" ? "idle" : st));
+              }}
+              aria-pressed={!voice}
+              title={voice ? "Stop speaking answers" : "Speak answers aloud"}
+            >
+              {voice ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />}
+              {voice ? "Sound on" : "Sound off"}
+            </button>
+          )}
+        </div>
 
         <form
           className="kiosk__bar"
