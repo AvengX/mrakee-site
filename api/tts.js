@@ -141,6 +141,40 @@ export default async function handler(req, res) {
   const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
   if (rateLimited(ip)) return res.status(429).json({ error: "slow-down" });
 
+  /* AUTH ONLY. Verifies the key against /v1/voices and returns without
+     synthesising anything, so authentication can be confirmed without
+     spending a TTS request. Returns the HTTP status and voice metadata;
+     never the key, and never any part of it. */
+  if (req.body?.check === "elevenlabs") {
+    const key = envKey("elevenlabs");
+    if (!key) return res.status(200).json({ check: "elevenlabs", keyPresent: false });
+    try {
+      const r = await fetch("https://api.elevenlabs.io/v1/voices", {
+        headers: { "xi-api-key": key },
+      });
+      const body = r.ok ? await r.json() : null;
+      const voices = body?.voices || [];
+      const female = voices.find(
+        (v) => String(v.labels?.gender || "").toLowerCase() === "female"
+      );
+      return res.status(200).json({
+        check: "elevenlabs",
+        keyPresent: true,
+        status: r.status,
+        ok: r.ok,
+        voiceCount: voices.length,
+        // name and gender label only — nothing identifying the account
+        selected: female
+          ? { name: female.name, gender: female.labels?.gender }
+          : voices[0]
+          ? { name: voices[0].name, gender: voices[0].labels?.gender || "unlabelled" }
+          : null,
+      });
+    } catch (e) {
+      return res.status(200).json({ check: "elevenlabs", keyPresent: true, error: e.message });
+    }
+  }
+
   const text = String(req.body?.text || "").slice(0, MAX_CHARS).trim();
   if (!text) return res.status(400).json({ error: "empty" });
 
