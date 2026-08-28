@@ -157,5 +157,21 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(503).json({ error: "tts-unavailable", tried });
+  /* NAMES ONLY, never values. "no-key" is ambiguous on its own -- it
+     cannot tell a variable that was never added from one added under a
+     slightly different name, and chasing that difference through a
+     dashboard is slow. This reports whether each expected name is
+     present, plus any OTHER variable whose name looks like it was meant
+     to be one of them, which is what catches ELEVEN_LABS_API_KEY and
+     friends. No value is ever read or returned. */
+  const configured = {
+    ELEVENLABS_API_KEY: !!process.env.ELEVENLABS_API_KEY,
+    OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
+    ANTHROPIC_API_KEY: !!process.env.ANTHROPIC_API_KEY,
+  };
+  const lookalikes = Object.keys(process.env).filter(
+    (k) => /eleven|tts|voice|speech/i.test(k) && !(k in configured)
+  );
+
+  return res.status(503).json({ error: "tts-unavailable", tried, configured, lookalikes });
 }
