@@ -45,36 +45,19 @@ function rateLimited(ip) {
   return hits.length > MAX_PER_WINDOW;
 }
 
-/* Resolved once per instance. Looking up a voice on every reply would
-   add a round trip to every sentence the assistant speaks. */
-let cachedElevenVoice = null;
-
-async function elevenVoiceId(key, configured) {
-  if (configured) return configured;
-  if (cachedElevenVoice) return cachedElevenVoice;
-
-  const r = await fetch("https://api.elevenlabs.io/v1/voices", { headers: { "xi-api-key": key } });
-  /* 401 here means the key was found but ElevenLabs rejected it, which
-     is a different problem from a missing key and points at the value
-     rather than the name or the deployment. */
-  if (r.status === 401) throw new Error("key rejected by ElevenLabs (401) - check the value, not the name");
-  if (!r.ok) throw new Error(`voices ${r.status}`);
-  const { voices = [] } = await r.json();
-
-  /* Pick a female voice from the account's own library rather than
-     hardcoding an ID that may not exist on it. labels.gender is what
-     ElevenLabs itself tags them with. */
-  const female = voices.find((v) => String(v.labels?.gender || "").toLowerCase() === "female");
-  cachedElevenVoice = (female || voices[0])?.voice_id;
-  if (!cachedElevenVoice) throw new Error("no voices on this account");
-  return cachedElevenVoice;
-}
-
 async function speakElevenLabs(text, opts) {
   const key = envKey("elevenlabs");
   if (!key) return null;
 
-  const id = await elevenVoiceId(key, opts?.voiceId);
+  /* PINNED, never enumerated. The voice id comes from
+     src/lib/voiceConfig.js and is used directly, so the only ElevenLabs
+     permission production needs is Text to Speech. Voices > Read is not
+     required and is not used: the /v1/voices lookup that used to run
+     here returned 400 on a scoped key and was a dependency worth losing
+     anyway -- it put a network round trip in front of every first
+     reply. */
+  const id = opts?.voiceId;
+  if (!id) throw new Error("no voiceId configured - set VOICE.elevenlabs.voiceId in src/lib/voiceConfig.js");
 
   /* THE with-timestamps VARIANT, which is the whole reason the voice
      can be lip-synced properly. It returns the audio AND where every
@@ -95,7 +78,12 @@ async function speakElevenLabs(text, opts) {
       }),
     }
   );
-  if (!r.ok) throw new Error(`elevenlabs ${r.status} ${(await r.text()).slice(0, 200)}`);
+  if (!r.ok) {
+    /* The body carries the reason -- an unknown voice id, a missing
+       permission, a quota. Without it a 400 is unactionable, which cost
+       several rounds already. Upstream text only; no key, no headers. */
+    throw new Error(`elevenlabs ${r.status}: ${(await r.text()).slice(0, 300)}`);
+  }
 
   const data = await r.json();
   return {
@@ -140,40 +128,6 @@ export default async function handler(req, res) {
 
   const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
   if (rateLimited(ip)) return res.status(429).json({ error: "slow-down" });
-
-  /* AUTH ONLY. Verifies the key against /v1/voices and returns without
-     synthesising anything, so authentication can be confirmed without
-     spending a TTS request. Returns the HTTP status and voice metadata;
-     never the key, and never any part of it. */
-  if (req.body?.check === "elevenlabs") {
-    const key = envKey("elevenlabs");
-    if (!key) return res.status(200).json({ check: "elevenlabs", keyPresent: false });
-    try {
-      const r = await fetch("https://api.elevenlabs.io/v1/voices", {
-        headers: { "xi-api-key": key },
-      });
-      const body = r.ok ? await r.json() : null;
-      const voices = body?.voices || [];
-      const female = voices.find(
-        (v) => String(v.labels?.gender || "").toLowerCase() === "female"
-      );
-      return res.status(200).json({
-        check: "elevenlabs",
-        keyPresent: true,
-        status: r.status,
-        ok: r.ok,
-        voiceCount: voices.length,
-        // name and gender label only — nothing identifying the account
-        selected: female
-          ? { name: female.name, gender: female.labels?.gender }
-          : voices[0]
-          ? { name: voices[0].name, gender: voices[0].labels?.gender || "unlabelled" }
-          : null,
-      });
-    } catch (e) {
-      return res.status(200).json({ check: "elevenlabs", keyPresent: true, error: e.message });
-    }
-  }
 
   const text = String(req.body?.text || "").slice(0, MAX_CHARS).trim();
   if (!text) return res.status(400).json({ error: "empty" });

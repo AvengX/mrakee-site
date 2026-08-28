@@ -47,6 +47,10 @@ provider or voice name appears anywhere else in the app.
 present on the server wins, so you can add `ELEVENLABS_API_KEY` later
 and it takes over from OpenAI on the next reply with no code change.
 
-For ElevenLabs, leaving `voiceId` empty makes the server pick a female
-voice from your own account's library on first use and cache it. Set it
-to pin a specific one.
+The ElevenLabs voice is **pinned** in `VOICE.elevenlabs.voiceId`. The
+server calls text-to-speech with that id directly and never enumerates
+voices, so the key needs only **Text to Speech** permission — **Voices →
+Read is not required**.
+
+To change the voice: elevenlabs.io → Voices → pick one → copy its Voice
+ID and paste it into `voiceConfig.js`.

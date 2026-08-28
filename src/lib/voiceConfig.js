@@ -28,11 +28,22 @@ export const VOICE = {
   order: ["elevenlabs", "openai", "browser"],
 
   elevenlabs: {
-    /* Leave voiceId empty and the server picks a female voice from the
-       account's own library on first use, then caches it. That avoids
-       hardcoding an ID that may not exist on this account — set one
-       here to pin it, from elevenlabs.io/app/voice-library. */
-    voiceId: "",
+    /* THE VOICE. Pinned, and the only place it is named.
+
+       The server sends this id straight to text-to-speech and never
+       enumerates voices, so the ElevenLabs key needs "Text to Speech"
+       permission and nothing else — "Voices > Read" is deliberately not
+       required. The lookup that used to live here returned 400 on a
+       scoped key, and it also put a network round trip in front of
+       every first reply, so losing it is a gain twice over.
+
+       The default is Sarah, from ElevenLabs' shared premade library
+       that every account has: a warm young female voice.
+
+       TO USE A DIFFERENT ONE: elevenlabs.io -> Voices, pick the voice,
+       copy its Voice ID from the voice card, and paste it here. Nothing
+       else in the app changes. */
+    voiceId: "EXAVITQu4vr4xnSDxMaL",
 
     /* Quality over latency, which is the stated priority.
        eleven_turbo_v2_5 is roughly half the latency and slightly less
