@@ -29,3 +29,4 @@ npm-debug.log*
 film-src/_solutions_raw/
 film-src/_services_raw/
 film-src/sources/
+__pycache__/

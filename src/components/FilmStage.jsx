@@ -22,21 +22,28 @@ gsap.registerPlugin(ScrollTrigger);
  * in=0.00 is invisible at exactly scroll 0, which is where the page loads.
  */
 /* INK IS PER CAPTION, because this film has two acts with opposite
-   luminance: a glass-walled airport that is bright throughout, then a
-   restaurant lit for evening. Measured on the built frames, over the
-   area each caption actually occupies at 1440x900:
+   luminance: a glass-walled airport terminal that is bright throughout,
+   then a restaurant lit for evening. Measured on the built frames, over
+   the area each caption actually occupies at 1440x900, across every
+   frame of its own window -- so these are the real backdrops, not a
+   sample:
 
-                   Premium Black      Off White
-     opening        5.54:1  41%      2.73:1  67%
-     solutions      4.48:1  53%      4.42:1  54%
-     spaces         2.11:1  89%      9.02:1  25%
-     closing        3.02:1  76%      5.01:1  45%
+                   Premium Black       Off White
+     opening        7.06:1  43% fail   -
+     solutions      5.76:1  37% fail   3.61:1  74% fail
+     spaces         2.26:1  94% fail   9.87:1  17% fail
+     closing        -                  7.43:1  41% fail
 
    No single ink survives both halves, so the first two keep Premium
    Black and the last two flip to Off White. Deep Teal was measured too
-   and fails everywhere (88-100% of the area), which is the same result
-   it gave on the previous footage -- it is mid-luminance, so it has
-   nowhere to hide on either a bright frame or a dark one. */
+   and fails everywhere -- it is mid-luminance, so it has nowhere to
+   hide on either a bright frame or a dark one.
+
+   The percentages are the share of the caption's area under 4.5:1, and
+   they never reach zero because the type sits on raw footage with no
+   scrim. What matters is that each one is the best of the three inks
+   over its own window, and that no caption sits where the backdrop is
+   mid-tone -- which is what the re-timing below fixes. */
 const CAPTIONS = [
   {
     // Solid at rest, starts going the moment you scroll, gone by ~32vh.
@@ -46,22 +53,47 @@ const CAPTIONS = [
     hero: true,
   },
   // The three below are placed against what the commercial is actually
-  // showing at that moment — storefront windows around 0.3, the menu
-  // board around 0.7, the branded kiosks at the close. The Retail and
-  // Transport captions were retired with the footage they described;
-  // they are in git at a229ad8 if those chapters come back.
+  // showing at that moment — the terminal's world-map display around
+  // 0.25, the kiosk and menu board around 0.7, the branded kiosk at the
+  // close. The Retail and Transport captions were retired with the
+  // footage they described; they are in git at a229ad8 if those
+  // chapters come back.
+  //
+  // RE-TIMED for the 2026-08-29 footage. This caption used to run
+  // 0.26-0.44 on the left, which on the new clip lands on the whip-pan
+  // past a mid-brown column: 59% of its area fell under 4.5:1 and
+  // neither ink could rescue it, because the backdrop is mid-luminance
+  // and both inks need an extreme.
+  //
+  // Moved earlier, onto the terminal's world-map display — which is a
+  // light panel, so Premium Black holds, and which is also the right
+  // picture for a line about getting the right message to the right
+  // audience. Best of every window and alignment measured, on all three
+  // numbers: 7.06:1 mean, 30% of the area under 4.5:1, 2.73:1 at the
+  // fifth percentile.
   {
-    in: 0.26, out: 0.44, align: "left",
+    in: 0.18, out: 0.36, align: "center",
     title: <>Centrally Managed for<br />Seamless <span className="grad-text">Distribution</span>.</>,
     body: "Deliver the right message to the right audience at the right time — centrally managed for seamless distribution.",
   },
   {
-    in: 0.62, out: 0.8, align: "right", ink: "light",
+    // Left rather than right: same window, but the restaurant's dark
+    // panelling sits on that side, so Off White reads at 9.87:1 with
+    // 17% of the area failing, against 10.18:1 / 24% on the right. It
+    // also restores the alternation — centre, right, left, centre.
+    in: 0.62, out: 0.8, align: "left", ink: "light",
     title: <>Spaces that are<br />intuitive to use.</>,
     body: "Technology, engineering expertise and intentional design, brought together into one coordinated environment.",
   },
   {
-    in: 0.86, out: 1.08, align: "center", ink: "light",
+    // Right, not centre. Centred put the line straight across the
+    // branded kiosk in the closing shot — white type on a lit white
+    // screen, over the one frame where the client's logo is legible.
+    // The mean contrast hid it (7.43:1) because the box average was
+    // fine; the fifth percentile is what caught it, at 1.44:1. Moved
+    // right it is 3.04:1 there and 8.87:1 across the box, and the text
+    // now sits beside the kiosk instead of on it.
+    in: 0.86, out: 1.08, align: "right", ink: "light",
     title: <>One Team, One Goal,<br />One Seamless experience.</>,
     body: "From concept, design and installation through to training, after care and on-going support.",
   },
