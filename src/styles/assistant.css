@@ -532,11 +532,22 @@
    the halo and goes quiet rather than competing with the panel. */
 .dock__launcher.is-open {
   background: linear-gradient(180deg, #ffffff 0%, #eef2ee 100%);
+  /* THE ICON COLOUR IS NOT OPTIONAL HERE. The launcher inherits white
+     ink from when its background was a solid brand fill; turning the
+     background white left a white glyph on white — measured at 1.00:1,
+     which is not "low contrast", it is invisible. Deep Teal on this
+     ground is 5.60:1. */
+  color: var(--teal-deep);
   box-shadow:
     0 1px 2px rgba(11, 31, 42, 0.08),
     0 8px 22px rgba(11, 31, 42, 0.16),
     0 0 0 1px rgba(11, 31, 42, 0.06);
 }
+
+/* currentColor is what the lucide icon strokes with, so the glyph has
+   to be able to see the colour set above. */
+.dock__launcher.is-open .dock__face,
+.dock__launcher.is-open .dock__face svg { color: inherit; }
 
 /* ---- the close button: glass, not a grey circle ---- */
 .dock__close {
