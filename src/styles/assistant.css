@@ -137,8 +137,7 @@
   border-radius: 0;
 }
 
-.avatar--hero .avatar__stack,
-.avatar--hero .avatar__stack img {
+.avatar--hero .avatar__frame {
   border-radius: 0;
   overflow: visible;
 }
@@ -147,7 +146,7 @@
    panel, biased upward so her face keeps full opacity and only the
    ground around her shoulders fades out. Prefixed form first: the
    minifier treats the two as aliases and keeps whichever comes last. */
-.avatar--hero .avatar__stack {
+.avatar--hero .avatar__frame {
   -webkit-mask-image: radial-gradient(ellipse 74% 78% at 50% 42%, #000 52%, rgba(0, 0, 0, 0.72) 74%, transparent 100%);
   mask-image: radial-gradient(ellipse 74% 78% at 50% 42%, #000 52%, rgba(0, 0, 0, 0.72) 74%, transparent 100%);
   animation: avatar-float 10s ease-in-out infinite;
@@ -413,7 +412,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .avatar--hero .avatar__stack,
+  .avatar--hero .avatar__frame,
   .kiosk__stage::before,
   .kiosk__wave i:first-child,
   .dock__panel.is-open .kiosk__frame { animation: none !important; }

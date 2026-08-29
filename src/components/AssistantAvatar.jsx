@@ -35,8 +35,6 @@ const POSES = ["idle", "listening", "thinking", "answering"];
 const EXTS = ["webp", "png"];
 const baseFor = (pose) =>
   `assistant/avatar-${pose === "thinking" ? "listening" : pose}`;
-const fileFor = (pose) => `${baseFor(pose)}.${resolvedExt}`;
-let resolvedExt = EXTS[0];
 
 export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, viseme = null, className = "" }) {
   const pose = POSES.includes(state) ? state : "idle";
@@ -50,7 +48,7 @@ export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, 
       const probe = new Image();
       probe.onload = () => {
         if (!alive) return;
-        if (probe.naturalWidth > 1) { resolvedExt = EXTS[i]; setCustom(src); }
+        if (probe.naturalWidth > 1) setCustom(src);
         else tryExt(i + 1);
       };
       probe.onerror = () => tryExt(i + 1);
@@ -84,6 +82,14 @@ export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, 
   }, []);
   const attentive = pose === "listening" || pose === "thinking";
 
+  /* Which mouth is on her face right now. Alignment from the voice
+     provider when there is any, loudness when there is not, and a
+     closed mouth when neither says otherwise. */
+  const speaking =
+    (viseme && viseme !== "rest" ? viseme : null) ||
+    (!viseme ? visemeForOpenness(open) : null) ||
+    "rest";
+
   return (
     <span
       className={`avatar avatar--${state}${className ? " " + className : ""}`}
@@ -91,59 +97,32 @@ export default function AssistantAvatar({ state = "idle", size = 84, mouth = 0, 
       aria-hidden="true"
     >
       {custom ? (
-        /* TWO ALIGNED STILLS, CROSSFADED BY THE AUDIO.
+        /* ONE IMAGE. NEVER TWO.
 
-           These renders share a head position — measured at generation
-           time: identical hair-top row, head widths within 2.7% — which
-           is the only reason this works. The closed-mouth frame sits
-           underneath and the open-mouth frame fades in over it in
-           proportion to how loud the voice is right now, so the mouth
-           moves continuously with the speech rather than switching
-           between two states.
+           This used to draw the closed-mouth render and then paint a
+           mouth over it, and that is what produced the "double mouth":
+           her baked-in smile stayed visible underneath every open
+           shape, because a face laid over a face still has a face
+           underneath it.
 
-           What it CANNOT do, and no crossfade of two photographs can:
-           tell an "oo" from an "ee". That needs a viseme set or a rig,
-           and this asset has neither. */
-        <span className="avatar__stack" style={{ width: size, height: size }}>
-          <img src={fileFor("idle")} alt="" width={size} height={size} />
+           There is no underneath now. A single <img> swaps its src, so
+           the only mouth on screen at any moment is the one in the file
+           being shown. The artefact is structurally impossible rather
+           than tuned away.
 
-          {/* VISEME PATH. Ten mouth shapes cut from these same two
-              renders, so every pixel outside the mouth is identical and
-              swapping between them cannot shift the face. The shape
-              comes from the provider's character alignment; the CSS
-              crossfade below is what stops it flicking. */}
-          {pose === "answering" && viseme && viseme !== "rest" && (
-            <img
-              className="avatar__viseme"
-              src={`assistant/visemes/${viseme}.webp`}
-              alt=""
-              width={size}
-              height={size}
-            />
-          )}
-
-          {/* AMPLITUDE PATH, for providers that send no alignment and
-              for the browser voice.
-
-              It picks a viseme by loudness and draws it FULLY OPAQUE.
-              It used to cross-fade the whole answering face over the
-              idle one at the openness value, and because both are
-              complete opaque faces, every intermediate opacity painted
-              two mouths at once — the baked smile showing through the
-              open one. One face at a time, always. */}
-          {pose === "answering" && !viseme && visemeForOpenness(open) && (
-            <img
-              className="avatar__viseme"
-              src={`assistant/visemes/${visemeForOpenness(open)}.webp`}
-              alt=""
-              width={size}
-              height={size}
-            />
-          )}
-          {pose !== "answering" && custom !== fileFor("idle") && (
-            <img className="avatar__mouthFrame" src={custom} alt="" width={size} height={size} style={{ opacity: 1 }} />
-          )}
-        </span>
+           The frames are complete faces built by film-src/build_visemes.py,
+           which selects between the two real renders per pixel and never
+           scales anything — so no face can deform, and every speaking
+           frame takes its brows, eyes and hair from the same source, so
+           swapping them at syllable rate moves her mouth and nothing
+           else. */
+        <img
+          className="avatar__frame"
+          src={pose === "answering" ? `assistant/visemes/${speaking}.webp` : custom}
+          alt=""
+          width={size}
+          height={size}
+        />
       ) : (
         <svg viewBox="0 0 100 100" width={size} height={size}>
           <defs>

@@ -4488,30 +4488,26 @@ a.contact__info:hover .contact__infoIcon {
   .logo__wordArt { height: 22px; }
 }
 
-/* ---- the avatar's two stacked frames ----
+/* ---- the avatar's single frame ----
 
-   Closed-mouth underneath, open-mouth over it at an opacity the audio
-   sets. They are the same head in the same position, so what the eye
-   sees is a mouth opening rather than two pictures dissolving. */
-.avatar__stack {
-  position: relative;
-  display: block;
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-.avatar__stack img {
+   ONE element, whose src changes. There is no layer under it and
+   nothing composited over it, which is the whole point: a face drawn on
+   top of a face leaves the lower face's mouth visible through it, and
+   that is what "two mouths" was. It cannot happen to a lone <img>. */
+.avatar__frame {
   position: absolute;
   inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 50%;
+  object-fit: cover;
 }
 
-/* Nothing animates opacity on a face layer any more — a face drawn at
-   partial opacity shows the face beneath it, which is what put two
-   mouths on screen. The hint is left off deliberately. */
+/* No opacity transition here, deliberately. Any value below 1 on a
+   face reveals whatever is behind it; the frames swap hard instead,
+   every 50-150ms, which is how drawn animation has always read as
+   movement. */
 
 /* Breathing, for the still avatar. Two pixels over four seconds: enough
    that the face is not frozen, not enough to notice as animation. */
@@ -4520,31 +4516,10 @@ a.contact__info:hover .contact__infoIcon {
   50%      { transform: translateY(-1.5px) scale(1.008); }
 }
 
-.avatar .avatar__stack { animation: avatar-breathe 4.2s ease-in-out infinite; }
+.avatar .avatar__frame { animation: avatar-breathe 4.2s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .avatar .avatar__stack { animation: none; }
-}
-
-/* The viseme frame. A short crossfade so shapes blend rather than cut —
-   90ms is under a syllable at normal speech, so it softens the change
-   without letting the mouth lag behind the voice. Longer and it turns
-   to mush; shorter and it flickers. */
-/* NO OPACITY ANIMATION, and that is the fix rather than an omission.
-
-   This used to fade in from 0.25. The viseme images are complete,
-   opaque faces, so any opacity below 1 painted the base face through
-   them — the baked smile showing inside the open mouth, plus ghosted
-   eyes, since idle and answering differ there too. A crossfade between
-   two faces cannot look like one face.
-
-   Smoothness comes from the shape sequence instead. Visemes change
-   every 50-150ms, which is fast enough that a hard swap reads as
-   movement; it is how drawn animation has always worked. */
-.avatar__viseme {
-  position: absolute;
-  inset: 0;
-  opacity: 1;
+  .avatar .avatar__frame { animation: none; }
 }
 
 /* Muted: the session is still live, the input is not. Distinct from
@@ -4618,8 +4593,7 @@ a.contact__info:hover .contact__infoIcon {
 /* Rounded, not circular. A circle crops her shoulders and reads as a
    chat icon; the source is square and is shown square. */
 .avatar--hero,
-.avatar--hero .avatar__stack,
-.avatar--hero .avatar__stack img,
+.avatar--hero .avatar__frame,
 .avatar--hero img {
   border-radius: var(--r-lg);
 }
@@ -4630,7 +4604,7 @@ a.contact__info:hover .contact__infoIcon {
   max-height: min(38vh, 260px);
 }
 
-.avatar--hero .avatar__stack { width: 100% !important; height: 100% !important; }
+.avatar--hero .avatar__frame { width: 100% !important; height: 100% !important; }
 
 .kiosk__status {
   display: inline-flex;
@@ -6568,30 +6542,26 @@ a.contact__info:hover .contact__infoIcon {
   .logo__wordArt { height: 22px; }
 }
 
-/* ---- the avatar's two stacked frames ----
+/* ---- the avatar's single frame ----
 
-   Closed-mouth underneath, open-mouth over it at an opacity the audio
-   sets. They are the same head in the same position, so what the eye
-   sees is a mouth opening rather than two pictures dissolving. */
-.avatar__stack {
-  position: relative;
-  display: block;
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-.avatar__stack img {
+   ONE element, whose src changes. There is no layer under it and
+   nothing composited over it, which is the whole point: a face drawn on
+   top of a face leaves the lower face's mouth visible through it, and
+   that is what "two mouths" was. It cannot happen to a lone <img>. */
+.avatar__frame {
   position: absolute;
   inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 50%;
+  object-fit: cover;
 }
 
-/* Nothing animates opacity on a face layer any more — a face drawn at
-   partial opacity shows the face beneath it, which is what put two
-   mouths on screen. The hint is left off deliberately. */
+/* No opacity transition here, deliberately. Any value below 1 on a
+   face reveals whatever is behind it; the frames swap hard instead,
+   every 50-150ms, which is how drawn animation has always read as
+   movement. */
 
 /* Breathing, for the still avatar. Two pixels over four seconds: enough
    that the face is not frozen, not enough to notice as animation. */
@@ -6600,31 +6570,10 @@ a.contact__info:hover .contact__infoIcon {
   50%      { transform: translateY(-1.5px) scale(1.008); }
 }
 
-.avatar .avatar__stack { animation: avatar-breathe 4.2s ease-in-out infinite; }
+.avatar .avatar__frame { animation: avatar-breathe 4.2s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .avatar .avatar__stack { animation: none; }
-}
-
-/* The viseme frame. A short crossfade so shapes blend rather than cut —
-   90ms is under a syllable at normal speech, so it softens the change
-   without letting the mouth lag behind the voice. Longer and it turns
-   to mush; shorter and it flickers. */
-/* NO OPACITY ANIMATION, and that is the fix rather than an omission.
-
-   This used to fade in from 0.25. The viseme images are complete,
-   opaque faces, so any opacity below 1 painted the base face through
-   them — the baked smile showing inside the open mouth, plus ghosted
-   eyes, since idle and answering differ there too. A crossfade between
-   two faces cannot look like one face.
-
-   Smoothness comes from the shape sequence instead. Visemes change
-   every 50-150ms, which is fast enough that a hard swap reads as
-   movement; it is how drawn animation has always worked. */
-.avatar__viseme {
-  position: absolute;
-  inset: 0;
-  opacity: 1;
+  .avatar .avatar__frame { animation: none; }
 }
 
 /* Muted: the session is still live, the input is not. Distinct from
@@ -6698,8 +6647,7 @@ a.contact__info:hover .contact__infoIcon {
 /* Rounded, not circular. A circle crops her shoulders and reads as a
    chat icon; the source is square and is shown square. */
 .avatar--hero,
-.avatar--hero .avatar__stack,
-.avatar--hero .avatar__stack img,
+.avatar--hero .avatar__frame,
 .avatar--hero img {
   border-radius: var(--r-lg);
 }
@@ -6710,7 +6658,7 @@ a.contact__info:hover .contact__infoIcon {
   max-height: min(38vh, 260px);
 }
 
-.avatar--hero .avatar__stack { width: 100% !important; height: 100% !important; }
+.avatar--hero .avatar__frame { width: 100% !important; height: 100% !important; }
 
 .kiosk__status {
   display: inline-flex;
