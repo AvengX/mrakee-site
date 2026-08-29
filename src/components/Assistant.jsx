@@ -77,9 +77,37 @@ export default function Assistant({ compact = false }) {
 
   askRef.current = ask;
 
+  /* STICK TO THE BOTTOM, BUT DO NOT FIGHT THE VISITOR.
+
+     The old effect scrolled to the bottom on every turn and every state
+     change, so reading back through the conversation was impossible —
+     one "Thinking" tick and you were yanked to the end again.
+
+     `stick` is true while the visitor is at the bottom, which is where
+     they start. Scrolling up more than a screen's tail turns it off and
+     they are left alone; scrolling back down turns it on again. Sending
+     a message always turns it back on, because asking something is a
+     statement that you want to see the answer. */
+  const stick = useRef(true);
+
+  function onLogScroll(e) {
+    const el = e.currentTarget;
+    stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  }
+
   useEffect(() => {
-    // keep the newest answer in view without yanking the whole page
-    logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: "smooth" });
+    const el = logRef.current;
+    if (!el || !stick.current) return;
+    /* Two frames: the first lets React paint the new turn, the second
+       measures a scrollHeight that includes it. Scrolling on the same
+       frame lands short of the bottom by exactly the height of the
+       message that was just added. */
+    const id = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+      })
+    );
+    return () => cancelAnimationFrame(id);
   }, [turns, state]);
 
   async function ask(text) {
@@ -94,6 +122,7 @@ export default function Assistant({ compact = false }) {
        finishes speaking. */
     sessionRef.current?.pause();
     const history = [...turns, { role: "user", content: question }];
+    stick.current = true; // you asked, so you want to see the answer
     setTurns(history);
     setDraft("");
     setState("thinking");
@@ -280,81 +309,44 @@ export default function Assistant({ compact = false }) {
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE AI</p>
             <p className="kiosk__role">Voice assistant</p>
-          </div>
-          {/* The live state sits in the header, where the concept puts
-              it — a glance target that does not move as the transcript
-              grows. It is a label, not a control. */}
-          {session && (
+            {/* One line, always in the same place, so the state never
+                moves as the transcript grows. */}
             <span className={`kiosk__live kiosk__live--${state}`}>
               <span className={`kiosk__dot kiosk__dot--${state}`} aria-hidden="true" />
-              {muted
-                ? "Muted"
-                : state === "thinking"
-                ? "Thinking"
-                : state === "answering"
-                ? "Speaking"
-                : "Listening"}
+              {session
+                ? muted
+                  ? "Muted"
+                  : state === "thinking"
+                  ? "Thinking"
+                  : state === "answering"
+                  ? "Speaking"
+                  : "Listening"
+                : "Online"}
             </span>
-          )}
+          </div>
+
+          {/* THE AVATAR, small and in the header.
+
+              It used to be a 330px portrait in the middle of the panel,
+              which pushed the conversation below the fold and made the
+              assistant read as a modal. It is identity here, not the
+              subject: the conversation is the subject. The component is
+              unchanged and still receives mouth and viseme, so lip-sync
+              plays exactly as before — at 64px rather than 330. */}
+          <AssistantAvatar
+            className="avatar--chip"
+            state={pose}
+            size={64}
+            mouth={mouth}
+            viseme={viseme}
+          />
+
           {turns.length > 0 && !session && (
             <button type="button" className="kiosk__reset" onClick={reset} title="Clear the conversation">
               <RotateCcw size={15} aria-hidden="true" />
               Start again
             </button>
           )}
-        </div>
-
-        {/* THE STAGE. The avatar is the point of a voice assistant, so
-            it gets the room: a portrait, not a profile chip. Square
-            source shown square, rounded rather than circular, because a
-            circle crops her shoulders and reads as a chat icon. */}
-        <div className={`kiosk__stage kiosk__stage--${state}`}>
-          <span className="kiosk__waves" aria-hidden="true" />
-          <AssistantAvatar
-            className="avatar--hero"
-            state={pose}
-            size={compact ? 250 : 300}
-            mouth={mouth}
-            viseme={viseme}
-          />
-          {/* A card rather than a line, so the state has a second
-              sentence to say what to do about it. Two levels: what is
-              happening, and what the visitor should do. */}
-          <div className={`kiosk__state kiosk__state--${state}`}>
-            <span className="kiosk__wave" aria-hidden="true">
-              <i /><i /><i /><i />
-            </span>
-            <span className="kiosk__stateText">
-              <strong>
-                {session
-                  ? muted
-                    ? "Muted"
-                    : state === "listening"
-                    ? "Listening"
-                    : state === "thinking"
-                    ? "Thinking"
-                    : state === "answering"
-                    ? "Speaking"
-                    : "Connected"
-                  : turns.length
-                  ? "Ask me anything else"
-                  : "Ready when you are"}
-              </strong>
-              <span>
-                {session
-                  ? muted
-                    ? "Unmute when you want to talk."
-                    : state === "listening"
-                    ? "Go ahead, I'm listening…"
-                    : state === "thinking"
-                    ? "One moment…"
-                    : state === "answering"
-                    ? "Talk over me any time."
-                    : "Connected."
-                  : "Start a conversation or type below."}
-              </span>
-            </span>
-          </div>
         </div>
 
         {!turns.length && !session && (
@@ -367,6 +359,7 @@ export default function Assistant({ compact = false }) {
         <div
           className="kiosk__log"
           ref={logRef}
+          onScroll={onLogScroll}
           role="log"
           aria-live="polite"
           aria-label="Conversation"

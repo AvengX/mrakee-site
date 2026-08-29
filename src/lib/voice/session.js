@@ -87,19 +87,42 @@ export function createVoiceSession({
 
     let finalText = "";
     let lastInterim = "";
+    let dispatched = false;   // onresult already handed this turn over
 
     r.onstart = () => { failures = 0; onListening?.(); };
 
     r.onresult = (e) => {
       if (muted) return; // a muted session hears nothing, by definition
       let interim = "";
+      let sawFinal = false;
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) finalText += t;
+        if (e.results[i].isFinal) { finalText += t; sawFinal = true; }
         else interim += t;
       }
       if (interim.trim()) lastInterim = (finalText + interim).trim();
       onPartial?.((finalText + interim).trim());
+
+      /* DISPATCH HERE, NOT IN onend — this is the latency fix.
+
+         The utterance used to be handed over in onend, so nothing was
+         sent until Chrome decided the recognition session was over.
+         isFinal means the engine has already committed to the
+         transcript; onend arrives some hundreds of milliseconds later,
+         after its own end-of-speech timer. Waiting for it put that
+         delay in front of every single question, including "Hello".
+
+         `dispatched` is what stops it being asked twice: onend still
+         fires afterwards and still has the text. */
+      if (sawFinal) {
+        const said = finalText.trim();
+        if (said) {
+          dispatched = true;
+          finalText = "";
+          lastInterim = "";
+          onUtterance?.(said);
+        }
+      }
     };
 
     r.onerror = (e) => {
@@ -117,7 +140,11 @@ export function createVoiceSession({
       const said = (finalText.trim() || lastInterim).trim();
       finalText = "";
       lastInterim = "";
-      if (said && !muted) onUtterance?.(said);
+      /* Only if onresult did not already send it. Chrome does not
+         reliably promote the last phrase to isFinal before ending, so
+         this path still has to exist for the utterances it misses. */
+      if (said && !muted && !dispatched) onUtterance?.(said);
+      dispatched = false;
 
       /* THE LINE THAT MAKES IT CONTINUOUS. Recognition ending is not
          the conversation ending — while the session is active and we

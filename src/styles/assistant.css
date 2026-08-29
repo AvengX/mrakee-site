@@ -95,11 +95,17 @@
 
 /* ---- header: type sitting on the background, not a bar ---- */
 .kiosk--compact .kiosk__head {
-  border-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  border-bottom: 1px solid rgba(11, 31, 42, 0.07);
   background: transparent;
-  padding: 1.05rem 3.1rem 0.2rem 1.3rem;
-  align-items: baseline;
+  /* right padding clears the dock's close button, which is positioned
+     against the panel rather than inside this header */
+  padding: 0.95rem 3.4rem 0.95rem 1.3rem;
 }
+
+.kiosk__intro { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
 .kiosk__name {
   font-family: "Outfit", "Inter Variable", "Inter", system-ui, sans-serif;
@@ -113,11 +119,11 @@
 .kiosk__intro::after {
   content: "";
   display: block;
-  width: 44px;
-  height: 3px;
+  width: 30px;
+  height: 2px;
   border-radius: 2px;
   background: var(--gold);
-  margin-top: 0.6rem;
+  margin-top: 0.35rem;
 }
 
 .kiosk__role {
@@ -133,8 +139,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  margin-left: auto;
-  padding: 0.3rem 0.7rem;
+  align-self: flex-start;
+  margin-top: 0.34rem;
+  padding: 0.22rem 0.6rem;
   border-radius: 999px;
   border: 1px solid rgba(0, 111, 115, 0.16);
   background: rgba(255, 255, 255, 0.6);
@@ -151,178 +158,58 @@
 
 .kiosk__live--thinking { color: var(--gold-ink); }
 
-/* ---- the stage: she is the only object in it ---- */
-.kiosk__stage {
-  position: relative;
-  background: none;
-  border: 0;
-  padding: 0.2rem 1rem 0;
-  gap: 0;
-  overflow: visible;
+/* ---- THE PANEL IS A THREE-PART FRAME --------------------------
+   header / messages / input, and only the middle one scrolls. The whole
+   card used to scroll as one column with a 330px portrait at the top,
+   so reaching the newest answer meant scrolling past her every time. */
+.kiosk--compact .kiosk__frame {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
-/* Ambient light behind her — and it must stay NARROWER THAN THE PANEL.
-   It used to be min(128%, 460px), which is 460px inside a 430px panel,
-   so .dock__panel's overflow:hidden sliced the ellipse's sides into
-   two straight vertical edges. With a near-white core at 0.9 alpha
-   that read as a white card sitting behind her: the exact boundary
-   this design exists to remove, produced by the thing meant to remove
-   it. Narrower than the panel, and no white core — the panel ground is
-   already light, so the glow only needs to carry the brand hues. */
-.kiosk__stage::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: min(88%, 350px);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
+.kiosk--compact .kiosk__head,
+.kiosk--compact .kiosk__welcome,
+.kiosk--compact .kiosk__chips,
+.kiosk--compact .kiosk__controls,
+.kiosk--compact .kiosk__bar,
+.kiosk--compact .kiosk__fine { flex: none; }
+
+.kiosk--compact .kiosk__log {
+  flex: 1 1 auto;
+  min-height: 0;          /* without this a flex child refuses to scroll */
+  overflow-y: auto;
+  overscroll-behavior: contain;   /* stop the page scrolling at the ends */
+  scrollbar-width: thin;
+}
+
+/* ---- the avatar, now a 64px identity chip ---- */
+.avatar--chip {
+  flex: none;
+  width: 64px !important;
+  height: 64px !important;
   border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    rgba(0, 160, 160, 0.16) 0%,
-    rgba(0, 160, 160, 0.10) 44%,
-    rgba(216, 163, 42, 0.09) 68%,
-    transparent 80%
-  );
-  pointer-events: none;
-  z-index: 0;
+  overflow: hidden;
+  align-self: center;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 0 5px rgba(0, 111, 115, 0.22),
+    0 6px 16px rgba(11, 31, 42, 0.14);
 }
 
-.kiosk__stage > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* A second, finer ring of light INSIDE the first. Two soft edges read
-   as depth where one reads as a blob — and because both sit behind
-   her, nothing is ever drawn over her face. It is the one place the
-   design is allowed to look like a presence rather than a picture. */
-.kiosk__stage::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 48%;
-  width: min(96%, 300px);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    rgba(255, 255, 255, 0) 62%,
-    rgba(0, 160, 160, 0.16) 84%,
-    rgba(0, 160, 160, 0) 100%
-  );
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.9;
-}
-
-/* The ring answers the state, slowly, and only by breathing. */
-@keyframes halo-breathe {
-  0%, 100% { transform: translate(-50%, -50%) scale(1);     opacity: 0.72; }
-  50%      { transform: translate(-50%, -50%) scale(1.075); opacity: 1; }
-}
-.kiosk__stage--listening::after { animation: halo-breathe 4.2s ease-in-out infinite; }
-.kiosk__stage--answering::after { animation: halo-breathe 2.8s ease-in-out infinite; }
-.kiosk__stage--thinking::after {
-  background: radial-gradient(
-    closest-side,
-    rgba(255, 255, 255, 0) 62%,
-    rgba(216, 163, 42, 0.20) 84%,
-    rgba(216, 163, 42, 0) 100%
-  );
-  animation: halo-breathe 3.4s ease-in-out infinite;
-}
-
-/* No ring. It was the most dashboard-like thing in the previous pass:
-   a hard boundary drawn exactly where this design needs none. */
-
-/* ---- the avatar, unframed ---- */
-.avatar--hero {
-  box-shadow: none;
-  border-radius: 0;
-}
-
-.avatar--hero .avatar__frame {
-  border-radius: 0;
-  overflow: visible;
-}
-
-/* A CIRCLE, not a dissolved square.
-
-   The radial mask that used to live here was solving the right problem
-   the hard way: her asset is opaque with #f3f6f2 baked in, so a square
-   edge shows against any panel, and the mask faded that edge out. It
-   worked on a wide desktop panel and failed everywhere else — on a
-   phone the frame is narrower than the ambient glow, the clip squared
-   the glow off, and a hard rectangle appeared around her again.
-   
-   Cropping to a circle removes the edge instead of hiding it: there is
-   no corner left to show. The ring and the glow then belong to the
-   design rather than compensating for the asset, which is how the
-   kiosk screen presents her. */
-.avatar--hero .avatar__frame {
+.avatar--chip .avatar__frame {
   -webkit-mask-image: none;
   mask-image: none;
   border-radius: 50%;
   object-fit: cover;
-  /* Her head sits high in a 512 square, so a centred circle would crop
-     the top of her hair and leave dead space at the chest. */
   object-position: 50% 16%;
-  /* White ring first, then teal — the white separates her from the ring
-     so the teal reads as light around her rather than a border drawn on
-     her. */
-  animation: avatar-float 10s ease-in-out infinite;
+  animation: none;
 }
 
-.avatar--hero {
-  border-radius: 50%;
-  /* The CLIP lives here, on the parent, not on the <img>. border-radius
-     on the image alone rounded its box — the outline followed the
-     circle — but did not clip the painted bitmap, so her square
-     background kept showing in the four corners. Clipping on the
-     containing span works regardless of how the replaced content is
-     fitted.
-
-     The rings live here too, for the same reason: a box-shadow on the
-     image is drawn outside the image's box and this parent clips it
-     away. White first so the teal reads as light around her rather
-     than a line drawn on her. */
-  overflow: hidden;
-  box-shadow:
-    0 0 0 4px rgba(255, 255, 255, 0.95),
-    0 0 0 6px rgba(0, 111, 115, 0.22),
-    0 14px 34px rgba(11, 31, 42, 0.13);
-}
-
-/* She floats, barely: ten seconds, three pixels. Enough that she is not
-   a photograph, not enough to read as animation. */
-@keyframes avatar-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-3px); }
-}
-
-/* Listening and speaking lift the light BEHIND her rather than adding
-   anything in front of her, so her face is never competing with an
-   effect. */
-@keyframes stage-glow {
-  0%, 100% { opacity: 0.82; transform: translate(-50%, -50%) scale(1); }
-  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.05); }
-}
-
-.kiosk__stage--listening::before,
-.kiosk__stage--answering::before { animation: stage-glow 9s ease-in-out infinite; }
-.kiosk__stage--answering::before { animation-duration: 6s; }
-
-.kiosk__stage--thinking::before {
-  background: radial-gradient(
-    closest-side,
-    rgba(216, 163, 42, 0.20) 0%,
-    rgba(216, 163, 42, 0.12) 48%,
-    transparent 80%
-  );
-}
+/* A ring that answers the state, on the chip rather than the panel. */
+.kiosk__live--listening ~ * .avatar--chip,
+.avatar--chip { transition: box-shadow 0.3s var(--ease-soft); }
 
 /* ---- status: a dot and a word, on the background ---- */
 .kiosk__state {
@@ -388,13 +275,13 @@
 
 /* ---- welcome and transcript: typography, no bubbles ---- */
 .kiosk__welcome {
-  text-align: center;
-  padding: 0.35rem 1.9rem 0.2rem;
+  text-align: left;
+  padding: 0.9rem 1.15rem 0.1rem;
 }
 
 .kiosk__welcomeLead {
   font-family: "Outfit", "Inter Variable", "Inter", system-ui, sans-serif;
-  font-size: 1.16rem;
+  font-size: 1.02rem;
   font-weight: 500;
   letter-spacing: -0.015em;
   color: var(--ink);
@@ -409,38 +296,67 @@
 }
 
 .kiosk--compact .kiosk__log {
-  padding: 0.5rem 1.4rem 0.2rem;
-  gap: 0.55rem;
-  text-align: center;
+  padding: 1rem 1.15rem 0.6rem;
+  gap: 0.7rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 
 /* The newest answer is the one being spoken, so it should read as
    speech rather than as a message in a list: no bubble, no border,
    centred under her. */
-.kiosk--compact .kiosk__answer,
-.kiosk--compact .kiosk__answer > p {
-  max-width: 100%;
+/* The assistant speaks from the left on white; the visitor answers from
+   the right in teal. Bubbles, because a transcript without them is a
+   wall of centred text — which is what this was. */
+.kiosk--compact .kiosk__answer {
+  align-self: flex-start;
+  max-width: 86%;
   background: none;
   border: 0;
   padding: 0;
-  font-size: 0.96rem;
-  line-height: 1.55;
-  color: var(--ink);
 }
 
+.kiosk--compact .kiosk__answer > p {
+  margin: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(11, 31, 42, 0.06);
+  border-radius: 16px 16px 16px 5px;
+  padding: 0.66rem 0.86rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  /* Explicit, not var(--ink): something upstream colours text inside
+     the log teal, and an answer rendered in the brand colour reads as a
+     link rather than as speech. */
+  color: #0b1f2a;
+  box-shadow: 0 1px 3px rgba(11, 31, 42, 0.04);
+}
+
+/* The status dot matches the word beside it. Idle rendered grey while
+   the label said "Online", which is a contradiction the eye catches
+   before the word does. */
+.kiosk__live .kiosk__dot { background: var(--teal); }
+.kiosk__live--thinking .kiosk__dot { background: var(--gold); }
+.kiosk__live--answering .kiosk__dot,
+.kiosk__live--listening .kiosk__dot { background: var(--teal); }
+
 .kiosk--compact .kiosk__ask {
-  align-self: center;
-  max-width: 100%;
-  background: none;
-  border: 0;
-  padding: 0;
-  font-size: 0.78rem;
-  color: var(--ink-faint);
+  align-self: flex-end;
+  max-width: 86%;
+  margin: 0;
+  background: rgba(0, 111, 115, 0.10);
+  border: 1px solid rgba(0, 111, 115, 0.14);
+  border-radius: 16px 16px 5px 16px;
+  padding: 0.6rem 0.84rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--teal-deep);
 }
 
 /* Everything older than the last exchange recedes rather than
    disappearing, so the history is there without competing. */
-.kiosk--compact .kiosk__log > *:not(:nth-last-child(-n + 2)) { opacity: 0.38; }
+/* No fading. It made sense when only the last exchange was on screen;
+   in a scrollable transcript it just makes history hard to read. */
 
 /* ---- controls ---- */
 .kiosk__controls {

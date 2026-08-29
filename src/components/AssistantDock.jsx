@@ -43,11 +43,33 @@ export default function AssistantDock() {
   const panelRef = useRef(null);
   const launcherRef = useRef(null);
 
+  /* WARM THE FUNCTIONS ON OPEN.
+
+     Both API routes are Vercel serverless functions, and a cold one
+     spends its first second or so starting a container before it reads
+     a single byte of the request. That cost landed on the visitor's
+     first question — reliably the slowest "Hello" of the session.
+
+     A GET is enough: both handlers reject a non-POST on their first
+     line, before the rate limiter and before any call to Claude or
+     ElevenLabs. So this warms the container and the TLS connection
+     while the panel is still animating open, costs nothing, invokes no
+     model, and consumes no rate-limit budget. Fired once. */
+  const warmed = useRef(false);
+  function warm() {
+    if (warmed.current) return;
+    warmed.current = true;
+    for (const route of ["/api/chat", "/api/tts"]) {
+      fetch(route, { method: "GET", cache: "no-store" }).catch(() => {});
+    }
+  }
+
   function toggle() {
     if (open) {
       close();
       return;
     }
+    warm();
     setMounted(true);
     setOpen(true);
   }
