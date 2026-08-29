@@ -121,12 +121,24 @@ export default function FilmStage() {
     if (!ready) return;
 
     const ctx = gsap.context(() => {
+      /* Last written value per caption, so a caption that is off screen
+         costs nothing. Three of the four are hidden at any moment and
+         were being handed four style writes each per tick anyway —
+         including a blur(), which is the one property here that forces
+         the element to repaint. Skipping the no-ops leaves the visuals
+         identical and takes the steady-state write count from 16 to 4. */
+      const wrote = CAPTIONS.map(() => null);
+
       const paint = (p) => {
         draw(canvas.current, p);
         capRefs.current.forEach((el, i) => {
           if (!el) return;
           const c = CAPTIONS[i];
           const o = opacityAt(p, c.in, c.out, c.fade);
+          const hidden = o <= 0.001;
+          if (hidden && wrote[i] === "hidden") return;
+          wrote[i] = hidden ? "hidden" : o;
+
           el.style.opacity = o;
           // drift up slightly as it fades through its window, and come
           // out of a light blur as it arrives. Written as custom
@@ -134,14 +146,17 @@ export default function FilmStage() {
           const t = (p - c.in) / (c.out - c.in);
           el.style.setProperty("--drift", `${(0.5 - t) * 26}px`);
           el.style.filter = o > 0.995 ? "none" : `blur(${(1 - o) * 5}px)`;
-          el.style.visibility = o <= 0.001 ? "hidden" : "visible";
+          el.style.visibility = hidden ? "hidden" : "visible";
         });
 
         // the scroll cue is only true while you have not scrolled
         if (hint.current) {
           const fade = Math.max(0, 1 - p * 22);
-          hint.current.style.opacity = fade;
-          hint.current.style.visibility = fade <= 0.01 ? "hidden" : "visible";
+          if (!(fade <= 0.01 && hint.__gone)) {
+            hint.__gone = fade <= 0.01;
+            hint.current.style.opacity = fade;
+            hint.current.style.visibility = fade <= 0.01 ? "hidden" : "visible";
+          }
         }
       };
 
