@@ -574,7 +574,14 @@
    generic chat-bubble treatment there is. The ring is now a soft teal
    halo that sits OUTSIDE the edge, so nothing is drawn across her, and
    the gold survives as a thin inner line rather than a border. */
-.dock__launcher {
+/* :not(--figure) matters. index.css gives .dock__launcher--figure
+   background:none and box-shadow:none so the cut-out greeter stands on
+   the page with nothing behind her. This file loads later and the two
+   selectors have equal specificity, so an unscoped .dock__launcher rule
+   wins and paints a white slab with rings behind a PNG that already has
+   a clean alpha silhouette — which is the light rectangle that appeared
+   around her. The chrome belongs to the circular bust only. */
+.dock__launcher:not(.dock__launcher--figure) {
   border: 0;
   background: linear-gradient(180deg, #ffffff 0%, #f4f7f3 100%);
   box-shadow:
@@ -585,7 +592,7 @@
   transition: transform 0.26s var(--ease-soft), box-shadow 0.26s var(--ease-soft);
 }
 
-.dock__launcher:hover {
+.dock__launcher:not(.dock__launcher--figure):hover {
   transform: translateY(-3px) scale(1.05);
   box-shadow:
     0 1px 2px rgba(11, 31, 42, 0.10),
@@ -595,6 +602,15 @@
 }
 
 .dock__launcher:active { transform: translateY(-1px) scale(0.99); }
+
+/* Belt and braces: whatever else lands on .dock__launcher later, the
+   figure keeps nothing behind her. */
+.dock__launcher--figure,
+.dock__launcher--figure:hover {
+  background: none;
+  box-shadow: none;
+  border: 0;
+}
 
 /* Open, it is no longer her — it is a close affordance, so it drops
    the halo and goes quiet rather than competing with the panel. */
