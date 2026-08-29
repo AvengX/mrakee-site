@@ -23,18 +23,49 @@
   width: clamp(430px, 34vw, 500px);
   max-width: calc(100vw - 1.8rem);
   height: min(760px, calc(100dvh - 12rem));
-  border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  background: #f3f6f2;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  /* Still opaque, and that is a constraint rather than a preference:
+     her asset is a square with #f3f6f2 baked in, dissolved by a radial
+     mask. Over a translucent panel the mask would meet whatever the
+     hero film is showing that second, and her edge would ring. So the
+     glass goes on the CHROME — chips, bar, buttons, the rim below —
+     and the ground she stands on stays light and still. */
+  background: linear-gradient(180deg, #fbfcfa 0%, #f7f8f6 44%, #f2f5f1 100%);
+  /* Depth in four layers rather than one flat drop: a tight contact
+     shadow, a wide ambient one, a cool rim that ties it to the brand,
+     and an inner top highlight that gives the edge its thickness. */
   box-shadow:
-    0 30px 70px rgba(11, 31, 42, 0.2),
-    0 2px 8px rgba(11, 31, 42, 0.06);
+    0 1px 2px rgba(11, 31, 42, 0.06),
+    0 8px 24px rgba(11, 31, 42, 0.08),
+    0 36px 80px rgba(11, 31, 42, 0.22),
+    0 0 0 1px rgba(0, 111, 115, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* The wrapper is a flex item of .dock__panel, and a flex item defaults
+   to min-width:auto — so .kiosk refused to shrink below its widest
+   child and stood 713px wide inside a 490px panel. Every constraint
+   below it was therefore measuring against the wrong number. This is
+   the link in the chain that actually had to be cut. */
+.kiosk--compact {
+  min-width: 0;
+  width: 100%;
 }
 
 .kiosk--compact .kiosk__frame {
   background: transparent;
   position: relative;
   isolation: isolate;
+  min-width: 0;
+  /* index.css puts overflow:hidden on .kiosk__frame. That is fine on a
+     desktop panel, where the ambient glow (460px) fits inside the frame
+     (490px) — but on a phone the frame is 374px, so the clip cut the
+     glow into hard vertical edges and drew a visible square around her:
+     the exact card boundary this design exists to remove. Releasing it
+     is safe because .dock__panel already clips to its own radius, so
+     nothing escapes the panel; only the glow stops being squared off. */
+  overflow: visible;
 }
 
 /* Ambient light rather than decoration: warm gold low behind her
@@ -47,9 +78,19 @@
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(70% 46% at 50% 20%, rgba(0, 160, 160, 0.14), transparent 72%),
-    radial-gradient(78% 40% at 50% 62%, rgba(216, 163, 42, 0.16), transparent 74%),
-    linear-gradient(180deg, #f7faf7 0%, #f3f6f2 46%, #eef2ee 100%);
+    radial-gradient(64% 40% at 22% 12%, rgba(0, 160, 160, 0.16), transparent 70%),
+    radial-gradient(58% 38% at 84% 30%, rgba(0, 111, 115, 0.10), transparent 72%),
+    radial-gradient(84% 42% at 50% 68%, rgba(216, 163, 42, 0.15), transparent 76%),
+    linear-gradient(180deg, #fbfdfb 0%, #f4f7f3 46%, #eef2ee 100%);
+  /* The light drifts. Twenty-eight seconds for a 3% move is under the
+     threshold you would call animation — it just stops the panel from
+     looking like a printed rectangle. */
+  animation: dock-aurora 28s ease-in-out infinite;
+}
+
+@keyframes dock-aurora {
+  0%, 100% { transform: scale(1)    translate3d(0, 0, 0); }
+  50%      { transform: scale(1.03) translate3d(0, -1.2%, 0); }
 }
 
 /* ---- header: type sitting on the background, not a bar ---- */
@@ -61,19 +102,31 @@
 }
 
 .kiosk__name {
-  font-size: 0.9rem;
+  font-family: "Outfit", "Inter Variable", "Inter", system-ui, sans-serif;
+  font-size: 0.88rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--teal-deep);
+}
+
+.kiosk__intro::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gold);
+  margin-top: 0.6rem;
 }
 
 .kiosk__role {
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--ink-faint);
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .kiosk__live {
@@ -81,9 +134,16 @@
   align-items: center;
   gap: 0.4rem;
   margin-left: auto;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 111, 115, 0.16);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--teal-deep);
   white-space: nowrap;
@@ -101,23 +161,29 @@
   overflow: visible;
 }
 
-/* The light she emerges from. Wider than she is, and with no edge —
-   closest-side to transparent, so it ends nowhere in particular. */
+/* Ambient light behind her — and it must stay NARROWER THAN THE PANEL.
+   It used to be min(128%, 460px), which is 460px inside a 430px panel,
+   so .dock__panel's overflow:hidden sliced the ellipse's sides into
+   two straight vertical edges. With a near-white core at 0.9 alpha
+   that read as a white card sitting behind her: the exact boundary
+   this design exists to remove, produced by the thing meant to remove
+   it. Narrower than the panel, and no white core — the panel ground is
+   already light, so the glow only needs to carry the brand hues. */
 .kiosk__stage::before {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(128%, 460px);
-  aspect-ratio: 1.1;
+  width: min(88%, 350px);
+  aspect-ratio: 1;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(
     closest-side,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(0, 160, 160, 0.13) 46%,
-    rgba(216, 163, 42, 0.1) 66%,
-    transparent 82%
+    rgba(0, 160, 160, 0.16) 0%,
+    rgba(0, 160, 160, 0.10) 44%,
+    rgba(216, 163, 42, 0.09) 68%,
+    transparent 80%
   );
   pointer-events: none;
   z-index: 0;
@@ -126,6 +192,47 @@
 .kiosk__stage > * {
   position: relative;
   z-index: 1;
+}
+
+/* A second, finer ring of light INSIDE the first. Two soft edges read
+   as depth where one reads as a blob — and because both sit behind
+   her, nothing is ever drawn over her face. It is the one place the
+   design is allowed to look like a presence rather than a picture. */
+.kiosk__stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: min(96%, 300px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0) 62%,
+    rgba(0, 160, 160, 0.16) 84%,
+    rgba(0, 160, 160, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
+}
+
+/* The ring answers the state, slowly, and only by breathing. */
+@keyframes halo-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);     opacity: 0.72; }
+  50%      { transform: translate(-50%, -50%) scale(1.075); opacity: 1; }
+}
+.kiosk__stage--listening::after { animation: halo-breathe 4.2s ease-in-out infinite; }
+.kiosk__stage--answering::after { animation: halo-breathe 2.8s ease-in-out infinite; }
+.kiosk__stage--thinking::after {
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0) 62%,
+    rgba(216, 163, 42, 0.20) 84%,
+    rgba(216, 163, 42, 0) 100%
+  );
+  animation: halo-breathe 3.4s ease-in-out infinite;
 }
 
 /* No ring. It was the most dashboard-like thing in the previous pass:
@@ -142,14 +249,51 @@
   overflow: visible;
 }
 
-/* The mask that removes the card. Her square edge dissolves into the
-   panel, biased upward so her face keeps full opacity and only the
-   ground around her shoulders fades out. Prefixed form first: the
-   minifier treats the two as aliases and keeps whichever comes last. */
+/* A CIRCLE, not a dissolved square.
+
+   The radial mask that used to live here was solving the right problem
+   the hard way: her asset is opaque with #f3f6f2 baked in, so a square
+   edge shows against any panel, and the mask faded that edge out. It
+   worked on a wide desktop panel and failed everywhere else — on a
+   phone the frame is narrower than the ambient glow, the clip squared
+   the glow off, and a hard rectangle appeared around her again.
+   
+   Cropping to a circle removes the edge instead of hiding it: there is
+   no corner left to show. The ring and the glow then belong to the
+   design rather than compensating for the asset, which is how the
+   kiosk screen presents her. */
 .avatar--hero .avatar__frame {
-  -webkit-mask-image: radial-gradient(ellipse 74% 78% at 50% 42%, #000 52%, rgba(0, 0, 0, 0.72) 74%, transparent 100%);
-  mask-image: radial-gradient(ellipse 74% 78% at 50% 42%, #000 52%, rgba(0, 0, 0, 0.72) 74%, transparent 100%);
+  -webkit-mask-image: none;
+  mask-image: none;
+  border-radius: 50%;
+  object-fit: cover;
+  /* Her head sits high in a 512 square, so a centred circle would crop
+     the top of her hair and leave dead space at the chest. */
+  object-position: 50% 16%;
+  /* White ring first, then teal — the white separates her from the ring
+     so the teal reads as light around her rather than a border drawn on
+     her. */
   animation: avatar-float 10s ease-in-out infinite;
+}
+
+.avatar--hero {
+  border-radius: 50%;
+  /* The CLIP lives here, on the parent, not on the <img>. border-radius
+     on the image alone rounded its box — the outline followed the
+     circle — but did not clip the painted bitmap, so her square
+     background kept showing in the four corners. Clipping on the
+     containing span works regardless of how the replaced content is
+     fitted.
+
+     The rings live here too, for the same reason: a box-shadow on the
+     image is drawn outside the image's box and this parent clips it
+     away. White first so the teal reads as light around her rather
+     than a line drawn on her. */
+  overflow: hidden;
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.95),
+    0 0 0 6px rgba(0, 111, 115, 0.22),
+    0 14px 34px rgba(11, 31, 42, 0.13);
 }
 
 /* She floats, barely: ten seconds, three pixels. Enough that she is not
@@ -174,8 +318,8 @@
 .kiosk__stage--thinking::before {
   background: radial-gradient(
     closest-side,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(216, 163, 42, 0.18) 46%,
+    rgba(216, 163, 42, 0.20) 0%,
+    rgba(216, 163, 42, 0.12) 48%,
     transparent 80%
   );
 }
@@ -200,7 +344,8 @@
 }
 
 .kiosk__stateText strong {
-  font-size: 0.82rem;
+  font-family: "Outfit", "Inter Variable", "Inter", system-ui, sans-serif;
+  font-size: 0.84rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--ink);
@@ -248,8 +393,9 @@
 }
 
 .kiosk__welcomeLead {
-  font-size: 1.12rem;
-  font-weight: 600;
+  font-family: "Outfit", "Inter Variable", "Inter", system-ui, sans-serif;
+  font-size: 1.16rem;
+  font-weight: 500;
   letter-spacing: -0.015em;
   color: var(--ink);
 }
@@ -303,27 +449,56 @@
 }
 
 .kiosk__start {
-  background: var(--teal-deep);
+  position: relative;
+  background: linear-gradient(168deg, #00868a 0%, var(--teal-deep) 56%, #005c60 100%);
   border: 0;
   color: #fff;
-  padding: 0.7rem 1.6rem;
-  font-size: 0.88rem;
+  padding: 0.78rem 1.8rem;
+  font-family: "Outfit", "Inter Variable", "Inter", system-ui, sans-serif;
+  font-size: 0.94rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   border-radius: 999px;
-  box-shadow: 0 8px 20px rgba(0, 111, 115, 0.24);
-  transition: background 0.2s var(--ease-soft), transform 0.2s var(--ease-soft);
+  /* A lit edge along the top and a shadow the same hue as the fill.
+     A neutral grey shadow under a coloured button is the detail that
+     makes a control look pasted on. */
+  box-shadow:
+    0 1px 2px rgba(0, 60, 62, 0.28),
+    0 10px 26px rgba(0, 111, 115, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  transition: transform 0.22s var(--ease-soft), box-shadow 0.22s var(--ease-soft),
+              filter 0.22s var(--ease-soft);
 }
 
 .kiosk__start:hover {
-  background: var(--teal);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+  box-shadow:
+    0 1px 2px rgba(0, 60, 62, 0.28),
+    0 16px 36px rgba(0, 111, 115, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+.kiosk__start:active { transform: translateY(0) scale(0.985); }
+
 .kiosk__ctrl {
-  background: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(11, 31, 42, 0.08);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(11, 31, 42, 0.07);
   color: var(--ink-soft);
-  padding: 0.5rem 1.05rem;
-  box-shadow: 0 3px 10px rgba(11, 31, 42, 0.05);
+  padding: 0.52rem 1.1rem;
+  box-shadow:
+    0 2px 8px rgba(11, 31, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: background 0.2s var(--ease-soft), border-color 0.2s var(--ease-soft),
+              transform 0.2s var(--ease-soft);
+}
+
+.kiosk__ctrl:hover {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(0, 111, 115, 0.22);
+  transform: translateY(-1px);
 }
 
 .kiosk__ctrl--end {
@@ -335,15 +510,27 @@
 .kiosk--compact .kiosk__bar {
   margin: 0 1rem 0.8rem;
   border-radius: 999px;
-  border: 1px solid rgba(11, 31, 42, 0.08);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 4px 14px rgba(11, 31, 42, 0.05);
+  border: 1px solid rgba(11, 31, 42, 0.07);
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  box-shadow:
+    0 2px 10px rgba(11, 31, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
   padding: 0.28rem 0.28rem 0.28rem 0.32rem;
+  transition: border-color 0.22s var(--ease-soft), box-shadow 0.22s var(--ease-soft),
+              background 0.22s var(--ease-soft);
 }
 
+/* Focus is a soft teal bloom, not a hard outline ring — the same
+   language as the halo behind her. */
 .kiosk--compact .kiosk__bar:focus-within {
-  border-color: rgba(0, 160, 160, 0.4);
-  box-shadow: 0 4px 18px rgba(0, 160, 160, 0.12);
+  background: rgba(255, 255, 255, 0.86);
+  border-color: rgba(0, 160, 160, 0.42);
+  box-shadow:
+    0 0 0 4px rgba(0, 160, 160, 0.10),
+    0 6px 22px rgba(0, 160, 160, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .kiosk--compact .kiosk__chips {
@@ -352,22 +539,100 @@
   scrollbar-width: none;
   padding: 0 1rem 0.4rem;
   justify-content: flex-start;
+  /* min-width:0 is the whole fix, and it was a real bug rather than a
+     nicety: a flex item defaults to min-width:auto, so this row refused
+     to shrink below its content. Six chips measured 713px inside a
+     490px panel, which widened the frame and carried the INPUT BAR 209
+     px outside the panel — the send button sat off the edge and the
+     panel scrolled sideways. It never scrolled horizontally because it
+     was never narrower than its contents. Predates this redesign;
+     fixed here because it breaks the surface being redesigned. */
+  min-width: 0;
 }
 
 .kiosk--compact .kiosk__chips::-webkit-scrollbar { display: none; }
 
 .kiosk--compact .kiosk__chips button {
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(11, 31, 42, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: background 0.2s var(--ease-soft), border-color 0.2s var(--ease-soft),
+              transform 0.2s var(--ease-soft);
+}
+
+.kiosk--compact .kiosk__chips button:hover {
+  background: rgba(255, 255, 255, 0.86);
+  border-color: rgba(0, 111, 115, 0.24);
+  transform: translateY(-1px);
+}
+
+/* ---- the launcher: she is the button ----------------------------
+   It was a flat white circle with a 2px gold ring, which is the most
+   generic chat-bubble treatment there is. The ring is now a soft teal
+   halo that sits OUTSIDE the edge, so nothing is drawn across her, and
+   the gold survives as a thin inner line rather than a border. */
+.dock__launcher {
+  border: 0;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7f3 100%);
+  box-shadow:
+    0 1px 2px rgba(11, 31, 42, 0.10),
+    0 10px 30px rgba(11, 31, 42, 0.20),
+    0 0 0 1px rgba(216, 163, 42, 0.55),
+    0 0 0 7px rgba(0, 160, 160, 0.10);
+  transition: transform 0.26s var(--ease-soft), box-shadow 0.26s var(--ease-soft);
+}
+
+.dock__launcher:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow:
+    0 1px 2px rgba(11, 31, 42, 0.10),
+    0 18px 42px rgba(11, 31, 42, 0.26),
+    0 0 0 1px rgba(216, 163, 42, 0.7),
+    0 0 0 11px rgba(0, 160, 160, 0.13);
+}
+
+.dock__launcher:active { transform: translateY(-1px) scale(0.99); }
+
+/* Open, it is no longer her — it is a close affordance, so it drops
+   the halo and goes quiet rather than competing with the panel. */
+.dock__launcher.is-open {
+  background: linear-gradient(180deg, #ffffff 0%, #eef2ee 100%);
+  box-shadow:
+    0 1px 2px rgba(11, 31, 42, 0.08),
+    0 8px 22px rgba(11, 31, 42, 0.16),
+    0 0 0 1px rgba(11, 31, 42, 0.06);
+}
+
+/* ---- the close button: glass, not a grey circle ---- */
+.dock__close {
+  border: 1px solid rgba(11, 31, 42, 0.07);
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  color: var(--ink-soft);
+  box-shadow:
+    0 2px 8px rgba(11, 31, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: background 0.2s var(--ease-soft), color 0.2s var(--ease-soft),
+              border-color 0.2s var(--ease-soft);
+}
+
+.dock__close:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 111, 115, 0.22);
+  color: var(--teal-deep);
 }
 
 /* ---- entrance ---- */
 @keyframes panel-rise {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
   to   { opacity: 1; transform: none; }
 }
 
-.dock__panel.is-open .kiosk__frame { animation: panel-rise 0.45s var(--ease-soft) both; }
+.dock__panel.is-open .kiosk__frame { animation: panel-rise 0.52s var(--ease-soft) both; }
 
 /* ---- responsive: height-aware, and the avatar gives way last ----
    Order of collapse is disclaimer, chips, welcome copy, padding, then
@@ -402,7 +667,14 @@
   .dock__panel {
     width: calc(100vw - 1rem);
     max-width: none;
-    height: calc(100dvh - 1rem);
+    /* Clear the site nav. Full height put the panel's own header — and
+       its close button — underneath the nav bar, which measured as
+       genuinely unreachable on a phone: the dock lives inside
+       main.overlay, so its z-index is capped by that stacking context
+       and the nav paints over it whatever number the dock carries.
+       Sitting below the nav is the fix that does not require
+       restructuring the page. */
+    height: calc(100dvh - 6.4rem);
     margin: 0.5rem;
     border-radius: 24px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -414,6 +686,8 @@
 @media (prefers-reduced-motion: reduce) {
   .avatar--hero .avatar__frame,
   .kiosk__stage::before,
+  .kiosk__stage::after,
+  .kiosk--compact .kiosk__frame::before,
   .kiosk__wave i:first-child,
   .dock__panel.is-open .kiosk__frame { animation: none !important; }
 }
