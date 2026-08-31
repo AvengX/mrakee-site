@@ -89,14 +89,34 @@ export default function Assistant({ compact = false }) {
      a message always turns it back on, because asking something is a
      statement that you want to see the answer. */
   const stick = useRef(true);
+  /* Rendered state, so the "new message" pill can appear. `stick` stays
+     a ref because the scroll handler reads it on every frame and must
+     not re-render the transcript to do so. */
+  const [atBottom, setAtBottom] = useState(true);
+  const [unseen, setUnseen] = useState(false);
 
   function onLogScroll(e) {
     const el = e.currentTarget;
-    stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    stick.current = near;
+    setAtBottom((was) => (was === near ? was : near));
+    if (near) setUnseen(false);
+  }
+
+  function jumpToLatest() {
+    const el = logRef.current;
+    if (!el) return;
+    stick.current = true;
+    setUnseen(false);
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }
 
   useEffect(() => {
     const el = logRef.current;
+    /* Reading older messages is a decision, so it is respected: a new
+       turn arriving while scrolled up raises the pill instead of
+       dragging the visitor back down. */
+    if (el && !stick.current) setUnseen(true);
     if (!el || !stick.current) return;
     /* Two frames: the first lets React paint the new turn, the second
        measures a scrollHeight that includes it. Scrolling on the same
@@ -123,6 +143,7 @@ export default function Assistant({ compact = false }) {
     sessionRef.current?.pause();
     const history = [...turns, { role: "user", content: question }];
     stick.current = true; // you asked, so you want to see the answer
+    setUnseen(false);
     setTurns(history);
     setDraft("");
     setState("thinking");
@@ -306,6 +327,22 @@ export default function Assistant({ compact = false }) {
             avatar moved to the stage below, where it can be seen, and
             the actions moved to the foot. */}
         <div className="kiosk__head">
+          {/* THE AVATAR, small and on the LEFT of the header.
+
+              It used to be a 330px portrait in the middle of the panel,
+              which pushed the conversation below the fold and made the
+              assistant read as a modal. It is identity here, not the
+              subject: the conversation is the subject. The component is
+              unchanged and still receives mouth and viseme, so lip-sync
+              plays exactly as before — at 64px rather than 330. */}
+          <AssistantAvatar
+            className="avatar--chip"
+            state={pose}
+            size={64}
+            mouth={mouth}
+            viseme={viseme}
+          />
+
           <div className="kiosk__intro">
             <p className="kiosk__name">MRAKEE AI</p>
             <p className="kiosk__role">Voice assistant</p>
@@ -325,22 +362,6 @@ export default function Assistant({ compact = false }) {
             </span>
           </div>
 
-          {/* THE AVATAR, small and in the header.
-
-              It used to be a 330px portrait in the middle of the panel,
-              which pushed the conversation below the fold and made the
-              assistant read as a modal. It is identity here, not the
-              subject: the conversation is the subject. The component is
-              unchanged and still receives mouth and viseme, so lip-sync
-              plays exactly as before — at 64px rather than 330. */}
-          <AssistantAvatar
-            className="avatar--chip"
-            state={pose}
-            size={64}
-            mouth={mouth}
-            viseme={viseme}
-          />
-
           {turns.length > 0 && !session && (
             <button type="button" className="kiosk__reset" onClick={reset} title="Clear the conversation">
               <RotateCcw size={15} aria-hidden="true" />
@@ -349,13 +370,6 @@ export default function Assistant({ compact = false }) {
           )}
         </div>
 
-        {!turns.length && !session && (
-          <div className="kiosk__welcome">
-            <p className="kiosk__welcomeLead">Hi, I&rsquo;m your MRAKEE AI assistant.</p>
-            <p className="kiosk__welcomeSub">Ask me about our solutions, services or the spaces we build.</p>
-          </div>
-        )}
-
         <div
           className="kiosk__log"
           ref={logRef}
@@ -363,7 +377,26 @@ export default function Assistant({ compact = false }) {
           role="log"
           aria-live="polite"
           aria-label="Conversation"
+          /* THE FIX FOR "I HAVE TO DRAG THE SCROLLBAR".
+
+             Lenis runs the page's smooth scrolling and takes wheel and
+             touch events on the whole document — measured: a wheel over
+             this list came back defaultPrevented, so the gesture was
+             being spent scrolling the PAGE and the conversation never
+             moved. The scrollbar was the only thing left that worked.
+
+             data-lenis-prevent is Lenis's own opt-out: it walks up from
+             the event target and leaves anything carrying it alone, so
+             the wheel, the trackpad and a finger all reach this element
+             and scroll it natively. */
+          data-lenis-prevent=""
         >
+          {!turns.length && (
+            <div className="kiosk__welcome">
+              <p className="kiosk__welcomeLead">Hi &#128075; I&rsquo;m MRAKEE AI.</p>
+              <p className="kiosk__welcomeSub">How can I help you today?</p>
+            </div>
+          )}
           {turns.map((t, i) =>
             t.role === "user" ? (
               <p className="kiosk__ask" key={i}>{t.content}</p>
@@ -403,10 +436,24 @@ export default function Assistant({ compact = false }) {
             )
           )}
 
+          {/* Quick actions live in the conversation, not in a rail
+              under it — they are the assistant's opening offer, so they
+              belong with the message that makes it, and they scroll
+              away with it once the conversation starts. */}
+          {turns.length === 0 && (
+            <ul className="kiosk__chips">
+              {QUICK_ASKS.map((q) => (
+                <li key={q}>
+                  <button type="button" onClick={() => ask(q)}>{q}</button>
+                </li>
+              ))}
+            </ul>
+          )}
+
           {speaking && (
-            <p className="kiosk__thinking">
+            <p className="kiosk__thinking" aria-label="MRAKEE AI is typing">
+              <span className="kiosk__typingWho">MRAKEE AI is typing</span>
               <i /><i /><i />
-              <span className="sr-only">Thinking</span>
             </p>
           )}
 
@@ -423,14 +470,10 @@ export default function Assistant({ compact = false }) {
           )}
         </div>
 
-        {turns.length === 0 && (
-          <ul className="kiosk__chips">
-            {QUICK_ASKS.map((q) => (
-              <li key={q}>
-                <button type="button" onClick={() => ask(q)}>{q}</button>
-              </li>
-            ))}
-          </ul>
+        {unseen && !atBottom && (
+          <button type="button" className="kiosk__jump" onClick={jumpToLatest}>
+            <span aria-hidden="true">&#8595;</span> New message
+          </button>
         )}
 
         {/* THE CONTROLS, at the foot where a phone call puts them,
