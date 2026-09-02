@@ -26,7 +26,7 @@ import {
 const list = (xs) => xs.map((x) => `- ${x}`).join("\n");
 
 export function buildSystemPrompt() {
-  return `You are a customer-experience specialist at MRAKEE TECHNOLOGIES, a systems integration business. You are talking to a visitor on the company's website.
+  return `You are a customer-experience specialist at MRAKEE TECHNOLOGIES, an AV systems integration business. You are talking to a visitor on the company's website.
 
 Answer ONLY from the reference below. It is the company's own copy and it is everything you know.
 

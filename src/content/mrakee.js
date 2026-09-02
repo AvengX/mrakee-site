@@ -7,16 +7,20 @@
    gave a name with no description, the name is all that appears —
    nothing here is written to fill a gap.
 
-   ONE EXCEPTION, on the client's later instruction: the abbreviation
-   "AV" has been removed from every visible string on the site. Mostly
-   that is a deletion ("AV Systems Integration" -> "Systems
-   Integration"), but four places needed a word rather than a gap, since
-   removing the noun left the phrase pointing at nothing:
+   THE "AV" QUESTION, twice reversed. An earlier instruction removed the
+   abbreviation from every visible string on the site. Edit 4 puts it
+   back, and not in passing: it says "AV" about fifteen times, in the
+   opening sentence, the approach, the bullets, the FAQ and the closing
+   line. That is deliberate, and it is the newer document, so the site
+   says AV again.
 
-     Conference room AV          -> Conference room systems
-     brings together AV Technology -> brings together technology
-     coordinate AV requirements  -> coordinate technology requirements
-     an AV Systems Integration business -> a Systems Integration business
+   Four of those needed a word rather than a gap when it was removed,
+   and they are back to the original phrasing now:
+
+     Conference room systems            -> Conference room AV
+     brings together technology         -> brings together AV Technology
+     coordinate technology requirements -> coordinate AV requirements
+     a Systems Integration business     -> an AV Systems Integration business
 
    The last of those changes the article as well; "an" before "AV" is
    pronounced, not spelled.
@@ -54,22 +58,22 @@
    ================================================================ */
 
 export const HERO = {
-  eyebrow: "Systems Integration",
+  eyebrow: "AV Systems Integration",
   headline: "Integration made Simple",
-  strap: "Re-engineering the way technology connects the future.",
+  strap: "Engineering the way technology connects the future.",
   tagline: "Design. Integrate. Connect. Perform.",
   intro: [
-    "MRAKEE TECHNOLOGIES is a Systems Integration business that creates the road map for delivering smart, reliable, scalable technology solutions for business that are looking to redefine their technology. Expertise that range for solutions to support modern workplaces, educational institutions, secure government facilities, hospitality, critical command centres and large enterprise environments.",
-    "MRAKEE Technologies brings together technology, leading engineering expertise, revolutionary and intentional design to create spaces that are intuitive to use. Powerful in performance and built to scale with your business. Where growth is built together.",
+    "MRAKEE TECHNOLOGIES is an AV Systems Integration business that creates the road map for delivering smart, reliable, scalable technology solutions for business that are looking to redefine their technology. Expertise that range for solutions to support modern workplaces, educational institutions, secure government facilities, hospitality, critical command centres and large enterprise environments.",
+    "MRAKEE Technologies brings together AV Technology, leading engineering expertise, revolutionary and intentional design to create spaces that are intuitive to use. Powerful in performance and built to scale with your business. Where growth is built together.",
   ],
 };
 
 export const ABOUT = {
-  title: "Re-imagining the way that Technology connects People and endless Possibilities.",
+  title: "Displaying the way Technology connects People and endless Possibilities.",
   lede: "At MRAKEE TECHNOLOGIES, our belief is making technology seamless, secure and simple.",
   body: [
-    "Our team specialises in designing and integrating systems that help businesses deliver their technology needs. Ensuring that the solutions simplify and captivate users with engaging experiences.",
-    "Specialising in a wide range of solutions, our team will manage the complete journey. From Concept, Design, Installation, After Care, Training and On-going support. Each requirement is managed by experts who bring technical and market knowledge to ensure the success of your business goals.",
+    "Our team specialises in designing and integrating AV Systems that help businesses deliver their technology needs. Ensuring that the solutions simplify and captivate users with engaging experiences.",
+    "Specialising in a wide range of solutions, our team will manage the complete AV journey. From Concept, Design, Installation, After Care, Training and On-going support. Each requirement is managed by experts who bring technical and market knowledge to ensure the success of your business goals.",
     "Bridging the gap of reliable performance today with proactive planning for tomorrow.",
   ],
 };
@@ -106,7 +110,7 @@ export const SOLUTIONS = [
     quote: "Connectivity beyond a room…",
     img: "solutions/13.jpg",
     fallback: "solutions/13.jpg",
-    points: ["Video conferencing systems", "Conference room systems", "Wireless presentation", "Room scheduling", "Professional microphones and speakers", "Camera systems", "Collaboration platforms", "Room control and automation"],
+    points: ["Video conferencing systems", "Conference room AV", "Wireless presentation", "Room scheduling", "Professional microphones and speakers", "Camera systems", "Collaboration platforms", "Room control and automation"],
   },
   {
     t: "Corporate Meeting & Board Rooms",
@@ -127,7 +131,7 @@ export const SOLUTIONS = [
     quote: "Information is Key, delivering reliability during critical situations.",
     img: "solutions/03.jpg",
     fallback: "solutions/03.jpg",
-    points: ["Video walls", "Operator workstations", "Centralized control", "Signal distribution", "Monitoring systems", "Large-format displays", "Collaboration systems", "Control room audio", "24/7 operational support"],
+    points: ["Video walls", "Operator workstations", "Centralized AV control", "Signal distribution", "Monitoring systems", "Large-format displays", "Collaboration systems", "Control room audio", "24/7 operational support"],
   },
   {
     t: "Experience Centres",
@@ -167,8 +171,9 @@ export const SOLUTIONS = [
   },
 ];
 
-/* Eight industries. The document gives names only, so the showcase
-   shows names only. */
+/* Nine industries. The document gives names only, so the showcase shows
+   names only. Infrastructure was added in Edit 4; there is no
+   photograph for it yet, so it falls back like the other eight. */
 export const INDUSTRIES = [
   { t: "Corporate Solutions", short: "Corporate", img: "industries/01.jpg", fallback: "solutions/13.jpg" },
   { t: "Education", short: "Education", img: "industries/02.jpg", fallback: "solutions/02.jpg" },
@@ -178,6 +183,7 @@ export const INDUSTRIES = [
   { t: "Retail", short: "Retail", img: "industries/06.jpg", fallback: "solutions/10.jpg" },
   { t: "Banking & Financial Institutions", short: "Banking", img: "industries/07.jpg", fallback: "solutions/12.jpg" },
   { t: "Warehouse & Manufacturing", short: "Warehouse", img: "industries/08.jpg", fallback: "solutions/14.jpg" },
+  { t: "Infrastructure", short: "Infrastructure", img: "industries/09.jpg", fallback: "solutions/16.jpg" },
 ];
 
 export const WHY = [
@@ -195,14 +201,14 @@ export const WHY = [
    the team its sentence goes on to describe. */
 export const EXPERTISE = [
   { t: "Begin with Questions", d: "Where our experts evaluate your current set up, objectives, infrastructure and set goals." },
-  { t: "Engineering", d: "Our Engineering experts then work the magic of bridging concept to detailed designs." },
+  { t: "Engineering", d: "Our Engineering experts then work the magic of bridging concept to detailed AV Designs." },
   { t: "Project Delivery", d: "Then our Project Team work with the customer to manage procurement, scheduling, installing, stakeholder management, testing and ensuring successful timely completion." },
   { t: "Training", d: "Our Training Team will share customers with user and administrator testing which will allow the customers to confidently operate the new solutions." },
   { t: "MRAKEE After Care", d: "MRAKEE After Care team will be assigned to ensure that maintenance and support are managed." },
 ];
 
 export const EXPERTS = {
-  title: "One Team, One Goal, One Seamless experience.",
+  title: "One Team, One Goal, One Seamless AV experience.",
   body: [
     "MRAKEE TECHNOLOGIES invests in having the best minds in the business. This allows our customers to feel confident that who they interact with, have the technical, operational and market knowledge and experience to help with their requirements.",
     "Collaborative, approachable and professional are the pillars of the teams that will support your business needs.",
@@ -216,9 +222,9 @@ export const INSIGHTS = {
   title: "Know what is happening within the Technology.",
   lede: "Shaping modern technology today and beyond.",
   items: [
-    { t: "Technology", d: "Understand emerging technologies and how they can improve your environment." },
+    { t: "AV Technology", d: "Understand emerging technologies and how they can improve your environment." },
     { t: "Workplace Collaboration", d: "Explore new approaches to hybrid work, meetings and communication." },
-    { t: "Smart Spaces", d: "Discover how automation and connected technologies are transforming physical spaces." },
+    { t: "Smart Spaces", d: "Discover how AV, automation and connected technologies are transforming physical spaces." },
     { t: "Industry Insights", d: "Practical perspectives on technology adoption across industries." },
     { t: "Project Stories", d: "Explore the challenges, solutions and outcomes behind our projects." },
   ],
@@ -228,11 +234,11 @@ export const INSIGHTS = {
    have not made any changes." */
 export const FAQ = [
   { q: "What does MRAKEE TECHNOLOGIES do?", a: "MRAKEE TECHNOLOGIES designs, supplies, integrates and supports professional audio-visual technology for organizations across corporate, education, government, hospitality and other sectors." },
-  { q: "Can MRAKEE TECHNOLOGIES upgrade an existing system?", a: "Yes. We can assess existing infrastructure and recommend upgrades, replacements or improvements based on your requirements and available infrastructure." },
-  { q: "Do you provide complete turnkey solutions?", a: "Yes. Our services can cover consultation, design, equipment supply, installation, integration, programming, commissioning, training and ongoing support." },
+  { q: "Can MRAKEE TECHNOLOGIES upgrade an existing AV system?", a: "Yes. We can assess existing infrastructure and recommend upgrades, replacements or improvements based on your requirements and available infrastructure." },
+  { q: "Do you provide complete turnkey AV solutions?", a: "Yes. Our services can cover consultation, design, equipment supply, installation, integration, programming, commissioning, training and ongoing support." },
   { q: "Can you integrate different brands and technologies?", a: "Yes. We design technology environments based on functionality and compatibility, allowing different systems to work together as one solution." },
-  { q: "Do you provide maintenance after installation?", a: "Yes. We offer support and maintenance services designed to keep environments operational and minimize downtime." },
-  { q: "Can you design solutions for new buildings?", a: "Yes. Early involvement allows our team to coordinate technology requirements with architecture, electrical systems, networking, acoustics and other building infrastructure." },
+  { q: "Do you provide maintenance after installation?", a: "Yes. We offer support and maintenance services designed to keep AV environments operational and minimize downtime." },
+  { q: "Can you design AV solutions for new buildings?", a: "Yes. Early involvement allows our team to coordinate AV requirements with architecture, electrical systems, networking, acoustics and other building infrastructure." },
 ];
 
 export const FOOTER = {

@@ -49,7 +49,7 @@ const CAPTIONS = [
     // Solid at rest, starts going the moment you scroll, gone by ~32vh.
     in: -0.05, out: 0.06, fade: 0.03, align: "center",
     title: <>Integration made <span className="grad-text">Simple</span>.</>,
-    body: "Re-engineering the way technology connects the future. Design. Integrate. Connect. Perform.",
+    body: "Engineering the way technology connects the future. Design. Integrate. Connect. Perform.",
     hero: true,
   },
   // The three below are placed against what the commercial is actually
@@ -83,7 +83,7 @@ const CAPTIONS = [
     // also restores the alternation — centre, right, left, centre.
     in: 0.62, out: 0.8, align: "left", ink: "light",
     title: <>Spaces that are<br />intuitive to use.</>,
-    body: "Technology, engineering expertise and intentional design, brought together into one coordinated environment.",
+    body: "AV technology, engineering expertise and intentional design, brought together into one coordinated environment.",
   },
   {
     // Right, not centre. Centred put the line straight across the
@@ -94,7 +94,7 @@ const CAPTIONS = [
     // right it is 3.04:1 there and 8.87:1 across the box, and the text
     // now sits beside the kiosk instead of on it.
     in: 0.86, out: 1.08, align: "right", ink: "light",
-    title: <>One Team, One Goal,<br />One Seamless experience.</>,
+    title: <>One Team, One Goal,<br />One Seamless AV experience.</>,
     body: "From concept, design and installation through to training, after care and on-going support.",
   },
 ];
