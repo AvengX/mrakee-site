@@ -1654,6 +1654,40 @@ h3 {
   overflow: hidden; /* the track is wider than the page by design */
 }
 
+/* ---- the rail with motion off ---------------------------------
+   Every card still reachable, by wheel, trackpad, touch, scrollbar or
+   keyboard — just without the pinned scrub. .rail clips its track by
+   design (the track is wider than the page), so when the tween that
+   moves it is never created, the clip has to become a scroller or the
+   content is simply gone: 3,036px of it, measured. */
+.rail--static {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: clamp(1.5rem, 6vw, 4rem);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(11, 31, 42, 0.22) transparent;
+}
+
+.rail--static .rail__track {
+  /* nothing is transforming this now, so stop promoting it */
+  will-change: auto;
+}
+
+.rail--static .rail__card { scroll-snap-align: start; }
+
+.rail--static::-webkit-scrollbar { height: 8px; }
+.rail--static::-webkit-scrollbar-track { background: transparent; }
+.rail--static::-webkit-scrollbar-thumb {
+  background: rgba(11, 31, 42, 0.2);
+  border-radius: 999px;
+}
+.rail--static:hover::-webkit-scrollbar-thumb { background: rgba(11, 31, 42, 0.32); }
+
+/* The progress bar tracked the scrub, which no longer runs. */
+.rail--static .rail__bar { display: none; }
+
 .rail__track {
   display: flex;
   align-items: stretch;

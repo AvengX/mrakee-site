@@ -51,6 +51,19 @@ export default function SolutionRail({ items }) {
     return () => { alive = false; };
   }, [items]);
 
+  /* WHEN MOTION IS OFF, THE RAIL BECOMES A PLAIN SCROLLER.
+
+     Respecting prefers-reduced-motion must not mean hiding content, and
+     it did: the track is width:max-content and .rail clips it, so with
+     the scrub tween never created there was no way to reach cards three
+     to nine. Measured on a machine reporting `reduce`: 3,036px of the
+     rail simply unreachable, two of nine cards visible, no scrollbar,
+     no keyboard route.
+
+     So the pinned scrub is the enhancement and native horizontal
+     scrolling is the floor. Same cards, same order, no animation. */
+  const [still] = useState(() => !motionAllowed());
+
   useLayoutEffect(() => {
     const pin = pinRef.current;
     const track = trackRef.current;
@@ -100,7 +113,7 @@ export default function SolutionRail({ items }) {
   }, [items]);
 
   return (
-    <div className="rail" ref={pinRef}>
+    <div className={`rail${still ? " rail--static" : ""}`} ref={pinRef}>
       <div className="rail__track" ref={trackRef}>
         {items.map((s, i) => (
           <article className="rail__card" key={s.t}>
