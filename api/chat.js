@@ -155,7 +155,7 @@ export default async function handler(req, res) {
       model: MODEL,
       /* 1024, not 4096. The reply is one to three sentences; a cap this
          far above the real length only risks a long tail. */
-      max_tokens: 1024,
+      max_tokens: 512,
       // identical on every request, so it is written once and read back
       // at a fraction on every message after
       system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
