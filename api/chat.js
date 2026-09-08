@@ -137,17 +137,15 @@ export default async function handler(req, res) {
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no");
   res.flushHeaders?.();
-  /* Sent before the model is called, so the client can separate
-     "reaching the function" from "the model thinking". */
-  res.write(`data: {"ready":1}${"
-
-"}`);
-
   /* One SSE frame: `data: ` + JSON + a blank line. The blank line is
      the frame terminator, so it is written explicitly rather than as
      two real newlines in the template — a formatter would eat those. */
   const FRAME_END = "\n\n";
   const send = (obj) => res.write(`data: ${JSON.stringify(obj)}${FRAME_END}`);
+
+  /* Sent before the model is called, so the client can separate
+     "reaching the function" from "the model thinking". */
+  send({ ready: 1 });
 
   try {
     T.clientReady = Date.now();
