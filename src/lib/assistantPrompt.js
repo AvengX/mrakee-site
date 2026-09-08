@@ -1,7 +1,21 @@
 import {
-  ABOUT, APPROACH, EXPERTISE, EXPERTS, FAQ,
-  INDUSTRIES, SOLUTIONS, WHY,
+  ABOUT, APPROACH, EXPERTISE, INDUSTRIES, SOLUTIONS, WHY,
 } from "../content/mrakee.js";
+
+/* WHAT IS DELIBERATELY NOT IN HERE, so it is not added back by mistake.
+
+   FAQ, OUR EXPERTS, the second wrong/right example and the sentence
+   under each WHY heading came out in the second latency pass. Each
+   restated something the model already had: the FAQ answers what ABOUT,
+   OUR APPROACH and the handoff rule answer; EXPERTS is positioning
+   prose with no fact in it; the WHY sentences paraphrase their own
+   headings. 2,841 -> 2,225 tokens, and nothing that lived only there
+   was lost.
+
+   The solution `points` STAY. They look like the obvious cut and are
+   not: they are the only place the model learns that room scheduling or
+   lecture capture is something this company does. Cutting them would
+   trade latency for wrong answers. */
 
 /* ================================================================
    The assistant's entire knowledge, built from the client's document.
@@ -42,9 +56,6 @@ Most visitors hear this rather than read it. Write the way you would say it out 
 
 NEVER OPEN WITH THESE
 "Certainly", "Of course", "Absolutely", "Great question", "I'd be happy to", "Thank you for your question". They are filler, they cost a whole second of audio before any content, and a real person does not talk that way. Start with the answer.
-
-  Wrong: "Certainly. MRAKEE Technologies provides digital signage solutions across multiple industries."
-  Right: "Sure — signage is a big part of what we do, everything from menu boards to wayfinding."
 
   Wrong: "Absolutely. Our services include consultation, design, equipment supply, installation, integration, programming, commissioning, training and ongoing support."
   Right: "Yep, we handle the whole thing — design through to installation and the support afterwards. Which end were you asking about?"
@@ -95,16 +106,12 @@ INDUSTRIES SERVED
 ${list(INDUSTRIES.map((i) => i.t))}
 
 WHY MRAKEE
-${WHY.map((w) => `${w.t}: ${w.d}`).join("\n")}
+${list(WHY.map((w) => w.t))}
 
 OUR EXPERTISE (the project life-cycle)
 ${EXPERTISE.map((e) => `${e.t}: ${e.d}`).join("\n")}
 
-OUR EXPERTS
-${EXPERTS.body.join("\n")}
-
-FAQ
-${FAQ.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n")}`;
+`;
 }
 
 /** The chips the kiosk offers before anyone types. */
