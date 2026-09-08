@@ -29,7 +29,7 @@ import { SOLUTIONS } from "../src/content/mrakee.js";
    Haiku 4.5 does not think unless asked and is the fastest model in the
    family. Note it REJECTS output_config.effort, which is why that is
    gone rather than lowered. */
-const MODEL = "claude-haiku-4-5";
+const MODEL = "claude-sonnet-5";
 
 /* The control line the model appends, and the client never sees. It
    carries the two things the prose cannot: which solution cards to show,
@@ -133,6 +133,7 @@ export default async function handler(req, res) {
       /* 1024, not 4096. The reply is one to three sentences; a cap this
          far above the real length only risks a long tail. */
       max_tokens: 1024,
+      thinking: { type: "disabled" },
       // identical on every request, so it is written once and read back
       // at a fraction on every message after
       system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
