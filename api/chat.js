@@ -76,6 +76,10 @@ function rateLimited(ip) {
 }
 
 export default async function handler(req, res) {
+  /* TEMPORARY INSTRUMENTATION for the second latency pass. Reports where
+     the wall-clock actually goes, so the next change is aimed rather
+     than guessed. Removed before this pass is finished. */
+  const T = { recv: Date.now() };
   if (req.method !== "POST") {
     return res.status(405).json({ error: "POST only" });
   }
@@ -133,6 +137,11 @@ export default async function handler(req, res) {
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no");
   res.flushHeaders?.();
+  /* Sent before the model is called, so the client can separate
+     "reaching the function" from "the model thinking". */
+  res.write(`data: {"ready":1}${"
+
+"}`);
 
   /* One SSE frame: `data: ` + JSON + a blank line. The blank line is
      the frame terminator, so it is written explicitly rather than as
@@ -141,7 +150,9 @@ export default async function handler(req, res) {
   const send = (obj) => res.write(`data: ${JSON.stringify(obj)}${FRAME_END}`);
 
   try {
+    T.clientReady = Date.now();
     const client = new Anthropic();
+    T.modelStart = Date.now();
     const stream = client.messages.stream({
       model: MODEL,
       /* 1024, not 4096. The reply is one to three sentences; a cap this
@@ -162,6 +173,7 @@ export default async function handler(req, res) {
     let cut = -1;
 
     stream.on("text", (delta) => {
+      if (!T.firstDelta) T.firstDelta = Date.now();
       full += delta;
       if (cut === -1) {
         const at = full.indexOf(META);
@@ -201,6 +213,12 @@ export default async function handler(req, res) {
       reply: body,
       matches,
       handoff,
+      timing: {
+        sdkInit: T.clientReady - T.recv,
+        toModelCall: T.modelStart - T.recv,
+        anthropicTTFT: (T.firstDelta || Date.now()) - T.modelStart,
+        serverTotal: Date.now() - T.recv,
+      },
       usage: {
         input: msg?.usage?.input_tokens ?? null,
         cacheRead: msg?.usage?.cache_read_input_tokens ?? null,
