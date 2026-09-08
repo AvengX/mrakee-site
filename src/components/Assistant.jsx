@@ -144,7 +144,18 @@ export default function Assistant({ compact = false }) {
     const history = [...turns, { role: "user", content: question }];
     stick.current = true; // you asked, so you want to see the answer
     setUnseen(false);
-    setTurns(history);
+    /* THE BUBBLE APPEARS WITH THE QUESTION, NOT WITH THE ANSWER.
+
+       It used to be created by the first token, which meant a typing
+       pill was mounted at ~22ms, then unmounted, and a bubble mounted
+       in its place at ~1090ms. Two elements for one message, and the
+       text arrived into a container that had just appeared.
+
+       Now one element is mounted immediately, holding the same typing
+       dots, and the text fills it in place. `pending` is what marks it
+       as not-yet-answered; the model has not been called at this
+       point, so nothing here fabricates a reply. */
+    setTurns([...history, { role: "assistant", content: "", pending: true, matches: [], handoff: false }]);
     setDraft("");
     setState("thinking");
     setError(null);
@@ -224,14 +235,16 @@ export default function Assistant({ compact = false }) {
                  answer is complete, so she starts presenting as she
                  starts speaking. */
               setState("answering");
-              setTurns((t) => [...t, { role: "assistant", content: reply, matches: [], handoff: false }]);
-            } else {
-              setTurns((t) => {
-                const next = t.slice();
-                next[next.length - 1] = { ...next[next.length - 1], content: reply };
-                return next;
-              });
             }
+            setTurns((t) => {
+              const next = t.slice();
+              next[next.length - 1] = {
+                ...next[next.length - 1],
+                content: reply,
+                pending: false,
+              };
+              return next;
+            });
           }
 
           if (ev.done) meta = ev;
@@ -305,6 +318,12 @@ export default function Assistant({ compact = false }) {
         setTimeout(() => setState((st) => (st === "answering" ? "idle" : st)), 2600);
       }
     } catch (e) {
+      /* Drop the placeholder rather than leaving an empty bubble with
+         dots in it forever. */
+      setTurns((t) => {
+        const last = t[t.length - 1];
+        return last?.role === "assistant" && last.pending ? t.slice(0, -1) : t;
+      });
       setError({ text: e.message, offerEnquiry: true });
       setState("error");
     }
@@ -385,7 +404,8 @@ export default function Assistant({ compact = false }) {
   };
 
   const listening = state === "listening";
-  const speaking = state === "thinking";
+  /* `speaking` used to gate a standalone typing pill. The dots now live
+     inside the pending assistant bubble, so the flag has no reader. */
   const pose =
     state === "listening" ? "listening"
     : state === "thinking" ? "thinking"
@@ -477,7 +497,14 @@ export default function Assistant({ compact = false }) {
               <p className="kiosk__ask" key={i}>{t.content}</p>
             ) : (
               <div className="kiosk__answer" key={i}>
-                <p>{t.content}</p>
+                {t.pending ? (
+                  <p className="kiosk__thinking" aria-label="MRAKEE AI is typing">
+                    <span className="kiosk__typingWho">MRAKEE AI is typing</span>
+                    <i /><i /><i />
+                  </p>
+                ) : (
+                  <p>{t.content}</p>
+                )}
                 {t.matches?.length > 0 && (
                   <ul className="kiosk__cards">
                     {t.matches.map((title) => {
@@ -523,13 +550,6 @@ export default function Assistant({ compact = false }) {
                 </li>
               ))}
             </ul>
-          )}
-
-          {speaking && (
-            <p className="kiosk__thinking" aria-label="MRAKEE AI is typing">
-              <span className="kiosk__typingWho">MRAKEE AI is typing</span>
-              <i /><i /><i />
-            </p>
           )}
 
           {state === "error" && (
