@@ -209,7 +209,7 @@ export default function FilmStage() {
           <div
             key={i}
             ref={(el) => (capRefs.current[i] = el)}
-            className={`cap cap--${c.align}${c.ink === "light" ? " cap--light" : ""}`}
+            className={`cap cap--${c.align}${c.ink === "light" ? " cap--light" : ""}${c.hero ? " cap--hero" : ""}`}
             style={{ opacity: 0, visibility: "hidden" }}
           >
             {/* No eyebrow on any caption. The pills were removed on
