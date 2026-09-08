@@ -28,8 +28,22 @@ import { SOLUTIONS } from "../src/content/mrakee.js";
    cached reference. It needs time-to-first-token, not reasoning depth.
    Haiku 4.5 does not think unless asked and is the fastest model in the
    family. Note it REJECTS output_config.effort, which is why that is
-   gone rather than lowered. */
-const MODEL = "claude-sonnet-5";
+   gone rather than lowered.
+
+   SONNET 5 WAS TRIED AND LOST, so nobody needs to try it again. It was
+   measured in production with thinking explicitly disabled: median TTFT
+   3,525ms against Haiku's ~1,600ms. It caches this prompt where Haiku
+   does not (minimums are 1,024 and 4,096 tokens; ours is ~2,329), and
+   it still lost by more than two to one — which settles that the
+   uncached prefill is not the term that matters here.
+
+   THE CACHE COST OF THIS CHOICE IS REAL AND ACCEPTED. Below 4,096
+   tokens Haiku ignores cache_control silently, with no error, so every
+   request re-reads ~2,329 input tokens. At Haiku's rate that is about
+   $0.002 per message. The cache_control below is kept deliberately: it
+   costs nothing today and starts working the moment the reference grows
+   past the threshold. */
+const MODEL = "claude-haiku-4-5";
 
 /* The control line the model appends, and the client never sees. It
    carries the two things the prose cannot: which solution cards to show,
@@ -133,7 +147,6 @@ export default async function handler(req, res) {
       /* 1024, not 4096. The reply is one to three sentences; a cap this
          far above the real length only risks a long tail. */
       max_tokens: 1024,
-      thinking: { type: "disabled" },
       // identical on every request, so it is written once and read back
       // at a fraction on every message after
       system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
