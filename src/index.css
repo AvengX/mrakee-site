@@ -451,26 +451,74 @@ body {
   }
 }
 
-/* THE OPENING CAPTION SITS LOW, off the wall display.
+/* THE OPENING CAPTION IS A TITLE CARD IN THE CORNER, not a slab
+   across the middle of the shot.
 
-   Centred at the stage's midline it landed squarely on the lit map
-   panel — the focal point of the shot — hiding 43% of it. Measured over
-   the caption's whole window, dropping it onto the polished floor wins
-   on every count at once, which is unusual: the floor is a far more
-   even backdrop than a map covered in continents and flight lines.
+   It began centred on the stage's midline, which put it squarely on
+   the lit map panel and hid 43% of it. Dropping it to the lower centre
+   fixed the panel but not the complaint behind it: at 86px and 42vw
+   wide it still lay across the middle of the frame, covering the arch's
+   reflection and the depth of the floor.
 
-               contrast   under 4.5:1   5th pct   panel hidden
-     midline     7.07:1        43%       2.44:1        43%
-     low         7.65:1         3%       4.90:1         0%
+   So it moves to the corner and gets smaller. Measured over the whole
+   opening window (frames 0-14, cover-fitted to 1440x900), against the
+   ink this caption actually uses:
 
-   Anchored to the BOTTOM rather than given a top offset, so it keeps
-   its distance from the floor edge as the viewport changes instead of
-   sliding down and off. The scroll cue lives at bottom 2.2rem, so 7rem
-   clears it. */
+                              area   contrast   under 4.5:1   5th pct   detail hidden
+     centred, 86px            11.3%    7.11:1        20%       2.65:1        5.3%
+     lower-left, 52px          5.2%    7.33:1         3%       5.32:1        1.4%
+
+   "detail hidden" is the share of the frame's total edge energy the
+   caption sits on — the honest measure of how much PICTURE is lost,
+   which contrast numbers do not capture at all. It falls by two thirds.
+
+   The type is smaller and reads BETTER, which sounds wrong and is not:
+   the corner of the polished floor is an even, bright, low-detail
+   ground, so the fifth-percentile contrast nearly doubles and almost
+   none of the caption fails AA any more. Bigger was never the same
+   thing as more legible here.
+
+   Left rather than right because the right is taken: above 760px the
+   scroll cue moves to the right edge and the assistant launcher sits in
+   that corner too. */
 .cap--hero {
   top: auto;
   bottom: 7rem;
   margin-top: 0;
+}
+
+/* Desktop only, for two reasons that are both about what else is on
+   screen. Below 760px the caption re-centres (see the .cap override in
+   that media block) and the scroll cue is centred under it, so 7rem is
+   the offset that clears the cue -- and the frame is cropped so hard at
+   that width that there is little background left to block. Above it,
+   the cue is at the right edge, so the caption can sit lower and
+   further out of the picture. Measured: 3.5rem beats 7rem on every
+   count (3% of the area under 4.5:1 against 9%, 1.4% of the frame's
+   detail against 2.7%). */
+@media (min-width: 761px) {
+  .cap--hero {
+    bottom: 3.5rem;
+    /* 38ch and not 34, which is the narrower box winning by being
+       SHORTER. At 34ch the supporting line breaks three ways and
+       leaves "Perform." alone on the last one; 38ch fits it in two,
+       and the line the caption loses is worth more than the 41px it
+       gains in width -- the box ends up smaller (5.2% of the frame
+       against 5.4%) and sits on less of the picture (1.4% of its
+       detail against 1.6%). */
+    width: min(38ch, 46vw);
+  }
+
+  /* Two lines, still. The base h1 clamp tops out at 5.4rem, which wraps
+     "Integration made Simple." to two lines at 605px wide; this one
+     tops out at 3.4rem and wraps it to two at 343px. The next size up
+     that was tried, 4rem, took it to THREE lines and grew the box back
+     to 7.7% of the frame -- larger type made the caption taller as well
+     as wider, so it lost more picture than it gained presence. */
+  .cap--hero h1 {
+    font-size: clamp(2.1rem, 3.6vw, 3.4rem);
+    max-width: 14ch;
+  }
 }
 
 /* No short-screen override, and that is the fix rather than an

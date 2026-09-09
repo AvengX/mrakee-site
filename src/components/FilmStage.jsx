@@ -47,7 +47,14 @@ gsap.registerPlugin(ScrollTrigger);
 const CAPTIONS = [
   {
     // Solid at rest, starts going the moment you scroll, gone by ~32vh.
-    in: -0.05, out: 0.06, fade: 0.03, align: "center",
+    //
+    // LEFT, not centre. Centred, this caption was a slab across the
+    // middle of the establishing shot — the one frame the visitor
+    // looks at longest, and the one the whole film is selling. Set
+    // left and small it reads as a title card in the corner and the
+    // architecture is visible behind it; the numbers are in the
+    // .cap--hero note in index.css.
+    in: -0.05, out: 0.06, fade: 0.03, align: "left",
     title: <>Integration made <span className="grad-text">Simple</span>.</>,
     body: "Engineering the way technology connects the future. Design. Integrate. Connect. Perform.",
     hero: true,
