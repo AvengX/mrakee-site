@@ -19,6 +19,28 @@ import { SOLUTIONS } from "../src/content/mrakee.js";
    Anthropic Console, which belongs there rather than here.
    ================================================================ */
 
+/* WHERE THIS FUNCTION RUNS is set in vercel.json: regions ["bom1"],
+   Mumbai, rather than the iad1 default. Measured, not assumed —
+   X-Vercel-Id read bom1::iad1, meaning every request entered at the
+   Mumbai edge and then crossed to Virginia and back before the model
+   was called. Warm browser-to-function first byte was 566-804ms on
+   iad1 and 230-316ms on bom1. Moving closer costs ~150-250ms on the
+   function-to-Anthropic hop, since Anthropic is US-hosted, and the
+   round still nets out ~280ms ahead: median TTFT 1630ms on iad1
+   against 1305ms on bom1. Right while the audience is India-centric;
+   re-measure before changing it.
+
+   The note lives HERE and not in vercel.json, which is the correction
+   to a real outage rather than a style preference. It was written into
+   that file as a "//" key, on the assumption that the convention JSON
+   users reach for when they want a comment would be tolerated. Vercel
+   validates vercel.json against a strict schema and rejects any
+   property it does not know, so every deployment failed with "should
+   NOT have additional property //" BEFORE the build started — no build
+   logs, nothing in the UI that looks like a code error, and production
+   silently frozen on the commit before it for four commits and two
+   days. vercel.json takes no comments. Put the reasoning in code. */
+
 /* MODEL, and why it is not Opus.
    Opus 5 runs adaptive thinking whenever `thinking` is omitted, so every
    "Hello" was reasoned about before it was answered. Measured against

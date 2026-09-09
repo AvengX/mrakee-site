@@ -1,6 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
-  "//": "bom1 (Mumbai), not the iad1 default. Measured, not assumed: X-Vercel-Id read bom1::iad1, meaning every request crossed to Virginia and back before the model was called. Warm T1 (browser to function first byte) was 566-804ms on iad1 and 230-316ms on bom1. Moving closer costs ~150-250ms on the function-to-Anthropic hop, since Anthropic is US-hosted, and the round still nets out ~280ms ahead: median TTFT 1630ms on iad1 against 1305ms on bom1. This is the right call while the audience is India-centric; if that changes, re-measure before changing it.",
   "regions": ["bom1"]
 }
