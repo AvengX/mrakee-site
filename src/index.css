@@ -857,7 +857,15 @@ body {
      borrowed contrast from. With that gone the bar has to be its own
      surface — and it is a bar, not a layer over the footage, so making
      it more solid costs no video. */
-  background: rgba(255, 255, 255, 0.82);
+  /* MUCH MORE GLASS THAN IT WAS, because the reference reads the
+     architecture straight through the bar and 0.82 white washed it out.
+     0.40 is not a guess: the film's top band was sampled, blurred the
+     way backdrop-filter blurs it, and composited at each opacity. The
+     link ink is what makes it possible — see .nav__links a below. At
+     0.40 the worst pixel under the labels measures 6.72:1 against a
+     4.5:1 floor, which is BETTER than the 5.93:1 the old opaque bar
+     managed with the old grey ink. */
+  background: rgba(255, 255, 255, 0.4);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
   box-shadow: 0 1px 2px rgba(11, 31, 42, 0.04), 0 12px 34px rgba(11, 31, 42, 0.10);
@@ -978,9 +986,13 @@ body {
      (The hover wash above has the same flaw and gets away with it only
      because it is 5.5% opaque.) */
   isolation: isolate;
-  /* darker than --ink-soft: these sit over the film with no wash under
-     them now, where --ink-soft measured 4.4:1 */
-  color: #475569;
+  /* Executive Dark, the brand navy, and it is what buys the glass
+     above. Measured over the film's top band at every bar opacity:
+     the old #475569 slate could not go below 0.66 white without
+     dropping under 4.5:1, while this ink still measures 6.02:1 at 0.34.
+     Darker ink is what lets the bar be see-through, not the other way
+     round. */
+  color: var(--exec-dark);
   text-decoration: none;
   font-size: 1.14rem;
   font-weight: 500;
