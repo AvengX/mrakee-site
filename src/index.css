@@ -825,7 +825,10 @@ body {
    ================================================================ */
 .nav {
   position: fixed;
-  top: 0.85rem;
+  /* 1.5rem clear of the top and of both edges, which is the brief's
+     20-30px, and is what makes it read as a floating object rather
+     than a bar stuck to the ceiling. */
+  top: 1.5rem;
   left: 50%;
   z-index: 50;
   /* Wider than the site's --maxw content measure, because the bar is a
@@ -835,32 +838,41 @@ body {
      (~1226px) the old rule and this one land in the same place; the
      difference only shows above ~1470px, where the old 1200px cap left
      the bar looking inset against a full-bleed hero. */
-  width: min(1440px, calc(100% - 3rem));
+  /* ~95% of the viewport, with a cap so it does not become a letterbox
+     on an ultrawide. calc(100% - 3rem) is 96.6% at 1440 and 96.9% at
+     1920, either side of the brief's 95%. */
+  width: min(1800px, calc(100% - 3rem));
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.55rem 0.6rem 0.55rem 1.1rem;
-  border-radius: 18px;
+  /* 0.85rem top and bottom around a 46px button is a 73px bar, inside
+     the 70-80px asked for. The left inset is larger than the right
+     because the right holds a pill with its own padding and the left
+     holds artwork with none. */
+  padding: 0.85rem 0.9rem 0.85rem 1.6rem;
+  border-radius: 34px;
   border: 1px solid transparent;
   /* The film used to have a white wash across its top which this bar
      borrowed contrast from. With that gone the bar has to be its own
      surface — and it is a bar, not a layer over the footage, so making
      it more solid costs no video. */
-  background: rgba(255, 255, 255, 0.86);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  backdrop-filter: blur(14px) saturate(180%);
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: 0 1px 2px rgba(11, 31, 42, 0.04), 0 12px 34px rgba(11, 31, 42, 0.10);
   transform: translateX(-50%);
   transition: background 0.5s var(--ease), border-color 0.5s var(--ease),
     box-shadow 0.5s var(--ease), padding 0.5s var(--ease);
 }
 
+/* Scrolled: the same object, more opaque. The padding used to shrink
+   here, which meant the bar had two heights; the brief asks for one, so
+   only the surface changes now. */
 .nav--solid {
   background: rgba(255, 255, 255, 0.95);
   border-color: var(--line);
-  box-shadow: var(--shadow-md);
-  padding-top: 0.42rem;
-  padding-bottom: 0.42rem;
+  box-shadow: 0 1px 2px rgba(11, 31, 42, 0.06), 0 14px 38px rgba(11, 31, 42, 0.14);
 }
 
 /* ---- Logo -------------------------------------------------------- */
@@ -932,21 +944,32 @@ body {
 
 .nav__links {
   display: flex;
-  gap: 0.15rem;
+  gap: 0.35rem;
   align-items: center;
   list-style: none;
+  flex-shrink: 0;
 }
 
 .nav__links a {
   position: relative;
   display: inline-flex;
-  padding: 0.52rem 0.85rem;
-  border-radius: 11px;
+  padding: 0.6rem 1.15rem;
+  border-radius: 999px;
+  /* isolation, and it is load-bearing rather than tidy: the active
+     pill below is an opaque ::after and pseudo-elements paint ABOVE
+     inline text. z-index:-1 alone would not fix it either, because the
+     anchor is position:relative with z-index:auto and so creates no
+     stacking context — the pill would drop behind .nav's own backdrop
+     -filter layer and vanish. isolate gives the anchor a context of its
+     own, so -1 means "behind this link's text" and nothing more.
+     (The hover wash above has the same flaw and gets away with it only
+     because it is 5.5% opaque.) */
+  isolation: isolate;
   /* darker than --ink-soft: these sit over the film with no wash under
      them now, where --ink-soft measured 4.4:1 */
   color: #475569;
   text-decoration: none;
-  font-size: 0.88rem;
+  font-size: 1.14rem;
   font-weight: 500;
   letter-spacing: -0.005em;
   transition: color 0.3s var(--ease-soft);
@@ -979,22 +1002,41 @@ body {
   color: var(--ink);
 }
 
+/* The current section is marked with a soft white pill rather than the
+   gradient underline that was here. It has to read on a surface that is
+   already 82% white, so the contrast comes from the shadow and a
+   hairline rather than from the fill — a stronger fill would turn it
+   into a button, which is what the brief rules out. */
 .nav__links a.is-active::after {
   content: "";
   position: absolute;
-  left: 50%;
-  bottom: 0.16rem;
-  width: 16px;
-  height: 2px;
-  border-radius: 2px;
-  transform: translateX(-50%);
-  background: linear-gradient(90deg, var(--gold), var(--teal));
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(11, 31, 42, 0.07), 0 4px 14px rgba(11, 31, 42, 0.08),
+    inset 0 0 0 1px rgba(11, 31, 42, 0.04);
 }
 
 .nav__cta {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.5rem;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Bigger than the site's small button, because in this bar it is the
+   one thing that has to carry weight: 46px tall inside a 73px bar. */
+.nav__cta > .btn--sm {
+  padding: 0.82rem 1.55rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  /* The bar has exactly one height. Without this the label wraps the
+     moment the row is tight and the whole header grows with it. */
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ---- Mobile ------------------------------------------------------ */
@@ -1098,7 +1140,14 @@ body {
   margin-top: 0.35rem;
 }
 
-@media (max-width: 880px) {
+/* 1080px, not 880. The links were raised to 18px for the reference
+   header and the row grew from 460px to 573px, so the three children no
+   longer fit between 880 and about 1035: the CTA was the one that gave,
+   and "Talk to us" wrapped to two lines, which took the bar from 76px
+   to 113px. Measured, not guessed — brand 200 + links 573 + button 142
+   + gaps 32 needs 947px of inner width, which is a 1035px viewport.
+   1080 leaves room. The existing sheet menu covers everything below. */
+@media (max-width: 1080px) {
   .nav__links {
     display: none;
   }
@@ -1119,7 +1168,7 @@ body {
   }
 }
 
-@media (min-width: 881px) {
+@media (min-width: 1081px) {
   .sheet {
     display: none;
   }
@@ -4658,12 +4707,9 @@ a.contact__info:hover .contact__infoIcon {
   animation:
     greeter-enter 0.7s var(--ease-soft) both,
     greeter-breathe 4.4s ease-in-out 0.7s infinite;
-  /* 37vh, from the reference, where she stands 37% of the viewport
-     height. The asset, its aspect, its pose and both its animations are
-     untouched — this is the same picture drawn larger. */
-  height: clamp(190px, 37vh, 360px);
+  height: clamp(190px, 30vh, 340px);
   width: auto;
-  max-width: min(46vw, 360px);
+  max-width: min(46vw, 340px);
   object-fit: contain;
   display: block;
 }
@@ -6715,12 +6761,9 @@ a.contact__info:hover .contact__infoIcon {
   animation:
     greeter-enter 0.7s var(--ease-soft) both,
     greeter-breathe 4.4s ease-in-out 0.7s infinite;
-  /* 37vh, from the reference, where she stands 37% of the viewport
-     height. The asset, its aspect, its pose and both its animations are
-     untouched — this is the same picture drawn larger. */
-  height: clamp(190px, 37vh, 360px);
+  height: clamp(190px, 30vh, 340px);
   width: auto;
-  max-width: min(46vw, 360px);
+  max-width: min(46vw, 340px);
   object-fit: contain;
   display: block;
 }
@@ -7119,18 +7162,17 @@ a.contact__info:hover .contact__infoIcon {
    and the links do not jump sideways when it appears. The delay on the
    visibility transition lets the opacity fade finish before the box
    goes inert. */
+/* THE MARK IS ALWAYS ON THE BAR, on request — it was briefly held back
+   while the hero carried its own lockup. flex:1 here and on .nav__cta
+   is what actually centres the links: with three flex children and
+   space-between, the list only lands in the middle when the two
+   outside it claim equal share, and the logo and the CTA are nowhere
+   near the same width. */
 .nav__brand {
   display: flex;
   align-items: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.45s var(--ease), visibility 0s linear 0.45s;
-}
-
-.nav__brand.is-shown {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.45s var(--ease), visibility 0s;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 /* ---- the greeting group: her, the hello, the chat control ---- */
@@ -7241,12 +7283,10 @@ a.contact__info:hover .contact__infoIcon {
   .dock__chip { display: none; }
 }
 
-/* She stands in the CORNER in the reference — flush to both edges, the
-   hem of her coat cropped by the bottom of the frame — rather than
-   floating inside the dock's margin. Negative margins on the greeting
-   group only, so the conversation panel keeps the inset it needs and
-   the dock's own positioning is untouched. */
-.dock__greet--figure {
-  margin-right: calc(-1 * clamp(0.9rem, 2vw, 1.5rem));
-  margin-bottom: calc(-1 * clamp(0.9rem, 2vw, 1.5rem));
-}
+/* SHE IS BACK TO HER ORIGINAL SIZE AND INSET, on request. She was
+   briefly drawn at 37vh and pulled flush to the corner to match a
+   reference screenshot; both are reverted. .dock__greet--figure now
+   carries no geometry of its own, so she sits exactly where the dock's
+   own right/bottom put her before the greeting group existed — the
+   wrapper is only a positioning context for the bubble and the chip.
+   Do not give this class margins again. */

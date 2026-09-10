@@ -69,16 +69,8 @@ export default function Nav() {
   return (
     <div ref={wrap}>
       <nav className={`nav${solid ? " nav--solid" : ""}`}>
-        {/* THE BAR'S MARK IS HELD BACK OVER THE HERO, because the hero
-            carries the lockup itself in the approved design and two
-            MRAKEE marks 200px apart read as a mistake. It is hidden
-            rather than removed, so it keeps its space in the flex row
-            (the links do not shift when it appears) and it comes back
-            the moment you scroll off the film — every section below the
-            hero keeps the branding it had. `solid` is the bar's
-            existing scrolled state; no new listener. */}
-        <span className={`nav__brand${solid ? " is-shown" : ""}`}>
-          <Logo />
+        <span className="nav__brand">
+          <Logo size={40} />
         </span>
 
         <ul className="nav__links">
