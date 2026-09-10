@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { X, MessageSquare, MessageCircle } from "lucide-react";
+import { X, MessageSquare } from "lucide-react";
 import Assistant from "./Assistant";
 import AssistantAvatar from "./AssistantAvatar";
 import { stopSpeaking } from "../lib/speech";
@@ -143,30 +143,6 @@ export default function AssistantDock() {
         </div>
       )}
 
-      {/* THE GREETING GROUP: her, the hello, and the round chat control,
-          in one positioned box so the three keep their relationship at
-          every viewport instead of each being pinned to the corner
-          separately. She is unchanged — same asset, same size rule,
-          same click target, same enter and breathe animations. The
-          bubble and the chip are additions from the approved reference
-          and appear only in the closed, full-figure state; once the
-          panel is open the launcher becomes the close icon and both go,
-          because a greeting next to an open conversation is noise. */}
-      <div className={`dock__greet${greeter && !open ? " dock__greet--figure" : ""}`}>
-        {greeter && !open && (
-          /* Decorative, and marked so. The figure beside it is already
-             a labelled button that opens the same panel, so exposing
-             this to a screen reader would announce the assistant
-             twice. */
-          <p className="dock__bubble" aria-hidden="true">
-            Hi! <span className="dock__wave">👋</span>
-            <br />
-            How can we help you
-            <br />
-            today?
-          </p>
-        )}
-
       <button
         type="button"
         className={`dock__launcher${open ? " is-open" : ""}${greeter && !open ? " dock__launcher--figure" : ""}`}
@@ -188,24 +164,6 @@ export default function AssistantDock() {
           )}
         </span>
       </button>
-
-        {greeter && !open && (
-          /* Same toggle as the figure, so there is one conversation and
-             one panel however you reach it. tabIndex -1 and aria-hidden
-             keep it out of the keyboard order for the same reason the
-             bubble is hidden: it is a second way to press a control
-             that is already reachable, not a second control. */
-          <button
-            type="button"
-            className="dock__chip"
-            onClick={toggle}
-            tabIndex={-1}
-            aria-hidden="true"
-          >
-            <MessageCircle size={24} aria-hidden="true" />
-          </button>
-        )}
-      </div>
     </div>
   );
 }
