@@ -2,6 +2,7 @@ import { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useFrameSequence } from "../hooks/useFrameSequence";
+import Logo from "./Logo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -223,8 +224,42 @@ export default function FilmStage() {
                 request; over the footage they read as chrome stuck on
                 the picture rather than as part of it, and the headline
                 already says which part of the film you are looking at. */}
+            {/* THE OPENING CAPTION IS THE HERO LOCKUP, per the approved
+                reference: mark, headline, supporting line, one call to
+                action, and the brand line pinned to the foot of the
+                column. Everything below lives INSIDE the caption on
+                purpose — the caption is the element the film's timeline
+                already fades and blurs, so the whole lockup enters and
+                leaves as one piece with no second animation to keep in
+                step. The other three captions are unchanged. */}
+            {c.hero && (
+              <span className="cap__logo">
+                <Logo size={58} />
+              </span>
+            )}
             {c.hero ? <h1>{c.title}</h1> : <h2>{c.title}</h2>}
             <p className="lede">{c.body}</p>
+            {c.hero && (
+              <>
+                <div className="hero__cta">
+                  <a className="btn btn--ghost" href="#solutions">
+                    Explore Our Solutions
+                    <span className="arrow" aria-hidden="true">→</span>
+                  </a>
+                </div>
+                {/* margin-top:auto in the stylesheet drops this to the
+                    foot of the column, so it holds the bottom-left
+                    corner at every viewport height without a second
+                    absolutely-positioned element to keep in sync. */}
+                <p className="cap__strap">
+                  People
+                  <i aria-hidden="true" />
+                  Technology
+                  <i aria-hidden="true" />
+                  A Brighter Tomorrow
+                </p>
+              </>
+            )}
           </div>
         ))}
 

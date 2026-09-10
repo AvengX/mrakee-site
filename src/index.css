@@ -451,83 +451,197 @@ body {
   }
 }
 
-/* THE OPENING CAPTION IS A TITLE CARD IN THE CORNER, not a slab
-   across the middle of the shot.
+/* ================================================================
+   THE HERO LOCKUP — the approved reference design.
 
-   It began centred on the stage's midline, which put it squarely on
-   the lit map panel and hid 43% of it. Dropping it to the lower centre
-   fixed the panel but not the complaint behind it: at 86px and 42vw
-   wide it still lay across the middle of the frame, covering the arch's
-   reflection and the depth of the floor.
+   The opening caption is not a caption any more, it is the hero: mark,
+   headline, supporting line, one call to action, and the brand line at
+   the foot of the column. All five are children of the SAME .cap
+   element the film's timeline already fades, blurs and drifts, so the
+   lockup arrives and leaves as one piece and there is no second
+   animation to keep in step with the first.
 
-   So it moves to the corner and gets smaller. Measured over the whole
-   opening window (frames 0-14, cover-fitted to 1440x900), against the
-   ink this caption actually uses:
+   It is a flex COLUMN spanning a fixed band of the stage rather than a
+   block hung off one edge. That is what lets the brand line hold the
+   bottom-left corner at any viewport height with `margin-top: auto`,
+   instead of being a second absolutely-positioned element that has to
+   be kept clear of the caption above it by hand.
 
-                              area   contrast   under 4.5:1   5th pct   detail hidden
-     centred, 86px            11.3%    7.11:1        20%       2.65:1        5.3%
-     lower-left, 52px          5.2%    7.33:1         3%       5.32:1        1.4%
-
-   "detail hidden" is the share of the frame's total edge energy the
-   caption sits on — the honest measure of how much PICTURE is lost,
-   which contrast numbers do not capture at all. It falls by two thirds.
-
-   The type is smaller and reads BETTER, which sounds wrong and is not:
-   the corner of the polished floor is an even, bright, low-detail
-   ground, so the fifth-percentile contrast nearly doubles and almost
-   none of the caption fails AA any more. Bigger was never the same
-   thing as more legible here.
-
-   Left rather than right because the right is taken: above 760px the
-   scroll cue moves to the right edge and the assistant launcher sits in
-   that corner too. */
+   The three later captions are untouched — they still use .cap--center
+   / --left / --right exactly as before.
+   ================================================================ */
 .cap--hero {
-  top: auto;
-  bottom: 7rem;
+  top: 27.6%;
+  bottom: 7.7%;
   margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-/* Desktop only, for two reasons that are both about what else is on
-   screen. Below 760px the caption re-centres (see the .cap override in
-   that media block) and the scroll cue is centred under it, so 7rem is
-   the offset that clears the cue -- and the frame is cropped so hard at
-   that width that there is little background left to block. Above it,
-   the cue is at the right edge, so the caption can sit lower and
-   further out of the picture. Measured: 3.5rem beats 7rem on every
-   count (3% of the area under 4.5:1 against 9%, 1.4% of the frame's
-   detail against 2.7%). */
 @media (min-width: 761px) {
-  .cap--hero {
-    bottom: 3.5rem;
-    /* 38ch and not 34, which is the narrower box winning by being
-       SHORTER. At 34ch the supporting line breaks three ways and
-       leaves "Perform." alone on the last one; 38ch fits it in two,
-       and the line the caption loses is worth more than the 41px it
-       gains in width -- the box ends up smaller (5.2% of the frame
-       against 5.4%) and sits on less of the picture (1.4% of its
-       detail against 1.6%). */
-    width: min(38ch, 46vw);
+  .cap.cap--hero {
+    /* Wide enough for "Integration made" to hold one line at the size
+       below; the headline's own max-width does the wrapping. */
+    width: min(46ch, 44vw);
   }
 
-  /* Two lines, still. The base h1 clamp tops out at 5.4rem, which wraps
-     "Integration made Simple." to two lines at 605px wide; this one
-     tops out at 3.4rem and wraps it to two at 343px. The next size up
-     that was tried, 4rem, took it to THREE lines and grew the box back
-     to 7.7% of the frame -- larger type made the caption taller as well
-     as wider, so it lost more picture than it gained presence. */
-  .cap--hero h1 {
-    font-size: clamp(2.1rem, 3.6vw, 3.4rem);
-    max-width: 14ch;
+  .cap.cap--hero h1 {
+    /* Sized off the reference rather than off taste: there the headline
+       runs from the column's left edge to 28% of the viewport width,
+       and 3.45vw is what puts it there. max-width is 17ch and not 12
+       because the break has to fall after "made" — at 12ch the line
+       broke after "Integration" and the lockup lost its shape. */
+    font-size: clamp(2.2rem, 3.63vw, 3.95rem);
+    max-width: 17ch;
+    margin: 0;
+  }
+
+  .cap.cap--hero .lede {
+    /* 40ch, so the first sentence ends the first line exactly as it
+       does in the reference. At 33ch it broke mid-sentence and ran to
+       three lines, which pushed the button down onto the floor's
+       reflection. */
+    font-size: clamp(0.95rem, 1.2vw, 1.18rem);
+    line-height: 1.62;
+    max-width: 40ch;
+    margin: 1.5rem 0 0;
   }
 }
 
-/* No short-screen override, and that is the fix rather than an
-   omission. Two were written first, reducing the offset on shorter
-   viewports on the theory that the caption should follow the rising
-   floor. Reducing `bottom` moves it DOWN, so it did the opposite and
-   overlapped the scroll cue by 6px at 1280x700. One offset holds at
-   every height because both the caption and the cue are anchored to
-   the same edge, so the gap between them cannot drift. */
+/* The mark, given its own size in the hero. In the bar it is 36px and
+   paired with a 22-28px wordmark; here the lockup is the first thing
+   read, so both grow. The wordmark is artwork rather than type, so it
+   is sized by height and left to keep its own ratio. */
+.cap__logo {
+  display: block;
+  margin-bottom: clamp(1.1rem, 5.6vh, 3.2rem);
+}
+
+.cap__logo .logo {
+  gap: 0.85rem;
+}
+
+.cap__logo .logo__wordArt {
+  height: clamp(34px, 3.1vw, 52px);
+}
+
+/* The same white halo .cap h1 / .lede carry, for the same reason: the
+   mark sits on raw footage with no ground, and here that footage is the
+   terminal's glass wall — bright, but ruled with mullions that cut
+   straight through the wordmark. Without this the lockup reads as a
+   watermark rather than as the logo. */
+/* Heavier than the headline's, and measured rather than matched by eye:
+   the wordmark's own ink is rgb(75,122,80), and over the terminal's
+   glass wall — which averages 0.53 relative luminance and is ruled with
+   bright mullions — it scores 2.80:1 mean and 1.24:1 at the fifth
+   percentile, with every pixel of it under 4.5:1. The headline can
+   afford a light halo because it is 42px of bold type; TECHNOLOGIES is
+   8px of letterspaced caps and has nothing in reserve. */
+.cap__logo img,
+.cap__logo svg,
+.cap__strap {
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 1))
+    drop-shadow(0 1px 4px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 0 14px rgba(255, 255, 255, 0.85));
+}
+
+/* A translucent pill rather than .btn--ghost's near-solid white: this
+   one sits on the film, and the reference shows the floor through it.
+   The border and ink are the ghost button's, so it is the same control
+   as everywhere else on the site, wearing the hero's weight. */
+.cap--hero .hero__cta {
+  margin-top: clamp(1.2rem, 2.6vh, 2rem);
+}
+
+.cap--hero .hero__cta .btn--ghost {
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  backdrop-filter: blur(8px) saturate(150%);
+  border-color: rgba(11, 31, 42, 0.28);
+  padding: 0.72rem 1.45rem;
+  font-size: 0.88rem;
+}
+
+.cap--hero .hero__cta .btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* THE BRAND LINE, pinned to the foot of the column by margin-top:auto
+   — which is why the column has a definite height above. nowrap lets it
+   run wider than the text column it sits under without dragging the
+   headline's measure out with it. */
+.cap__strap {
+  position: relative;
+  margin: 1.5rem 0 0;
+  white-space: nowrap;
+  font-size: clamp(0.6rem, 0.72vw, 0.72rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+@media (min-width: 761px) {
+  .cap__strap { margin-top: auto; }
+}
+
+/* The hanging rule. It sits OUTSIDE the column's left edge, so the
+   brand line's first letter stays flush with the headline and the mark
+   above it — the alignment is the point, and a rule with the text
+   indented past it would break the one vertical the eye follows. */
+.cap__strap::before {
+  content: "";
+  position: absolute;
+  left: -1.35rem;
+  top: 50%;
+  width: 1px;
+  height: clamp(3.4rem, 10vh, 5.6rem);
+  transform: translateY(-50%);
+  background: var(--gold);
+  opacity: 0.85;
+}
+
+.cap__strap i {
+  display: inline-block;
+  width: 1px;
+  height: 0.85em;
+  margin: 0 0.7rem;
+  vertical-align: -0.08em;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+/* SHORT AND NARROW SCREENS. The band above is a percentage of the
+   stage, and on a phone the same percentages leave the five stacked
+   pieces fighting for about 500px. So the hero keeps the centred
+   treatment the other captions get below 760px, gives back the top of
+   the band, and lets the column find its own height rather than
+   stretching the brand line away from the rest of the lockup. */
+@media (max-width: 760px) {
+  .cap--hero {
+    top: auto;
+    /* 7.5rem, not 5.5: the cue is centred at bottom 2.2rem below 760px
+       and the brand line is full width, so at 5.5rem the two overlapped
+       by 6px at 390x844 — measured, and invisible on a desktop check
+       because up there the cue is at the right-hand edge instead. */
+    bottom: 7.5rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cap__logo { margin-bottom: 1.1rem; }
+  .cap__logo .logo__wordArt { height: 30px; }
+  .cap--hero .hero__cta { justify-content: center; }
+  .cap__strap {
+    white-space: normal;
+    letter-spacing: 0.16em;
+  }
+  /* The hanging rule has nothing to hang off once the column is
+     centred, and a vertical line beside centred text reads as a stray
+     mark rather than as structure. */
+  .cap__strap::before { display: none; }
+}
 
 .cap--left {
   left: clamp(1.5rem, 7vw, 6rem);
@@ -714,7 +828,14 @@ body {
   top: 0.85rem;
   left: 50%;
   z-index: 50;
-  width: min(var(--maxw), calc(100% - 1.6rem));
+  /* Wider than the site's --maxw content measure, because the bar is a
+     floating surface over full-bleed sections rather than a member of
+     the text grid — and because the approved reference shows it running
+     the width of the frame. At the width that reference was captured
+     (~1226px) the old rule and this one land in the same place; the
+     difference only shows above ~1470px, where the old 1200px cap left
+     the bar looking inset against a full-bleed hero. */
+  width: min(1440px, calc(100% - 3rem));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4411,8 +4532,14 @@ a.contact__info:hover .contact__infoIcon {
   }
 
   /* Hidden behind a full-screen sheet — it would otherwise sit on top
-     of the conversation with nothing to toggle back to. */
-  .dock__panel.is-open ~ .dock__launcher { display: none; }
+     of the conversation with nothing to toggle back to.
+     BOTH selectors, and that is not belt and braces: the greeting group
+     added for the reference design wraps the launcher, so the original
+     sibling combinator stopped reaching it and the button reappeared
+     over the full-screen conversation on a phone. The first line keeps
+     working if the wrapper is ever removed. */
+  .dock__panel.is-open ~ .dock__launcher,
+  .dock__panel.is-open ~ .dock__greet { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4531,9 +4658,12 @@ a.contact__info:hover .contact__infoIcon {
   animation:
     greeter-enter 0.7s var(--ease-soft) both,
     greeter-breathe 4.4s ease-in-out 0.7s infinite;
-  height: clamp(190px, 30vh, 340px);
+  /* 37vh, from the reference, where she stands 37% of the viewport
+     height. The asset, its aspect, its pose and both its animations are
+     untouched — this is the same picture drawn larger. */
+  height: clamp(190px, 37vh, 360px);
   width: auto;
-  max-width: min(46vw, 340px);
+  max-width: min(46vw, 360px);
   object-fit: contain;
   display: block;
 }
@@ -6585,9 +6715,12 @@ a.contact__info:hover .contact__infoIcon {
   animation:
     greeter-enter 0.7s var(--ease-soft) both,
     greeter-breathe 4.4s ease-in-out 0.7s infinite;
-  height: clamp(190px, 30vh, 340px);
+  /* 37vh, from the reference, where she stands 37% of the viewport
+     height. The asset, its aspect, its pose and both its animations are
+     untouched — this is the same picture drawn larger. */
+  height: clamp(190px, 37vh, 360px);
   width: auto;
-  max-width: min(46vw, 340px);
+  max-width: min(46vw, 360px);
   object-fit: contain;
   display: block;
 }
@@ -6972,3 +7105,148 @@ a.contact__info:hover .contact__infoIcon {
 }
 .kiosk--compact .kiosk__chips::-webkit-scrollbar { display: none; }
 .kiosk--compact .kiosk__chips button { flex-shrink: 0; }
+
+/* ================================================================
+   HERO REFERENCE PASS — nav mark, greeting group
+
+   Appended rather than edited in place: both selectors below have
+   earlier declarations in this file, and the later rule wins at equal
+   specificity. Putting them here is what makes them apply.
+   ================================================================ */
+
+/* The bar's mark, held back while the hero's own lockup is on screen.
+   visibility rather than display, so it keeps its box in the flex row
+   and the links do not jump sideways when it appears. The delay on the
+   visibility transition lets the opacity fade finish before the box
+   goes inert. */
+.nav__brand {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.45s var(--ease), visibility 0s linear 0.45s;
+}
+
+.nav__brand.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.45s var(--ease), visibility 0s;
+}
+
+/* ---- the greeting group: her, the hello, the chat control ---- */
+
+/* .dock > * sets pointer-events:auto, which on this wrapper would hand
+   the whole rectangle — most of it empty space around her — a claim on
+   every click that lands in the bottom-right of the page. The box is
+   transparent to the pointer again here and the three real controls
+   take it back individually. */
+.dock__greet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.dock__greet > .dock__launcher,
+.dock__greet > .dock__chip {
+  pointer-events: auto;
+}
+
+.dock__bubble {
+  position: absolute;
+  /* Tucked just inside her left edge and level with her shoulder, as
+     in the reference — not floated clear of her. Both offsets are
+     measured from the greeting group, which is her own box, so the
+     bubble keeps that relationship as she scales with the viewport. */
+  right: calc(100% - 0.85rem);
+  top: 18%;
+  margin: 0;
+  width: max-content;
+  max-width: 12.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 16px 16px 4px 16px;
+  background: rgba(255, 255, 255, 0.96);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(160%);
+  color: var(--ink);
+  font-size: 0.84rem;
+  line-height: 1.4;
+  box-shadow: 0 1px 2px rgba(11, 31, 42, 0.08), 0 12px 32px rgba(11, 31, 42, 0.16);
+  animation: greeter-enter 0.7s var(--ease-soft) both;
+  pointer-events: none;
+}
+
+.dock__wave {
+  display: inline-block;
+  transform-origin: 70% 80%;
+  animation: dock-wave 2.6s var(--ease-soft) 1.2s infinite;
+}
+
+@keyframes dock-wave {
+  0%, 62%, 100% { transform: rotate(0deg); }
+  68% { transform: rotate(16deg); }
+  74% { transform: rotate(-10deg); }
+  80% { transform: rotate(14deg); }
+  86% { transform: rotate(-6deg); }
+}
+
+/* A stationary emoji is the correct reading of a motion preference
+   here — the wave is decoration, and the greeting says the same thing
+   without it. */
+@media (prefers-reduced-motion: reduce) {
+  .dock__wave { animation: none; }
+}
+
+.dock__chip {
+  position: absolute;
+  right: 22%;
+  bottom: 11%;
+  width: clamp(48px, 3.6vw, 58px);
+  height: clamp(48px, 3.6vw, 58px);
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--teal-ink);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7f3 100%);
+  box-shadow:
+    0 1px 2px rgba(11, 31, 42, 0.1),
+    0 10px 28px rgba(11, 31, 42, 0.22),
+    0 0 0 1px rgba(216, 163, 42, 0.55);
+  transition: transform 0.24s var(--ease-soft), box-shadow 0.24s var(--ease-soft);
+}
+
+.dock__chip:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow:
+    0 1px 2px rgba(11, 31, 42, 0.1),
+    0 16px 38px rgba(11, 31, 42, 0.26),
+    0 0 0 1px rgba(216, 163, 42, 0.7);
+}
+
+/* Below 560px she is small enough that a 48px disc over her body covers
+   most of it, and the bubble has nowhere to go on her left. */
+/* On a phone the greeting group collapses back to exactly what shipped
+   before: she is 111px wide there, so a 48px disc covers half of her and
+   the bubble has no room to its left. The reference is a desktop
+   composition; below 560px the dock is the launcher and nothing else.
+   Hiding the chip also keeps it clear of the fixed-position launcher
+   the phone layout switches to below 520px, which is measured from the
+   viewport rather than from this wrapper. */
+@media (max-width: 560px) {
+  .dock__bubble,
+  .dock__chip { display: none; }
+}
+
+/* She stands in the CORNER in the reference — flush to both edges, the
+   hem of her coat cropped by the bottom of the frame — rather than
+   floating inside the dock's margin. Negative margins on the greeting
+   group only, so the conversation panel keeps the inset it needs and
+   the dock's own positioning is untouched. */
+.dock__greet--figure {
+  margin-right: calc(-1 * clamp(0.9rem, 2vw, 1.5rem));
+  margin-bottom: calc(-1 * clamp(0.9rem, 2vw, 1.5rem));
+}
