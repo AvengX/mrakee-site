@@ -828,7 +828,7 @@ body {
   /* 1.5rem clear of the top and of both edges, which is the brief's
      20-30px, and is what makes it read as a floating object rather
      than a bar stuck to the ceiling. */
-  top: 1.25rem;
+  top: 0.6rem;
   left: 50%;
   z-index: 50;
   /* Wider than the site's --maxw content measure, because the bar is a
@@ -896,26 +896,21 @@ body {
   box-shadow: none;
 }
 
-/* With the surface gone the labels sit on raw footage, and raw footage
-   is what this whole site has had to solve twice already. Measured over
-   the opening window: the navy ink averages 9.15:1 under the five
-   labels, but 8.9% of that area falls under 4.5:1 and the worst pixel
-   is 1.38:1 — the window mullions pass straight behind the glyphs.
+/* NO HALO ON THE LABELS, on request — it read as haze around the type.
 
-   So the same halo the hero captions carry, held tight to the
-   letterforms rather than spread into a plate. text-shadow and not
-   drop-shadow on purpose: a filter would apply to the anchor's ::after
-   as well and paint a white glow around the active pill. */
-.nav .nav__links a {
-  text-shadow: 0 0 2px rgba(255, 255, 255, 0.95),
-    0 1px 3px rgba(255, 255, 255, 0.9), 0 0 10px rgba(255, 255, 255, 0.7);
-}
+   What it was doing is recorded here rather than lost, because it is a
+   real trade and the numbers are measured, not guessed. The labels sit
+   on raw footage with no surface under them: over the opening window
+   the navy ink averages 9.15:1, but 8.9% of the area beneath the five
+   labels falls under 4.5:1 and the worst pixel is 1.38:1, where the
+   window mullions pass straight behind the glyphs. The halo was
+   covering that.
 
-/* The active item has its own white ground, so the halo would only
-   fatten its letterforms against it. */
-.nav .nav__links a.is-active {
-  text-shadow: none;
-}
+   Restoring it is three lines:
+     .nav .nav__links a { text-shadow:
+        0 0 2px rgba(255,255,255,.95), 0 1px 3px rgba(255,255,255,.9),
+        0 0 10px rgba(255,255,255,.7); }
+   with `text-shadow: none` on .is-active, which has its own ground. */
 
 /* ---- Logo -------------------------------------------------------- */
 .logo {
