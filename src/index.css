@@ -857,30 +857,56 @@ body {
      borrowed contrast from. With that gone the bar has to be its own
      surface — and it is a bar, not a layer over the footage, so making
      it more solid costs no video. */
-  /* MUCH MORE GLASS THAN IT WAS, because the reference reads the
-     architecture straight through the bar and 0.82 white washed it out.
-     0.40 is not a guess: the film's top band was sampled, blurred the
-     way backdrop-filter blurs it, and composited at each opacity. The
-     link ink is what makes it possible — see .nav__links a below. At
-     0.40 the worst pixel under the labels measures 6.72:1 against a
-     4.5:1 floor, which is BETTER than the 5.93:1 the old opaque bar
-     managed with the old grey ink. */
-  background: rgba(255, 255, 255, 0.4);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  backdrop-filter: blur(18px) saturate(180%);
-  box-shadow: 0 1px 2px rgba(11, 31, 42, 0.04), 0 12px 34px rgba(11, 31, 42, 0.10);
+  /* NO SURFACE AT THE TOP OF THE PAGE. In the approved reference the
+     terminal's arches and mullions run through the header at full
+     clarity — there is no white pill behind the links, only the active
+     item's pill and the gold button have surfaces of their own. Every
+     wash tried here (0.82, then 0.40) was still a visible band across
+     the shot.
+
+     The bar keeps its box — width, centring, height, padding — because
+     that is what holds the links on the centre axis and the button on
+     the right. Only its paint is gone. It comes back the moment you
+     scroll off the film; see .nav--solid. */
+  background: transparent;
+  box-shadow: none;
   transform: translateX(-50%);
   transition: background 0.5s var(--ease), border-color 0.5s var(--ease),
     box-shadow 0.5s var(--ease), padding 0.5s var(--ease);
 }
 
-/* Scrolled: the same object, more opaque. The padding used to shrink
-   here, which meant the bar had two heights; the brief asks for one, so
-   only the surface changes now. */
+/* Scrolled: the surface appears. Over the film the bar is invisible, but
+   the sections below it are full-bleed cards and photography, and a
+   floating row of unbacked labels over those is neither legible nor
+   what the rest of the site looks like. This is where the glass lives
+   now. The padding does not change, so the bar still has one height. */
 .nav--solid {
   background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
   border-color: var(--line);
   box-shadow: 0 1px 2px rgba(11, 31, 42, 0.06), 0 14px 38px rgba(11, 31, 42, 0.14);
+}
+
+/* With the surface gone the labels sit on raw footage, and raw footage
+   is what this whole site has had to solve twice already. Measured over
+   the opening window: the navy ink averages 9.15:1 under the five
+   labels, but 8.9% of that area falls under 4.5:1 and the worst pixel
+   is 1.38:1 — the window mullions pass straight behind the glyphs.
+
+   So the same halo the hero captions carry, held tight to the
+   letterforms rather than spread into a plate. text-shadow and not
+   drop-shadow on purpose: a filter would apply to the anchor's ::after
+   as well and paint a white glow around the active pill. */
+.nav:not(.nav--solid) .nav__links a {
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.95),
+    0 1px 3px rgba(255, 255, 255, 0.9), 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+/* The active item has its own white ground, so the halo would only
+   fatten its letterforms against it. */
+.nav:not(.nav--solid) .nav__links a.is-active {
+  text-shadow: none;
 }
 
 /* ---- Logo -------------------------------------------------------- */
@@ -1007,7 +1033,10 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.055), rgba(15, 23, 42, 0.03));
+  /* Light, not dark. This was a dark wash for when the bar was a white
+     surface; over the film a dark pill under a dark label is the one
+     thing that cannot work. */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.46));
   opacity: 0;
   transform: scale(0.92);
   transition: opacity 0.32s var(--ease), transform 0.32s var(--ease);
@@ -7222,5 +7251,17 @@ a.contact__info:hover .contact__infoIcon {
   .nav {
     padding-left: 0.6rem;
     right: 1.25rem;
+  }
+}
+
+/* Below the links breakpoint the bar is the hamburger's own surface —
+   the transparent treatment above is for the row of labels over the
+   film, and a bare icon on raw footage has nothing to sit on. */
+@media (max-width: 1080px) {
+  .nav {
+    background: rgba(255, 255, 255, 0.86);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    backdrop-filter: blur(18px) saturate(180%);
+    box-shadow: 0 1px 2px rgba(11, 31, 42, 0.06), 0 10px 28px rgba(11, 31, 42, 0.14);
   }
 }
