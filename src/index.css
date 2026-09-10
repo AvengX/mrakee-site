@@ -828,7 +828,7 @@ body {
   /* 1.5rem clear of the top and of both edges, which is the brief's
      20-30px, and is what makes it read as a floating object rather
      than a bar stuck to the ceiling. */
-  top: 1.5rem;
+  top: 1.25rem;
   left: 50%;
   z-index: 50;
   /* Wider than the site's --maxw content measure, because the bar is a
@@ -850,8 +850,14 @@ body {
      the 70-80px asked for. The left inset is larger than the right
      because the right holds a pill with its own padding and the left
      holds artwork with none. */
-  padding: 0.85rem 0.95rem 0.85rem 1.9rem;
-  border-radius: 38px;
+  /* Scaled down on request — it read as bulky at 80px. Every part
+      came down together so the proportions hold: the bar is 68px, the
+      button 44px, the labels 16px. Radius follows the height (32 on 68
+      is the same curve 38 was on 80), otherwise a shorter bar with the
+      old corner reads as a rectangle with rounded ends rather than a
+      pill. */
+  padding: 0.7rem 0.8rem 0.7rem 1.6rem;
+  border-radius: 32px;
   border: 1px solid transparent;
   /* The film used to have a white wash across its top which this bar
      borrowed contrast from. With that gone the bar has to be its own
@@ -875,17 +881,19 @@ body {
     box-shadow 0.5s var(--ease), padding 0.5s var(--ease);
 }
 
-/* Scrolled: the surface appears. Over the film the bar is invisible, but
-   the sections below it are full-bleed cards and photography, and a
-   floating row of unbacked labels over those is neither legible nor
-   what the rest of the site looks like. This is where the glass lives
-   now. The padding does not change, so the bar still has one height. */
+/* THE SCROLLED STATE LOOKS EXACTLY LIKE THE INITIAL ONE, on request —
+   the header must not change as you move down the page. This class is
+   still applied by Nav.jsx (it drives nothing else, and removing the
+   listener would be a change to behaviour rather than to appearance),
+   it simply no longer paints anything. Everything the bar had here —
+   0.95 white, the blur, the border and the shadow — is deliberately
+   gone.
+
+   If a dark section is ever added below, the labels there will need
+   handling; the halo below is doing that work everywhere today. */
 .nav--solid {
-  background: rgba(255, 255, 255, 0.95);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  backdrop-filter: blur(18px) saturate(180%);
-  border-color: var(--line);
-  box-shadow: 0 1px 2px rgba(11, 31, 42, 0.06), 0 14px 38px rgba(11, 31, 42, 0.14);
+  background: transparent;
+  box-shadow: none;
 }
 
 /* With the surface gone the labels sit on raw footage, and raw footage
@@ -898,14 +906,14 @@ body {
    letterforms rather than spread into a plate. text-shadow and not
    drop-shadow on purpose: a filter would apply to the anchor's ::after
    as well and paint a white glow around the active pill. */
-.nav:not(.nav--solid) .nav__links a {
+.nav .nav__links a {
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.95),
     0 1px 3px rgba(255, 255, 255, 0.9), 0 0 10px rgba(255, 255, 255, 0.7);
 }
 
 /* The active item has its own white ground, so the halo would only
    fatten its letterforms against it. */
-.nav:not(.nav--solid) .nav__links a.is-active {
+.nav .nav__links a.is-active {
   text-shadow: none;
 }
 
@@ -990,7 +998,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 0.35rem;
+  gap: 0.25rem;
   align-items: center;
   list-style: none;
   flex-shrink: 0;
@@ -1000,8 +1008,8 @@ body {
 .nav__links a {
   position: relative;
   display: inline-flex;
-  padding: 0.75rem 1.15rem;
-  border-radius: 26px;
+  padding: 0.6rem 0.95rem;
+  border-radius: 22px;
   /* isolation, and it is load-bearing rather than tidy: the active
      pill below is an opaque ::after and pseudo-elements paint ABOVE
      inline text. z-index:-1 alone would not fix it either, because the
@@ -1020,7 +1028,7 @@ body {
      round. */
   color: var(--exec-dark);
   text-decoration: none;
-  font-size: 1.14rem;
+  font-size: 1rem;
   font-weight: 500;
   letter-spacing: -0.005em;
   transition: color 0.3s var(--ease-soft);
@@ -1084,8 +1092,8 @@ body {
 /* Bigger than the site's small button, because in this bar it is the
    one thing that has to carry weight: 46px tall inside a 73px bar. */
 .nav__cta > .btn--sm {
-  padding: 0.88rem 1.5rem;
-  font-size: 1.08rem;
+  padding: 0.72rem 1.25rem;
+  font-size: 0.95rem;
   font-weight: 600;
   /* The bar has exactly one height. Without this the label wraps the
      moment the row is tight and the whole header grows with it. */
@@ -1194,14 +1202,13 @@ body {
   margin-top: 0.35rem;
 }
 
-/* 1080px, not 880. The links were raised to 18px for the reference
-   header and the row grew from 460px to 573px, so the three children no
-   longer fit between 880 and about 1035: the CTA was the one that gave,
-   and "Talk to us" wrapped to two lines, which took the bar from 76px
-   to 113px. Measured, not guessed — brand 200 + links 573 + button 142
-   + gaps 32 needs 947px of inner width, which is a 1035px viewport.
-   1080 leaves room. The existing sheet menu covers everything below. */
-@media (max-width: 1080px) {
+/* Back to the project's original 880 — the reason it was raised is
+   gone. It went to 1080 when the labels were 18px and the row was
+   573px wide; at 16px the row is 489px and the mark has left the bar
+   entirely, so links 489 + button 130 + gap 16 + padding 38 needs
+   673px of inner width, which an 880px viewport clears with 104px to
+   spare. Verified at 885. */
+@media (max-width: 880px) {
   .nav__links {
     display: none;
   }
@@ -1222,7 +1229,7 @@ body {
   }
 }
 
-@media (min-width: 1081px) {
+@media (min-width: 881px) {
   .sheet {
     display: none;
   }
@@ -7230,7 +7237,7 @@ a.contact__info:hover .contact__infoIcon {
    links centred — untouched. Nothing is added and nothing moves on the
    page behind it.
    ================================================================ */
-@media (max-width: 1080px) {
+@media (max-width: 880px) {
   .nav {
     width: auto;
     left: auto;
@@ -7257,7 +7264,7 @@ a.contact__info:hover .contact__infoIcon {
 /* Below the links breakpoint the bar is the hamburger's own surface —
    the transparent treatment above is for the row of labels over the
    film, and a bare icon on raw footage has nothing to sit on. */
-@media (max-width: 1080px) {
+@media (max-width: 880px) {
   .nav {
     background: rgba(255, 255, 255, 0.86);
     -webkit-backdrop-filter: blur(18px) saturate(180%);
