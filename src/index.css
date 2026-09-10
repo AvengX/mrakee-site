@@ -2017,9 +2017,21 @@ h3 {
   overflow: hidden;
 }
 
+/* THE IMAGE GIVES WAY, NOT THE TEXT. The rail is pinned, so a card
+   taller than the pinned area is not scrolled to — it is cut off, and
+   the card's link goes with it. With every point now listed, a 9-point
+   card ran 120px past the viewport at 1280x700, where the picture alone
+   was 271px of a 733px card.
+
+   So the media is capped in viewport units and only bites where the
+   screen is short: at 900px tall it takes 180px against the 276px the
+   aspect ratio asks for, and at 700px it takes 140px. The img is
+   already object-fit:cover, so it crops rather than squashes. Above
+   ~1250px tall the cap is inert and the 16/10 ratio is what renders. */
 .rail__media {
   position: relative;
   aspect-ratio: 16 / 10;
+  max-height: clamp(130px, 20vh, 300px);
   background: var(--surface-soft);
   overflow: hidden;
 }
@@ -2084,11 +2096,27 @@ h3 {
   color: var(--ink-soft);
 }
 
+/* TWO COLUMNS, because the list got longer rather than shorter.
+   Showing all nine points instead of six added 84px to every card, and
+   the rail is PINNED — anything past the viewport is not scrolled to,
+   it is simply cut off, and the card's link was going with it. At
+   1280x700 the card ran 135px past the pinned area.
+
+   Two columns turns nine rows into five and gives that back. Kept for
+   wide cards only: below 900px the card is ~300px, and two columns of
+   125px break "Professional microphones and speakers" into four
+   lines, which is taller than the single column it replaced. */
 .rail__points {
   list-style: none;
   margin-top: 1rem;
   display: grid;
-  gap: 0.4rem;
+  gap: 0.4rem 1.1rem;
+}
+
+@media (min-width: 900px) {
+  .rail__points {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .rail__points li {
@@ -7271,4 +7299,18 @@ a.contact__info:hover .contact__infoIcon {
     backdrop-filter: blur(18px) saturate(180%);
     box-shadow: 0 1px 2px rgba(11, 31, 42, 0.06), 0 10px 28px rgba(11, 31, 42, 0.14);
   }
+}
+
+/* SHORT SCREENS: the last 44px.
+
+   A 1366x768 laptop gives about 640px of viewport, and there the media
+   cap has already bottomed out — so the remaining overflow has to come
+   from the spacing rather than the picture. Measured at 1366x640: the
+   rail was 592px against 548px of pinned area, and these four trims
+   take it to 542px. They are deliberately small and only apply where
+   the alternative is a card with its link cut off. */
+@media (max-height: 720px) and (min-width: 900px) {
+  .rail__media { max-height: clamp(110px, 20vh, 300px); }
+  .rail__body { padding: 0.85rem 1.1rem; }
+  .rail__points { margin-top: 0.55rem; gap: 0.25rem 1.1rem; }
 }

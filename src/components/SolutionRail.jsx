@@ -136,9 +136,17 @@ export default function SolutionRail({ items }) {
               <h3>{s.t}</h3>
               {s.quote && <p className="rail__quote">{s.quote}</p>}
               {s.d && <p className="rail__lede">{s.d}</p>}
+              {/* EVERY POINT THE DOCUMENT LISTS, not the first six.
+                  slice(0, 6) was silently dropping 18 bullets across the
+                  nine portfolios — three each from Smart Classrooms,
+                  Command & Control, Experience Centres and Large Venue,
+                  two each from Seamless Communication, Corporate Meeting
+                  and Video Walls. The cards are flex columns in a
+                  stretch row, so they simply grow and stay level with
+                  each other. */}
               {s.points?.length > 0 && (
                 <ul className="rail__points">
-                  {s.points.slice(0, 6).map((p) => (
+                  {s.points.map((p) => (
                     <li key={p}>{p}</li>
                   ))}
                 </ul>
