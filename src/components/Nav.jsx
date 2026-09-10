@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import Logo from "./Logo";
 
 const LINKS = [
   { href: "#about", label: "About", hint: "Who we are" },
@@ -69,10 +68,6 @@ export default function Nav() {
   return (
     <div ref={wrap}>
       <nav className={`nav${solid ? " nav--solid" : ""}`}>
-        <span className="nav__brand">
-          <Logo size={36} />
-        </span>
-
         <ul className="nav__links">
           {LINKS.map((l) => (
             <li key={l.href}>

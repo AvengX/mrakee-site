@@ -942,12 +942,25 @@ body {
   color: var(--teal-ink);
 }
 
+/* CENTRED ON THE BAR, not on what is left over.
+   With the mark gone the row holds one child, and no amount of flex
+   arithmetic centres a list next to a single right-aligned button:
+   auto margins would split the free space either side of the list,
+   which lands it half the button's width to the left. Taking it out of
+   the flow and centring it on the bar's own axis is exact and stays
+   exact whatever the button's label becomes. `left: 50%` resolves
+   against .nav's padding box, which is symmetric, so the uneven left
+   and right padding does not pull it off centre. */
 .nav__links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   gap: 0.35rem;
   align-items: center;
   list-style: none;
   flex-shrink: 0;
+  margin: 0;
 }
 
 .nav__links a {
@@ -7156,27 +7169,46 @@ a.contact__info:hover .contact__infoIcon {
    and the links do not jump sideways when it appears. The delay on the
    visibility transition lets the opacity fade finish before the box
    goes inert. */
-/* THE MARK IS ALWAYS ON THE BAR, on request — it was briefly held back
-   while the hero carried its own lockup. flex:1 here and on .nav__cta
-   is what actually centres the links: with three flex children and
-   space-between, the list only lands in the middle when the two
-   outside it claim equal share, and the logo and the CTA are nowhere
-   near the same width. */
-.nav__brand {
-  display: flex;
-  align-items: center;
-  flex: 1 1 0;
-  min-width: 0;
+
+
+
+
+/* ================================================================
+   THE BAR BELOW THE LINKS BREAKPOINT
+
+   Consequence of taking the mark out, not a separate design choice.
+   Below 1080px the links are already hidden, so with the mark gone the
+   bar held exactly one control — and a 95%-wide, 73px-tall pill with a
+   single hamburger pinned to its right edge reads as a loading
+   placeholder, not a header. Measured at 390x844: 326px of bar for
+   44px of button.
+
+   So below the breakpoint the bar is the size of what it contains and
+   sits in the top-right corner, which keeps the floating-pill language
+   and leaves the desktop header — 95.5% wide, 80px tall, 38px radius,
+   links centred — untouched. Nothing is added and nothing moves on the
+   page behind it.
+   ================================================================ */
+@media (max-width: 1080px) {
+  .nav {
+    width: auto;
+    left: auto;
+    /* 2rem matches the 32px the full-width bar keeps either side above
+       the breakpoint, so the bar's outer edge does not jump when the
+       viewport crosses it. */
+    right: 2rem;
+    transform: none;
+    padding: 0.6rem;
+    border-radius: 26px;
+  }
 }
 
-/* The lockup measured 200px in the bar against the 175-190px asked for,
-   and the wordmark is the part carrying the excess — the mark is only
-   47px of it. Capped HERE rather than on .logo__wordArt, so the footer
-   and the mobile sheet keep the size they had. The artwork itself is
-   untouched and keeps its own ratio; only the box it is drawn into
-   changes. */
-.nav__brand .logo__wordArt {
-  height: 24px;
+/* The base rule's asymmetric left padding existed for the mark and is
+   overridden above; this narrow-screen tweak of it has nothing left to
+   act on. */
+@media (max-width: 560px) {
+  .nav {
+    padding-left: 0.6rem;
+    right: 1.25rem;
+  }
 }
-
-
