@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Logo from "./Logo";
 
 const LINKS = [
   { href: "#about", label: "About", hint: "Who we are" },
@@ -19,15 +20,39 @@ const LINKS = [
  */
 export default function Nav() {
   const [solid, setSolid] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
   const wrap = useRef(null);
 
+  /* THE MARK APPEARS ONCE THE HERO HAS GONE, and then it is the way
+     home from anywhere on the page.
+
+     The threshold is derived rather than picked. The film is 640vh with
+     a sticky 100vh stage, so its scrub runs over `height - viewport` of
+     scrolling, and FilmStage's opening caption is out at 0.06 of that
+     progress — about 32vh. Reading the element means this keeps working
+     if the film's height ever changes, instead of drifting away from a
+     hard-coded number. The extra 60px is so the mark arrives after the
+     lockup has finished fading rather than crossing it.
+
+     Both booleans share one listener; `solid` is the bar's existing
+     scrolled state and is left alone. */
   useEffect(() => {
-    const onScroll = () => setSolid(window.scrollY > 80);
+    const onScroll = () => {
+      setSolid(window.scrollY > 80);
+      const film = document.getElementById("film");
+      const span = film ? film.offsetHeight - window.innerHeight : 0;
+      const heroGone = span > 0 ? span * 0.06 : window.innerHeight * 0.5;
+      setPastHero(window.scrollY > heroGone + 60);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   /* Which section is being read. rootMargin pulls the detection band up
@@ -68,6 +93,13 @@ export default function Nav() {
   return (
     <div ref={wrap}>
       <nav className={`nav${solid ? " nav--solid" : ""}`}>
+        {/* Logo already renders an <a href="#top"> with a home label, so
+            this is the home button rather than something that imitates
+            one. inert while hidden, so it is not a stop in the keyboard
+            order before it exists on screen. */}
+        <span className={`nav__brand${pastHero ? " is-shown" : ""}`} inert={!pastHero}>
+          <Logo size={36} />
+        </span>
         <ul className="nav__links">
           {LINKS.map((l) => (
             <li key={l.href}>

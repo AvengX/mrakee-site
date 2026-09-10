@@ -7314,3 +7314,67 @@ a.contact__info:hover .contact__infoIcon {
   .rail__body { padding: 0.85rem 1.1rem; }
   .rail__points { margin-top: 0.55rem; gap: 0.25rem 1.1rem; }
 }
+
+/* ================================================================
+   THE FLOATING HOME MARK
+
+   It is not in the bar over the hero — the hero carries the full
+   lockup there, and two marks a few hundred pixels apart read as a
+   mistake. Once the film's opening caption has gone the small mark
+   fades in on the left of the bar and stays for the rest of the page,
+   which is where a visitor looks for the way back to the top.
+
+   No surface of its own, matching the bar it sits in. Every band below
+   the film paints light — the darkest is rgb(241,245,249) — so the
+   artwork reads without one.
+   ================================================================ */
+.nav__brand {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  /* The delay on visibility lets the fade finish before the box goes
+     inert, so it does not vanish mid-transition. */
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease),
+    visibility 0s linear 0.5s;
+}
+
+.nav__brand.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease),
+    visibility 0s;
+}
+
+/* Small — this is a way back, not the brand statement the hero makes. */
+.nav__brand .logo__wordArt {
+  height: 22px;
+}
+
+/* The links are absolutely centred on the bar, so the mark appearing
+   in the flow cannot push them off centre. It only needs to not push
+   the button either. */
+.nav__brand .logo {
+  gap: 0.55rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__brand,
+  .nav__brand.is-shown { transform: none; }
+}
+
+/* Below the links breakpoint the bar is the compact hamburger control
+   and nothing else, as asked. visibility:hidden was not enough — it
+   keeps the box, so the pill was already 250px wide at the top of the
+   page with 185px of it empty, which is the thing that treatment
+   exists to avoid. display:none takes the box away too.
+
+   The consequence, stated rather than hidden: there is no home button
+   on a phone. Swap this to `display: none` / `.is-shown { display:
+   flex }` if the mark should appear there after the hero as well — the
+   pill then grows from 65px to about 250px at that point. */
+@media (max-width: 880px) {
+  .nav__brand { display: none; }
+}
