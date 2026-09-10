@@ -2096,33 +2096,38 @@ h3 {
   color: var(--ink-soft);
 }
 
-/* TWO COLUMNS, because the list got longer rather than shorter.
-   Showing all nine points instead of six added 84px to every card, and
-   the rail is PINNED — anything past the viewport is not scrolled to,
-   it is simply cut off, and the card's link was going with it. At
-   1280x700 the card ran 135px past the pinned area.
+/* ONE COLUMN, so every point is one line.
 
-   Two columns turns nine rows into five and gives that back. Kept for
-   wide cards only: below 900px the card is ~300px, and two columns of
-   125px break "Professional microphones and speakers" into four
-   lines, which is taller than the single column it replaced. */
+   Two columns were tried and they are what made the lists ragged:
+   measured at 1440x900 the card is 460px, which leaves a 192px column,
+   and the longest point — "Professional microphones and speakers" —
+   needs 327px. So it broke over three lines while its neighbours took
+   one, and the rows stopped lining up. Widening the card until two
+   columns fit that string would take it to roughly 730px, which puts
+   barely two cards on screen.
+
+   One column of 402px clears 327px with room to spare, so nothing
+   wraps and every row is the same height. It costs nothing either:
+   nine single lines and eight gaps is 245px, against the 246px the
+   wrapped two-column version measured. Same height, even rows. */
 .rail__points {
   list-style: none;
   margin-top: 1rem;
   display: grid;
-  gap: 0.4rem 1.1rem;
-}
-
-@media (min-width: 900px) {
-  .rail__points {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  gap: 0.4rem;
 }
 
 .rail__points li {
   position: relative;
   padding-left: 1.5rem;
-  font-size: 0.9rem;
+  /* Scales with the card rather than sitting at a fixed 0.9rem. The
+     card is clamp(300px, 34vw, 460px), so between about 1000px and
+     1350px of viewport it is narrower than the 402px that keeps
+     "Professional microphones and speakers" on one line — and at
+     0.82rem that string measures 297px, which is what the card gives
+     at 1000px. Below roughly 1000px it wraps to two lines; the rail is
+     a plain horizontal scroller by then. */
+  font-size: clamp(0.82rem, 1vw, 0.9rem);
   line-height: 1.5;
   color: var(--ink);
 }
@@ -7310,9 +7315,12 @@ a.contact__info:hover .contact__infoIcon {
    take it to 542px. They are deliberately small and only apply where
    the alternative is a card with its link cut off. */
 @media (max-height: 720px) and (min-width: 900px) {
-  .rail__media { max-height: clamp(110px, 20vh, 300px); }
+  /* 100px, not 110: one column is four pixels taller than the wrapped
+     two-column list it replaced, and at 1366x640 that was the
+     difference between fitting the pinned area and overrunning it. */
+  .rail__media { max-height: clamp(100px, 20vh, 300px); }
   .rail__body { padding: 0.85rem 1.1rem; }
-  .rail__points { margin-top: 0.55rem; gap: 0.25rem 1.1rem; }
+  .rail__points { margin-top: 0.55rem; gap: 0.25rem; }
 }
 
 /* ================================================================
