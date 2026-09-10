@@ -70,7 +70,7 @@ export default function Nav() {
     <div ref={wrap}>
       <nav className={`nav${solid ? " nav--solid" : ""}`}>
         <span className="nav__brand">
-          <Logo size={40} />
+          <Logo size={36} />
         </span>
 
         <ul className="nav__links">
