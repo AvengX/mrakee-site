@@ -721,11 +721,32 @@ body {
    text-shadow paints through the transparent fill and washes the
    gradient out. */
 .cap h1,
-.cap h2,
-.cap .lede {
+.cap h2 {
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
     drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
     drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+}
+
+/* THE SUPPORTING LINE LOSES THE GLOW, on request — it read as haze.
+
+   The haze was the third shadow: a 10px white cloud at 0.6 alpha,
+   spread far enough from the glyphs to be seen as fog rather than as
+   an edge. That one is gone. What is left is a 1px rim, which is not
+   visible as an effect and is doing the actual work.
+
+   It is not removed outright, and the number is why. This line is
+   #111111 at 17px on raw footage, and measured over the opening window
+   across its own box: 6.06:1 mean, but 2.37:1 at the fifth percentile,
+   a worst pixel of 1.08:1, and 40.3% of its area under 4.5:1 — the
+   floor's reflections and the planter behind it swing from near-white
+   to near-black under one sentence. The header labels could lose their
+   halo because only 0.4% of that area was failing; this is a hundred
+   times worse.
+
+   To take it off completely, delete this rule. */
+.cap .lede {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 1px 1px rgba(255, 255, 255, 0.75));
 }
 
 /* On the dark scrim the gradient word flips to the board's BRIGHT pair,
@@ -797,11 +818,32 @@ body {
    text-shadow paints through the transparent fill and washes the
    gradient out. */
 .cap h1,
-.cap h2,
-.cap .lede {
+.cap h2 {
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
     drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
     drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+}
+
+/* THE SUPPORTING LINE LOSES THE GLOW, on request — it read as haze.
+
+   The haze was the third shadow: a 10px white cloud at 0.6 alpha,
+   spread far enough from the glyphs to be seen as fog rather than as
+   an edge. That one is gone. What is left is a 1px rim, which is not
+   visible as an effect and is doing the actual work.
+
+   It is not removed outright, and the number is why. This line is
+   #111111 at 17px on raw footage, and measured over the opening window
+   across its own box: 6.06:1 mean, but 2.37:1 at the fifth percentile,
+   a worst pixel of 1.08:1, and 40.3% of its area under 4.5:1 — the
+   floor's reflections and the planter behind it swing from near-white
+   to near-black under one sentence. The header labels could lose their
+   halo because only 0.4% of that area was failing; this is a hundred
+   times worse.
+
+   To take it off completely, delete this rule. */
+.cap .lede {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 1px 1px rgba(255, 255, 255, 0.75));
 }
 
 /* On the dark scrim the gradient word flips to the board's BRIGHT pair,
