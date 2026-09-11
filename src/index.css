@@ -541,9 +541,17 @@ body {
 .cap__logo img,
 .cap__logo svg,
 .cap__strap {
-  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 1))
-    drop-shadow(0 1px 4px rgba(255, 255, 255, 0.95))
-    drop-shadow(0 0 14px rgba(255, 255, 255, 0.85));
+  /* A RIM, NOT A GLOW. The 14px spread at 0.85 alpha was the haze — a
+     white cloud wide enough to be seen as fog over the terminal rather
+     than as an edge on the artwork. Gone. What is left is 2px, which
+     hugs the glyphs and leaves the picture alone.
+
+     Not removed outright: with no halo at all this ink measures 2.80:1
+     mean and 1.00:1 at worst, with 100% of its area under 4.5:1 — the
+     wordmark is a mid teal-green on a bright glass wall and the brand
+     line is mid-grey on a bright floor. Both would dissolve. */
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 1))
+    drop-shadow(0 0 2px rgba(255, 255, 255, 0.92));
 }
 
 /* A translucent pill rather than .btn--ghost's near-solid white: this
@@ -722,9 +730,13 @@ body {
    gradient out. */
 .cap h1,
 .cap h2 {
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
-    drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
-    drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+  /* Same trim as the mark above: the 10px spread went, the rim stayed.
+     At 42px bold the headline needs less help than the small type, but
+     it is not free either — unhaloed it measures 44.7% of its area
+     under 4.5:1, with a worst pixel of 1.01:1 where the planter and
+     the dark pillar pass behind it. */
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
 }
 
 /* THE SUPPORTING LINE LOSES THE GLOW, on request — it read as haze.
@@ -819,9 +831,13 @@ body {
    gradient out. */
 .cap h1,
 .cap h2 {
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
-    drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
-    drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+  /* Same trim as the mark above: the 10px spread went, the rim stayed.
+     At 42px bold the headline needs less help than the small type, but
+     it is not free either — unhaloed it measures 44.7% of its area
+     under 4.5:1, with a worst pixel of 1.01:1 where the planter and
+     the dark pillar pass behind it. */
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
 }
 
 /* THE SUPPORTING LINE LOSES THE GLOW, on request — it read as haze.
