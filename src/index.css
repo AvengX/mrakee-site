@@ -870,7 +870,7 @@ body {
   /* 1.5rem clear of the top and of both edges, which is the brief's
      20-30px, and is what makes it read as a floating object rather
      than a bar stuck to the ceiling. */
-  top: 0.6rem;
+  top: 0.25rem;
   left: 50%;
   z-index: 50;
   /* Wider than the site's --maxw content measure, because the bar is a
