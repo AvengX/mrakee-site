@@ -7,17 +7,10 @@ import { SOLUTIONS } from "../content/mrakee";
 /* ================================================================
    The enquiry form.
 
-   There is no backend on this project, so `send()` below composes a
-   pre-filled email and hands it to the visitor's mail client. That is a
-   real, working path today rather than a button that lies — but it is
-   NOT what you want in production, because it depends on the visitor
-   having a mail client configured and it never reaches you if they
-   abandon the compose window.
-
-   To make it a real submission, replace the marked block in `send()`
-   with a POST to your endpoint. Everything else — validation, the
-   pending state, the success state, the error handling — already works
-   against a promise and needs no changes.
+   Enquiries are delivered via the /api/enquiry endpoint to Web3Forms
+   and on to the sales inbox. Everything else — validation, the
+   pending state, the success state, the error handling — works
+   against a promise and maintains full visual parity.
    ================================================================ */
 
 /* LAUNCH BLOCKER. The client's content document gives
@@ -79,6 +72,7 @@ export default function ContactForm() {
   const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle"); // idle · sending · sent · failed
+  const [errorMessage, setErrorMessage] = useState("");
   const formRef = useRef(null);
 
   const set = (name) => (e) => {
@@ -89,33 +83,26 @@ export default function ContactForm() {
   };
 
   async function send(payload) {
-    /* ---- REPLACE FROM HERE to POST somewhere real -----------------
-       await fetch("/api/enquiry", {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify(payload),
-       }).then((r) => { if (!r.ok) throw new Error(r.statusText); });
-       ---------------------------------------------------------------- */
-    const subject = `Enquiry from ${payload.name}${payload.company ? ` · ${payload.company}` : ""}`;
-    const body = [
-      `Name: ${payload.name}`,
-      payload.company && `Company: ${payload.company}`,
-      `Email: ${payload.email}`,
-      // dialling code included, or a ten-digit number reaches nobody
-      payload.phone &&
-        `Phone: ${findCountry(payload.country).dial} ${digitsOf(payload.phone)}`,
-      payload.city && `City / Location: ${payload.city}`,
-      payload.projectType && `Project type: ${payload.projectType}`,
-      "",
-      payload.message,
-    ]
-      .filter(Boolean)
-      .join("\n");
+    const formattedPhone = payload.phone
+      ? `${findCountry(payload.country)?.dial || ""} ${digitsOf(payload.phone)}`.trim()
+      : "";
 
-    window.location.href = `mailto:${SALES_EMAIL}?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
-    /* ---- REPLACE TO HERE ------------------------------------------ */
+    const res = await fetch("/api/enquiry", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        ...payload,
+        phoneFormatted: formattedPhone,
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      throw new Error(data?.error || `Submission failed (${res.status})`);
+    }
   }
 
   async function onSubmit(e) {
@@ -139,11 +126,13 @@ export default function ContactForm() {
     }
 
     setStatus("sending");
+    setErrorMessage("");
     try {
       await send(values);
       setStatus("sent");
       setValues(EMPTY);
-    } catch {
+    } catch (err) {
+      setErrorMessage(err.message || "");
       setStatus("failed");
     }
   }
@@ -154,16 +143,18 @@ export default function ContactForm() {
         <span className="contact__doneIcon">
           <Check size={22} strokeWidth={2.4} aria-hidden="true" />
         </span>
-        <h3>Your mail client should be open.</h3>
+        <h3>Enquiry sent successfully.</h3>
         <p>
-          If nothing happened, write to us directly at{" "}
-          <a href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a>. We reply within one
-          business day.
+          Thank you for reaching out. We reply within one business day. You can also write to us directly at{" "}
+          <a href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a>.
         </p>
         <button
           type="button"
           className="btn btn--ghost btn--sm"
-          onClick={() => setStatus("idle")}
+          onClick={() => {
+            setStatus("idle");
+            setErrorMessage("");
+          }}
         >
           Send another
         </button>
@@ -290,8 +281,8 @@ export default function ContactForm() {
 
       {status === "failed" && (
         <p className="field__err" role="alert">
-          That didn't go through. Please email{" "}
-          <a href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a> instead.
+          {errorMessage ? `${errorMessage} ` : "That didn't go through. "}
+          Please email <a href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a> instead.
         </p>
       )}
 

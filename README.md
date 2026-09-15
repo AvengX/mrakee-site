@@ -222,6 +222,7 @@ bundle contains no key material.
 
 | Variable | Required? | What it does |
 |---|---|---|
+| `WEB3FORMS_ACCESS_KEY` | **Yes** | Web3Forms email delivery service for the Quick Enquiry contact form. |
 | `ANTHROPIC_API_KEY` | **Yes** | Claude answers every question. Without it the assistant cannot reply at all. |
 | `ELEVENLABS_API_KEY` | Optional | The natural voice. First choice — the one most listeners will not identify as synthetic. |
 | `OPENAI_API_KEY` | Optional | Second-choice voice. Cheaper and close in quality. **Speech only** — Claude remains the brain. |
@@ -306,7 +307,7 @@ re-run — none of these are estimates.
 - [x] Kiosk touchscreen at `/kiosk`
 - [x] Reduced-motion parity — no section hides content
 - [ ] **Real contact details** — phone, email and address are still placeholders in the client's document
-- [ ] **Contact form backend** — currently `mailto:`, with no delivery guarantee
+- [x] **Contact form backend** — Web3Forms delivery via `/api/enquiry` with server-side environment variables and Honeypot protection
 - [ ] **Projects section** — named in the footer, no case studies supplied yet
 - [ ] **Photography** — six of nine portfolios reuse a near-match image; Infrastructure has none
 - [ ] **Prune retired dependencies** — `three` and `@react-three/*` are imported only by `src/_retired-3d/`
