@@ -259,7 +259,7 @@ export const CONTACT = {
     { label: "Phone", value: "9319119008", href: "tel:9319119008" },
   ],
   emails: [
-    { label: "Email", value: "Sales@mrakeetechnologies.com", href: "mailto:Sales@mrakeetechnologies.com", wide: true },
     { label: "Email", value: "Info@mrakeetechnologies.com", href: "mailto:Info@mrakeetechnologies.com", wide: true },
+    { label: "Email", value: "Sales@mrakeetechnologies.com", href: "mailto:Sales@mrakeetechnologies.com", wide: true },
   ],
 };

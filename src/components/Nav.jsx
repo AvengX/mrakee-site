@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Phone, Mail } from "lucide-react";
 import Logo from "./Logo";
 
 const LINKS = [
@@ -23,7 +24,11 @@ export default function Nav() {
   const [pastHero, setPastHero] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
+  const [contactOpen, setContactOpen] = useState(false);
   const wrap = useRef(null);
+  const contactWrapRef = useRef(null);
+  const contactBtnRef = useRef(null);
+  const leaveTimerRef = useRef(null);
 
   /* THE MARK APPEARS ONCE THE HERO HAS GONE, and then it is the way
      home from anywhere on the page.
@@ -90,6 +95,77 @@ export default function Nav() {
     };
   }, [open]);
 
+  /* Dynamic alignment of pointer to the Talk to us button */
+  useEffect(() => {
+    const updateCenter = () => {
+      if (contactBtnRef.current && contactWrapRef.current) {
+        const btnWidth = contactBtnRef.current.offsetWidth;
+        const isCompact = window.innerWidth <= 880;
+        // Below 880px, hamburger toggle (44px + 8px gap = 52px) is to the right
+        const offset = isCompact ? btnWidth / 2 + 52 : btnWidth / 2;
+        contactWrapRef.current.style.setProperty("--talk-btn-center", `${offset - 6}px`);
+      }
+    };
+    updateCenter();
+    window.addEventListener("resize", updateCenter);
+    return () => window.removeEventListener("resize", updateCenter);
+  }, []);
+
+  /* Dismiss contact dropdown on Escape or outside click/tap */
+  useEffect(() => {
+    if (!contactOpen) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setContactOpen(false);
+        contactBtnRef.current?.focus();
+      }
+    };
+    const onDown = (e) => {
+      if (!contactWrapRef.current?.contains(e.target)) {
+        setContactOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [contactOpen]);
+
+  const handleMouseEnter = () => {
+    if (leaveTimerRef.current) {
+      clearTimeout(leaveTimerRef.current);
+      leaveTimerRef.current = null;
+    }
+    setContactOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    leaveTimerRef.current = setTimeout(() => {
+      setContactOpen(false);
+    }, 150);
+  };
+
+  const handleFocus = () => {
+    if (leaveTimerRef.current) {
+      clearTimeout(leaveTimerRef.current);
+      leaveTimerRef.current = null;
+    }
+    setContactOpen(true);
+  };
+
+  const handleBlur = (e) => {
+    if (!contactWrapRef.current?.contains(e.relatedTarget)) {
+      setContactOpen(false);
+    }
+  };
+
+  const handleTalkClick = (e) => {
+    e.preventDefault();
+    setContactOpen((prev) => !prev);
+  };
+
   return (
     <div ref={wrap}>
       <nav className={`nav${solid ? " nav--solid" : ""}`}>
@@ -111,10 +187,83 @@ export default function Nav() {
         </ul>
 
         <div className="nav__cta">
-          <a className="btn btn--primary btn--sm" href="#contact">
-            Talk to us
-            <span className="arrow" aria-hidden="true">→</span>
-          </a>
+          <div
+            className="nav__talk"
+            ref={contactWrapRef}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          >
+            <a
+              ref={contactBtnRef}
+              className="btn btn--primary btn--sm nav__talkBtn"
+              href="#contact"
+              role="button"
+              aria-haspopup="dialog"
+              aria-expanded={contactOpen}
+              aria-controls="nav-talk-card"
+              aria-label="Talk to us contact options"
+              onClick={handleTalkClick}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setContactOpen((prev) => !prev);
+                }
+              }}
+            >
+              Talk to us
+              <span className="arrow" aria-hidden="true">→</span>
+            </a>
+
+            <div
+              id="nav-talk-card"
+              className={`nav__talkCard${contactOpen ? " is-open" : ""}`}
+              role="region"
+              aria-label="Contact Information"
+            >
+              <div className="nav__talkPointer" aria-hidden="true" />
+
+              {/* Phone Section */}
+              <div className="nav__talkSection">
+                <div className="nav__talkIconBox">
+                  <Phone size={17} strokeWidth={1.8} aria-hidden="true" />
+                </div>
+                <div className="nav__talkDetails">
+                  <span className="nav__talkLabel">PHONE</span>
+                  <div className="nav__talkLinks">
+                    <a href="tel:9319015591" className="nav__talkLink">
+                      9319015591
+                    </a>
+                    <a href="tel:9319119008" className="nav__talkLink">
+                      9319119008
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="nav__talkDivider" aria-hidden="true" />
+
+              {/* Email Section */}
+              <div className="nav__talkSection">
+                <div className="nav__talkIconBox">
+                  <Mail size={17} strokeWidth={1.8} aria-hidden="true" />
+                </div>
+                <div className="nav__talkDetails">
+                  <span className="nav__talkLabel">EMAIL</span>
+                  <div className="nav__talkLinks">
+                    <a href="mailto:Info@mrakeetechnologies.com" className="nav__talkLink">
+                      Info@mrakeetechnologies.com
+                    </a>
+                    <a href="mailto:Sales@mrakeetechnologies.com" className="nav__talkLink">
+                      Sales@mrakeetechnologies.com
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <button
             type="button"
             className="nav__toggle"

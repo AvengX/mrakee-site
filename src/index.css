@@ -1144,7 +1144,8 @@ body {
 
 /* Bigger than the site's small button, because in this bar it is the
    one thing that has to carry weight: 46px tall inside a 73px bar. */
-.nav__cta > .btn--sm {
+.nav__cta > .btn--sm,
+.nav__talk > .btn--sm {
   padding: 0.72rem 1.25rem;
   font-size: 0.95rem;
   font-weight: 600;
@@ -1152,6 +1153,182 @@ body {
      moment the row is tight and the whole header grows with it. */
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* ================================================================
+   TALK TO US — Contact Dropdown Card
+   ================================================================ */
+.nav__talk {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Floating contact card */
+.nav__talkCard {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 334px;
+  max-width: calc(100vw - 2rem);
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(11, 31, 42, 0.03),
+              0 16px 36px -4px rgba(11, 31, 42, 0.13),
+              0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+  padding: 1.15rem 1.25rem;
+  z-index: 99;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.22s var(--ease),
+              transform 0.22s var(--ease),
+              visibility 0.22s;
+}
+
+/* Invisible hover bridge to prevent card from closing when moving mouse across gap */
+.nav__talkCard::after {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: transparent;
+}
+
+/* Triangular pointer pointing to Talk to us button */
+.nav__talkPointer {
+  position: absolute;
+  top: -6px;
+  right: calc(var(--talk-btn-center, 62px));
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 23, 42, 0.09);
+  border-left: 1px solid rgba(15, 23, 42, 0.09);
+  transform: rotate(45deg);
+  border-top-left-radius: 2px;
+  z-index: 3;
+}
+
+/* Active / Open state (hover, focus-within, or mobile tap .is-open) */
+.nav__talk:hover .nav__talkCard,
+.nav__talk:focus-within .nav__talkCard,
+.nav__talkCard.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Phone and Email sections */
+.nav__talkSection {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.nav__talkIconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+  color: var(--gold-deep);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.nav__talkDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.nav__talkLabel {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+
+.nav__talkLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.nav__talkLink {
+  display: inline-block;
+  font-size: 0.92rem;
+  font-weight: 550;
+  line-height: 1.42;
+  color: var(--teal-deep);
+  text-decoration: none;
+  transition: color 0.2s var(--ease-soft), transform 0.2s var(--ease-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 1px 0;
+}
+
+.nav__talkLink:hover {
+  color: var(--gold-ink);
+  transform: translateX(2px);
+}
+
+.nav__talkLink:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.nav__talkDivider {
+  height: 1px;
+  background: rgba(15, 23, 42, 0.07);
+  margin: 0.82rem 0;
+}
+
+@media (max-width: 880px) {
+  .nav__talkCard {
+    right: -52px;
+    width: min(330px, calc(100vw - 2.2rem));
+  }
+}
+
+@media (max-width: 480px) {
+  .nav__talkCard {
+    right: -52px;
+    width: calc(100vw - 1.4rem);
+    padding: 0.95rem 1rem;
+  }
+  .nav__talk > .btn--sm {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.88rem;
+  }
+  .nav__talkSection {
+    gap: 0.7rem;
+  }
+  .nav__talkIconBox {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+  .nav__talkLink {
+    font-size: clamp(0.74rem, 3.3vw, 0.86rem);
+  }
 }
 
 /* ---- Mobile ------------------------------------------------------ */
