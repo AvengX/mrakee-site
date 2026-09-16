@@ -235,9 +235,6 @@ export default function Nav() {
                     <a href="tel:9319015591" className="nav__talkLink">
                       9319015591
                     </a>
-                    <a href="tel:9319119008" className="nav__talkLink">
-                      9319119008
-                    </a>
                   </div>
                 </div>
               </div>
@@ -254,9 +251,6 @@ export default function Nav() {
                   <div className="nav__talkLinks">
                     <a href="mailto:Info@mrakeetechnologies.com" className="nav__talkLink">
                       Info@mrakeetechnologies.com
-                    </a>
-                    <a href="mailto:Sales@mrakeetechnologies.com" className="nav__talkLink">
-                      Sales@mrakeetechnologies.com
                     </a>
                   </div>
                 </div>
