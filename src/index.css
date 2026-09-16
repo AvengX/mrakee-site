@@ -118,7 +118,16 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   /* Lenis drives the scroll; it disables this itself when it takes over. */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 html.lenis,
@@ -130,6 +139,8 @@ html.lenis body {
 }
 
 body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   background: var(--bg);
   color: var(--ink);
   font-family: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont,
