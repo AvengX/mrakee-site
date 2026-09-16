@@ -10,10 +10,10 @@ import WhyScroll from "./WhyScroll";
 import FaqMarquee from "./FaqMarquee";
 import AssistantDock from "./AssistantDock";
 import ExpertiseTrail from "./ExpertiseTrail";
-import { Ear, Layers, PenTool } from "lucide-react";
+import { Ear, Layers, PenTool, Phone, Mail } from "lucide-react";
 import { usePointerGlow } from "../hooks/usePointerGlow";
 import {
-  ABOUT, APPROACH, EXPERTISE, EXPERTS, FAQ, FOOTER,
+  ABOUT, APPROACH, CONTACT, EXPERTISE, EXPERTS, FAQ, FOOTER,
   INDUSTRIES, INSIGHTS, SOLUTIONS, WHY,
 } from "../content/mrakee";
 
@@ -194,12 +194,7 @@ export default function BrandPage() {
           Sits immediately above Contact on purpose: it answers what it
           can from the client's own words, and every dead end it reaches
           points at the enquiry form directly below it. */}
-      {/* ---------------- CONTACT ----------------
-          contactInfo is empty on purpose: the client's document gives
-          "+91 XXXXX XXXXX", "info@yourMRAKEE Technologies.com" and
-          "[Company Address]", all placeholders. The previous Singapore
-          details belonged to the acquired business, so showing them
-          would be worse than showing none. */}
+      {/* ---------------- CONTACT ---------------- */}
       <section className="band" id="contact">
         <div className="band__inner">
           <Reveal>
@@ -207,7 +202,10 @@ export default function BrandPage() {
               eyebrow="Contact Us"
               title="Ready to start your Technology Journey?"
               description="Get in touch with our experts."
-              contactInfo={[]}
+              contactInfo={[
+                ...CONTACT.phones.map((p) => ({ icon: Phone, ...p })),
+                ...CONTACT.emails.map((e) => ({ icon: Mail, ...e })),
+              ]}
               stepsLabel="What happens next"
               /* The client's own approach, stages one to three, word for
                  word. The reference's rows promise a free pilot and a

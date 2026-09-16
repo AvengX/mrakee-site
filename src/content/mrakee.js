@@ -48,14 +48,15 @@
    above it. Set back-to-back on a card the two read as a stutter. Say
    the word and it goes back in.
 
-   STILL MISSING, flagged rather than invented:
-     · phone, email and postal address — the final document still has
-       "+91 XXXXX XXXXX", "info@yourMRAKEE Technologies.com" and
-       "[Company Address]", all placeholders
+   OFFICIAL CONTACT DETAILS:
+     · Phone: 9319015591, 9319119008
+     · Email: Sales@mrakeetechnologies.com, Info@mrakeetechnologies.com
+   STILL MISSING:
+     · postal address — [Company Address]
      · social URLs for LinkedIn / Instagram / YouTube
      · a Projects section — in the footer quick links, but no project
        content was supplied
-   ================================================================ */
+    ================================================================ */
 
 export const HERO = {
   eyebrow: "AV Systems Integration",
@@ -250,4 +251,15 @@ export const FOOTER = {
   // LinkedIn / Instagram / YouTube are named in the document but no URLs
   // were supplied, so they are not rendered as links here.
   social: ["LinkedIn", "Instagram", "YouTube"],
+};
+
+export const CONTACT = {
+  phones: [
+    { label: "Phone", value: "9319015591", href: "tel:9319015591" },
+    { label: "Phone", value: "9319119008", href: "tel:9319119008" },
+  ],
+  emails: [
+    { label: "Email", value: "Sales@mrakeetechnologies.com", href: "mailto:Sales@mrakeetechnologies.com", wide: true },
+    { label: "Email", value: "Info@mrakeetechnologies.com", href: "mailto:Info@mrakeetechnologies.com", wide: true },
+  ],
 };

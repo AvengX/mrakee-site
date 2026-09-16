@@ -21,7 +21,7 @@ function ContactInfo({ icon: Icon, label, value, href, wide }) {
       <span className="contact__infoIcon">
         <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
       </span>
-      <span>
+      <span className="contact__infoText">
         <span className="contact__infoLabel">{label}</span>
         <span className="contact__infoValue">{value}</span>
       </span>
@@ -90,8 +90,8 @@ export default function ContactCard({
             an empty rail is a rule and a gap, which reads as broken. */}
         {contactInfo.length > 0 && (
           <div className="contact__infos">
-            {contactInfo.map((info) => (
-              <ContactInfo key={info.label} {...info} />
+            {contactInfo.map((info, idx) => (
+              <ContactInfo key={info.href || info.value || `${info.label}-${idx}`} {...info} />
             ))}
           </div>
         )}

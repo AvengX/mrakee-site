@@ -3999,7 +3999,7 @@ h3 {
 
 .contact__infos {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem 1rem;
   margin-top: 2.5rem;
   padding-top: 2rem;
@@ -4009,6 +4009,7 @@ h3 {
 @media (max-width: 520px) {
   .contact__infos {
     grid-template-columns: 1fr;
+    gap: 0.4rem;
   }
 }
 
@@ -4021,6 +4022,7 @@ h3 {
   border-radius: var(--r-sm);
   color: inherit;
   text-decoration: none;
+  min-width: 0;
   transition: background 0.3s var(--ease-soft);
 }
 
@@ -4051,6 +4053,11 @@ a.contact__info:hover .contact__infoIcon {
   color: var(--indigo);
 }
 
+.contact__infoText {
+  min-width: 0;
+  flex: 1;
+}
+
 .contact__infoLabel {
   display: block;
   font-size: 0.7rem;
@@ -4065,6 +4072,22 @@ a.contact__info:hover .contact__infoIcon {
   font-size: 0.94rem;
   font-weight: 550;
   line-height: 1.4;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (max-width: 520px) {
+  .contact__info {
+    gap: 0.75rem;
+    padding: 0.6rem 0.5rem;
+  }
+  .contact__infoIcon {
+    width: 38px;
+    height: 38px;
+  }
+  .contact__infoValue {
+    font-size: clamp(0.78rem, 3.4vw, 0.9rem);
+  }
 }
 
 /* ---- the form side ---------------------------------------------- */
@@ -6053,7 +6076,7 @@ a.contact__info:hover .contact__infoIcon {
 
 .contact__infos {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem 1rem;
   margin-top: 2.5rem;
   padding-top: 2rem;
@@ -6063,6 +6086,7 @@ a.contact__info:hover .contact__infoIcon {
 @media (max-width: 520px) {
   .contact__infos {
     grid-template-columns: 1fr;
+    gap: 0.4rem;
   }
 }
 
@@ -6075,6 +6099,7 @@ a.contact__info:hover .contact__infoIcon {
   border-radius: var(--r-sm);
   color: inherit;
   text-decoration: none;
+  min-width: 0;
   transition: background 0.3s var(--ease-soft);
 }
 
@@ -6105,6 +6130,11 @@ a.contact__info:hover .contact__infoIcon {
   color: var(--indigo);
 }
 
+.contact__infoText {
+  min-width: 0;
+  flex: 1;
+}
+
 .contact__infoLabel {
   display: block;
   font-size: 0.7rem;
@@ -6119,6 +6149,22 @@ a.contact__info:hover .contact__infoIcon {
   font-size: 0.94rem;
   font-weight: 550;
   line-height: 1.4;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (max-width: 520px) {
+  .contact__info {
+    gap: 0.75rem;
+    padding: 0.6rem 0.5rem;
+  }
+  .contact__infoIcon {
+    width: 38px;
+    height: 38px;
+  }
+  .contact__infoValue {
+    font-size: clamp(0.78rem, 3.4vw, 0.9rem);
+  }
 }
 
 /* ---- the form side ---------------------------------------------- */

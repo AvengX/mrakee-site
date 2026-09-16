@@ -13,12 +13,7 @@ import { SOLUTIONS } from "../content/mrakee";
    against a promise and maintains full visual parity.
    ================================================================ */
 
-/* LAUNCH BLOCKER. The client's content document gives
-   "info@yourMRAKEE Technologies.com", which is a placeholder, and this
-   address is a leftover guess from the previous (acquired-business)
-   content. Every enquiry the form produces goes here, so it must be
-   replaced with the real inbox before the site is public. */
-const SALES_EMAIL = "sales@mrakee.com";
+const SALES_EMAIL = "Sales@mrakeetechnologies.com";
 
 const FIELDS = [
   { name: "name", label: "Name", type: "text", autoComplete: "name", required: true },
