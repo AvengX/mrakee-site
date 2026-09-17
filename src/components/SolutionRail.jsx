@@ -8,10 +8,9 @@ gsap.registerPlugin(ScrollTrigger);
 /* ================================================================
    SOLUTIONS — a pinned horizontal rail
 
-   The pattern from goobaexport.com's products section: the section
-   pins, and the track slides sideways as you scroll down. Nine
-   portfolios read as a run of cards you travel along rather than a
-   column you fall past.
+   A pinned horizontal rail pattern: the section pins, and the track
+   slides sideways as you scroll down. Nine portfolios read as a run
+   of cards you travel along rather than a column you fall past.
 
    Three guards, all of which matter:
 
@@ -120,7 +119,7 @@ export default function SolutionRail({ items }) {
             <div className="rail__media">
               <img
                 src={ready.has(i) && s.img ? s.img : s.fallback}
-                alt=""
+                alt={`MRakee Technologies - ${s.t}`}
                 width="1600"
                 height="900"
                 loading="lazy"

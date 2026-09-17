@@ -59,10 +59,10 @@ export default function BrandPage() {
       </section>
 
       {/* ---------------- SOLUTIONS PORTFOLIO ----------------
-          A pinned horizontal rail, after goobaexport.com's products
-          section: the section pins and the nine portfolios travel
-          sideways as you scroll down. The rail sits outside band__inner
-          so the track can run past the column and off both edges. */}
+          A pinned horizontal rail: the section pins and the nine
+          portfolios travel sideways as you scroll down. The rail sits
+          outside band__inner so the track can run past the column and
+          off both edges. */}
       <section className="band band--rule" id="solutions">
         <div className="band__inner">
           <Reveal className="band__head">
@@ -233,7 +233,7 @@ export default function BrandPage() {
             </p>
           </div>
           <div>
-            <h4>What we do</h4>
+            <h3>What we do</h3>
             <ul>
               {FOOTER.disciplines.map((d) => (
                 <li key={d}>{d}</li>
@@ -241,7 +241,7 @@ export default function BrandPage() {
             </ul>
           </div>
           <div>
-            <h4>Quick links</h4>
+            <h3>Quick links</h3>
             <ul>
               <li><a href="#about">About Us</a></li>
               <li><a href="#solutions">Solutions</a></li>
@@ -255,7 +255,7 @@ export default function BrandPage() {
           <div>
             {/* Named in the client's document, but no URLs were supplied —
                 listed rather than linked, so there are no dead links. */}
-            <h4>Connect with us</h4>
+            <h3>Connect with us</h3>
             <ul>
               {FOOTER.social.map((s) => (
                 <li key={s}>{s}</li>

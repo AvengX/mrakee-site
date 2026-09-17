@@ -168,7 +168,7 @@ export const SOLUTIONS = [
     quote: "Smart Hospitality..Smart Guest Experience",
     img: "solutions/09.jpg",
     fallback: "solutions/09.jpg",
-    points: ["Digital Signage", "Large Event Spaces", "Workspace Management", "Virtual Concierge", "Self-Check In"],
+    points: ["Digital Signage", "Smart Kiosks & Self-Check In", "Large Event Spaces", "Workspace Management", "Virtual Concierge"],
   },
 ];
 
@@ -245,8 +245,8 @@ export const FAQ = [
 export const FOOTER = {
   strap: "Intelligent Audio-Visual Solutions. Seamlessly Integrated.",
   disciplines: [
-    "Audio-Visual Systems Integration", "Collaboration", "Digital Signage",
-    "Smart Spaces", "Command Centres", "Learning Spaces", "Large Venues",
+    "AI Solutions", "Digital Signage", "Smart Kiosks", "Audio-Visual Systems Integration",
+    "Collaboration", "Smart Spaces", "Command Centres", "Learning Spaces", "Large Venues",
   ],
   // LinkedIn / Instagram / YouTube are named in the document but no URLs
   // were supplied, so they are not rendered as links here.

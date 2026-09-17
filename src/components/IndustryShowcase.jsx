@@ -175,7 +175,7 @@ export default function IndustryShowcase({ items }) {
               <img
                 className={`ind__img${showB ? "" : " is-on"}`}
                 src={layerA.src}
-                alt=""
+                alt={items[layerA.i] ? `MRakee Technologies solutions for ${items[layerA.i].t}` : "MRakee Technologies industry solutions"}
                 width="1600"
                 height="900"
                 decoding="async"
@@ -185,7 +185,7 @@ export default function IndustryShowcase({ items }) {
               <img
                 className={`ind__img${showB ? " is-on" : ""}`}
                 src={layerB.src}
-                alt=""
+                alt={layerB && items[layerB.i] ? `MRakee Technologies solutions for ${items[layerB.i].t}` : "MRakee Technologies industry solutions"}
                 width="1600"
                 height="900"
                 decoding="async"

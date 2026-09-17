@@ -33,7 +33,7 @@ export default function Logo({ size = 36, showWordmark = true }) {
   const [wordArt, setWordArt] = useState(true);
 
   return (
-    <a href="#top" className="logo" aria-label="Mrakee Technologies — home">
+    <a href="#top" className="logo" aria-label="MRakee Technologies — home">
       {artwork ? (
         // the mark is 972x740 in the supplied artwork, so the box keeps
         // its 1.31:1 ratio — the box is wider than tall because the three
@@ -41,7 +41,7 @@ export default function Logo({ size = 36, showWordmark = true }) {
         <span className="logo__markBox" style={{ height: size, width: Math.round(size * 1.31) }}>
           <img
             src="logo.png"
-            alt=""
+            alt="MRakee Technologies"
             onError={() => setArtwork(false)}
             draggable="false"
           />
@@ -104,7 +104,7 @@ export default function Logo({ size = 36, showWordmark = true }) {
           <img
             className="logo__wordArt"
             src="logo-word.png"
-            alt=""
+            alt="MRakee Technologies"
             onError={() => setWordArt(false)}
             draggable="false"
           />

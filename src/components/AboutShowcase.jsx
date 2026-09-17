@@ -104,7 +104,7 @@ export default function AboutShowcase({
               key={s.t}
               className={`abt__img${i === active ? " is-on" : ""}`}
               src={loaded.has(i) ? s.img : undefined}
-              alt=""
+              alt={`MRakee Technologies systems integration - ${s.t} stage`}
               width="1600"
               height="900"
               loading={i === 0 ? "eager" : "lazy"}
