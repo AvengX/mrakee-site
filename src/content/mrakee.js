@@ -245,8 +245,17 @@ export const FAQ = [
 export const FOOTER = {
   strap: "Intelligent Audio-Visual Solutions. Seamlessly Integrated.",
   disciplines: [
-    "AI Solutions", "Digital Signage", "Smart Kiosks", "Audio-Visual Systems Integration",
-    "Collaboration", "Smart Spaces", "Command Centres", "Learning Spaces", "Large Venues",
+    { label: "AI Solutions", href: "/ai-solutions/" },
+    { label: "Digital Signage", href: "/digital-signage/" },
+    { label: "Smart Kiosks", href: "/smart-kiosks/" },
+    { label: "Airport Digital Signage", href: "/airport-digital-signage/" },
+    { label: "AI Chatbot Solutions", href: "/ai-chatbot-solutions/" },
+    { label: "Audio-Visual Systems Integration" },
+    { label: "Collaboration" },
+    { label: "Smart Spaces" },
+    { label: "Command Centres" },
+    { label: "Learning Spaces" },
+    { label: "Large Venues" },
   ],
   // LinkedIn / Instagram / YouTube are named in the document but no URLs
   // were supplied, so they are not rendered as links here.

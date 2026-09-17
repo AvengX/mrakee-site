@@ -236,7 +236,9 @@ export default function BrandPage() {
             <h3>What we do</h3>
             <ul>
               {FOOTER.disciplines.map((d) => (
-                <li key={d}>{d}</li>
+                <li key={d.label || d}>
+                  {d.href ? <a href={d.href}>{d.label}</a> : (d.label || d)}
+                </li>
               ))}
             </ul>
           </div>

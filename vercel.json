@@ -1,4 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["bom1"]
+  "cleanUrls": true,
+  "regions": ["bom1"],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "mrakeetechnologies.com"
+        }
+      ],
+      "destination": "https://www.mrakeetechnologies.com/:path*",
+      "permanent": true
+    }
+  ]
 }
