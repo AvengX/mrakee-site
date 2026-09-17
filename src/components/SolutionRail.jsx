@@ -150,6 +150,12 @@ export default function SolutionRail({ items }) {
                   ))}
                 </ul>
               )}
+              {s.link && (
+                <a className="rail__link rail__link--service" href={s.link} style={{ marginBottom: "0.5rem", color: "var(--teal-ink)" }}>
+                  {s.linkLabel || "Explore Solution"}
+                  <span className="arrow" aria-hidden="true">→</span>
+                </a>
+              )}
               <a className="rail__link" href="#contact">
                 Talk to us about this
                 <span className="arrow" aria-hidden="true">→</span>

@@ -34,6 +34,8 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 export default function AboutShowcase({
   eyebrow,
+  question,
+  directAnswer,
   title,
   paragraphs = [],
   chips = [],
@@ -79,7 +81,15 @@ export default function AboutShowcase({
       {/* ---- intro ---- */}
       <div className="abt__intro">
         {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-        <h2 className="abt__title">{title}</h2>
+        {question ? (
+          <>
+            <h2 className="abt__title">{question}</h2>
+            {directAnswer && <p className="abt__para abt__para--direct">{directAnswer}</p>}
+            {title && <h3 className="abt__sub">{title}</h3>}
+          </>
+        ) : (
+          <h2 className="abt__title">{title}</h2>
+        )}
 
         {paragraphs.map((p) => (
           <p className="abt__para" key={p}>

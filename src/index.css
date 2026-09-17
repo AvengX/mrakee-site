@@ -2994,6 +2994,22 @@ h3 {
   max-width: 52ch;
 }
 
+.abt__para--direct {
+  font-size: clamp(1.02rem, 1.15vw, 1.12rem);
+  line-height: 1.68;
+  color: var(--exec-dark);
+  font-weight: 500;
+}
+
+.abt__sub {
+  margin-top: 1.6rem;
+  font-size: clamp(1.2rem, 1.5vw, 1.45rem);
+  font-weight: 650;
+  line-height: 1.25;
+  color: var(--teal-deep);
+  letter-spacing: -0.02em;
+}
+
 /* Static, and styled so. The original renders these as Badges, which
    look pressable and do nothing — a control that invites a click and
    has no behaviour is the failure the guidance calls critical. No

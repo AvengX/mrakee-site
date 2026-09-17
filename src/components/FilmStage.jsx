@@ -57,7 +57,7 @@ const CAPTIONS = [
     // .cap--hero note in index.css.
     in: -0.05, out: 0.06, fade: 0.03, align: "left",
     title: <>Integration made <span className="grad-text">Simple</span>.</>,
-    body: "Engineering the way technology connects the future. Design. Integrate. Connect. Perform.",
+    body: "MRakee Technologies designs, engineers, and integrates enterprise AI solutions, smart digital signage, and interactive kiosks. Design. Integrate. Connect. Perform.",
     hero: true,
   },
   // The three below are placed against what the commercial is actually

@@ -64,17 +64,19 @@ export const HERO = {
   strap: "Engineering the way technology connects the future.",
   tagline: "Design. Integrate. Connect. Perform.",
   intro: [
-    "MRAKEE TECHNOLOGIES is an AV Systems Integration business that creates the road map for delivering smart, reliable, scalable technology solutions for business that are looking to redefine their technology. Expertise that range for solutions to support modern workplaces, educational institutions, secure government facilities, hospitality, critical command centres and large enterprise environments.",
-    "MRAKEE Technologies brings together AV Technology, leading engineering expertise, revolutionary and intentional design to create spaces that are intuitive to use. Powerful in performance and built to scale with your business. Where growth is built together.",
+    "MRakee Technologies is a technology systems integration company that creates the roadmap for delivering smart, reliable, scalable technology solutions for businesses looking to redefine their infrastructure. Our expertise spans solutions for modern workplaces, educational institutions, government facilities, hospitality venues, critical command centres, and large enterprise environments.",
+    "MRakee Technologies brings together audio-visual technology, AI solutions, engineering expertise, and intentional design to create spaces that are intuitive to use, powerful in performance, and built to scale with your business.",
   ],
 };
 
 export const ABOUT = {
+  question: "What is MRakee Technologies?",
+  directAnswer: "MRakee Technologies is a systems integration company that designs, integrates, and deploys enterprise AI solutions, digital signage, and smart kiosks. We deliver smart, reliable, scalable technology solutions for modern corporate workplaces, educational institutions, government facilities, hospitality venues, command centres, and commercial environments.",
   title: "Displaying the way Technology connects People and endless Possibilities.",
-  lede: "At MRAKEE TECHNOLOGIES, our belief is making technology seamless, secure and simple.",
+  lede: "At MRakee Technologies, our belief is making technology seamless, secure and simple.",
   body: [
-    "Our team specialises in designing and integrating AV Systems that help businesses deliver their technology needs. Ensuring that the solutions simplify and captivate users with engaging experiences.",
-    "Specialising in a wide range of solutions, our team will manage the complete AV journey. From Concept, Design, Installation, After Care, Training and On-going support. Each requirement is managed by experts who bring technical and market knowledge to ensure the success of your business goals.",
+    "Our team specialises in designing and integrating systems that help businesses deliver their technology needs, ensuring solutions simplify operations and captivate users with engaging experiences.",
+    "Specialising in end-to-end integration, our team manages the complete technology journey: from concept, engineering design, and installation to operator training and ongoing MRAKEE Care support. Each requirement is guided by specialists who bring technical and market expertise to ensure the success of your business goals.",
     "Bridging the gap of reliable performance today with proactive planning for tomorrow.",
   ],
 };
@@ -101,16 +103,15 @@ export const APPROACH = [
     d: "Where we continue to be your technology partner, to provide proactive support and maintenance." },
 ];
 
-/* The nine solution portfolios. Each `img` is the closest existing
-   photograph on the site; most were shot for digital signage and do not
-   show a boardroom, a classroom or a control room. See
-   film-src/AV_SOLUTION_PROMPTS.md — six of the nine need new images. */
+/* The nine solution portfolios with contextual links to dedicated service pages. */
 export const SOLUTIONS = [
   {
     t: "Seamless Communication & Video Conferencing",
     quote: "Connectivity beyond a room…",
     img: "solutions/13.jpg",
     fallback: "solutions/13.jpg",
+    link: "/ai-solutions/",
+    linkLabel: "Explore AI & Collaboration Solutions",
     points: ["Video conferencing systems", "Conference room AV", "Wireless presentation", "Room scheduling", "Professional microphones and speakers", "Camera systems", "Collaboration platforms", "Room control and automation"],
   },
   {
@@ -118,6 +119,8 @@ export const SOLUTIONS = [
     quote: "Where minds align and creativity is born",
     img: "solutions/13.jpg",
     fallback: "solutions/13.jpg",
+    link: "/ai-solutions/",
+    linkLabel: "Explore Meeting Room Solutions",
     points: ["Displays and interactive screens", "Video conferencing", "Digital presentation systems", "Ceiling and table microphones", "Professional audio", "Automated room control", "Wireless collaboration", "Lighting integration"],
   },
   {
@@ -132,6 +135,8 @@ export const SOLUTIONS = [
     quote: "Information is Key, delivering reliability during critical situations",
     img: "solutions/03.jpg",
     fallback: "solutions/03.jpg",
+    link: "/ai-solutions/",
+    linkLabel: "Explore Command Room Solutions",
     points: ["Video walls", "Operator workstations", "Centralized AV control", "Signal distribution", "Monitoring systems", "Large-format displays", "Collaboration systems", "Control room audio", "24/7 operational support"],
   },
   {
@@ -139,6 +144,8 @@ export const SOLUTIONS = [
     quote: "Where seeing is believing",
     img: "solutions/03.jpg",
     fallback: "solutions/03.jpg",
+    link: "/ai-solutions/",
+    linkLabel: "Explore Experience Centre Solutions",
     points: ["Interactive displays", "Video walls", "Immersive projection", "Touch interfaces", "Digital content systems", "Professional audio", "Lighting integration", "Interactive demonstrations", "Centralized control"],
   },
   {
@@ -146,7 +153,9 @@ export const SOLUTIONS = [
     quote: "Centrally Managed for Seamless Distribution through the network",
     img: "solutions/15.jpg",
     fallback: "solutions/15.jpg",
-    d: "Digital Signage solutions for your space.. centrally managed for seamless distribution.. Deliver the right message to the right audience at the right time. MRAKEE TECHNOLOGIES provides digital signage solutions for corporate offices, retail environments, campuses, hospitals, hospitality spaces, transportation facilities and public areas. From display hardware to content distribution and centralized management, we create signage ecosystems that are easy to manage and built for continuous operation.",
+    link: "/digital-signage/",
+    linkLabel: "Explore Digital Signage Solutions",
+    d: "Deliver the right message to the right audience at the right time. MRakee Technologies provides digital signage solutions for corporate offices, retail environments, campuses, hospitals, hospitality spaces, transportation facilities and public areas. From display hardware to content distribution and centralized management, we create signage ecosystems that are easy to manage and built for continuous operation.",
     points: [],
   },
   {
@@ -154,6 +163,8 @@ export const SOLUTIONS = [
     quote: "Visualisation at Large",
     img: "solutions/03.jpg",
     fallback: "solutions/03.jpg",
+    link: "/digital-signage/",
+    linkLabel: "Explore Video Wall Solutions",
     points: ["Command centres", "Corporate lobbies", "Experience centres", "Retail environments", "Control rooms", "Auditoriums", "Large venues", "Monitoring applications"],
   },
   {
@@ -168,6 +179,8 @@ export const SOLUTIONS = [
     quote: "Smart Hospitality..Smart Guest Experience",
     img: "solutions/09.jpg",
     fallback: "solutions/09.jpg",
+    link: "/smart-kiosks/",
+    linkLabel: "Explore Smart Kiosks & Concierge",
     points: ["Digital Signage", "Smart Kiosks & Self-Check In", "Large Event Spaces", "Workspace Management", "Virtual Concierge"],
   },
 ];
@@ -196,10 +209,7 @@ export const WHY = [
   { t: "Reliable, Seamless Execution", d: "Planning successfully means Successful Project outcomes." },
 ];
 
-/* The five-stage matrix. The final document runs stages two to five as
-   sentences with no heading of their own; the headings below are the
-   ones the client gave these same five stages in Edit 1, and each names
-   the team its sentence goes on to describe. */
+/* The five-stage matrix. */
 export const EXPERTISE = [
   { t: "Begin with Questions", d: "Where our experts evaluate your current set up, objectives, infrastructure and set goals." },
   { t: "Engineering", d: "Our Engineering experts then work the magic of bridging concept to detailed AV Designs." },
@@ -209,16 +219,13 @@ export const EXPERTISE = [
 ];
 
 export const EXPERTS = {
-  title: "One Team, One Goal, One Seamless AV experience.",
+  title: "One Team, One Goal, One Seamless Experience.",
   body: [
-    "MRAKEE TECHNOLOGIES invests in having the best minds in the business. This allows our customers to feel confident that who they interact with, have the technical, operational and market knowledge and experience to help with their requirements.",
+    "MRakee Technologies invests in having the best minds in the business. This allows our customers to feel confident that who they interact with, have the technical, operational and market knowledge and experience to help with their requirements.",
     "Collaborative, approachable and professional are the pillars of the teams that will support your business needs.",
   ],
 };
 
-/* Flagged again by the client reviewer on the final version: "Blog
-   Categories - Unsure what this is for but I didnt make any changes."
-   Carried through as written. */
 export const INSIGHTS = {
   title: "Know what is happening within the Technology.",
   lede: "Shaping modern technology today and beyond.",
@@ -231,15 +238,35 @@ export const INSIGHTS = {
   ],
 };
 
-/* Also flagged again: "Again FAQ - unsure who designed these, but I
-   have not made any changes." */
 export const FAQ = [
-  { q: "What does MRAKEE TECHNOLOGIES do?", a: "MRAKEE TECHNOLOGIES designs, supplies, integrates and supports professional audio-visual technology for organizations across corporate, education, government, hospitality and other sectors." },
-  { q: "Can MRAKEE TECHNOLOGIES upgrade an existing AV system?", a: "Yes. We can assess existing infrastructure and recommend upgrades, replacements or improvements based on your requirements and available infrastructure." },
-  { q: "Do you provide complete turnkey AV solutions?", a: "Yes. Our services can cover consultation, design, equipment supply, installation, integration, programming, commissioning, training and ongoing support." },
-  { q: "Can you integrate different brands and technologies?", a: "Yes. We design technology environments based on functionality and compatibility, allowing different systems to work together as one solution." },
-  { q: "Do you provide maintenance after installation?", a: "Yes. We offer support and maintenance services designed to keep AV environments operational and minimize downtime." },
-  { q: "Can you design AV solutions for new buildings?", a: "Yes. Early involvement allows our team to coordinate AV requirements with architecture, electrical systems, networking, acoustics and other building infrastructure." },
+  {
+    q: "What does MRakee Technologies do?",
+    a: "MRakee Technologies is a systems integration company that designs, supplies, integrates, and supports enterprise technology solutions, including AI solutions, smart digital signage, interactive kiosks, and audio-visual systems across corporate, education, government, hospitality, and commercial sectors."
+  },
+  {
+    q: "What technology solutions does MRakee Technologies provide?",
+    a: "MRakee Technologies provides enterprise AI solutions, centrally managed digital signage networks, smart kiosks and virtual concierge systems, boardroom video conferencing, command centre displays, interactive experience centres, and custom systems integration."
+  },
+  {
+    q: "Can MRakee Technologies upgrade an existing technology system?",
+    a: "Yes. We assess existing infrastructure and recommend targeted upgrades, replacements, or improvements based on operational requirements and existing facility investments."
+  },
+  {
+    q: "Do you provide complete turnkey integration solutions?",
+    a: "Yes. Our services cover consultation, engineering design, equipment procurement, installation, system integration, programming, testing, staff training, and ongoing support."
+  },
+  {
+    q: "Can you integrate different brands and technologies?",
+    a: "Yes. We design technology environments based on functionality and compatibility, allowing multi-vendor hardware and software systems to work together as one coordinated solution."
+  },
+  {
+    q: "Do you provide maintenance and ongoing support after installation?",
+    a: "Yes. Through MRAKEE Care, we offer proactive maintenance and ongoing support services designed to keep technology environments operational and minimize downtime."
+  },
+  {
+    q: "Can you design technology solutions for new buildings and fit-outs?",
+    a: "Yes. Early involvement allows our engineering team to coordinate technology requirements with architecture, electrical systems, networking, acoustics, and other building infrastructure."
+  },
 ];
 
 export const FOOTER = {
@@ -257,8 +284,6 @@ export const FOOTER = {
     { label: "Learning Spaces" },
     { label: "Large Venues" },
   ],
-  // LinkedIn / Instagram / YouTube are named in the document but no URLs
-  // were supplied, so they are not rendered as links here.
   social: ["LinkedIn", "Instagram", "YouTube"],
 };
 

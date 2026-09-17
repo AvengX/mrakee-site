@@ -45,6 +45,8 @@ export default function BrandPage() {
           <Reveal>
             <AboutShowcase
               eyebrow="About Us"
+              question={ABOUT.question}
+              directAnswer={ABOUT.directAnswer}
               title={ABOUT.title}
               paragraphs={[ABOUT.lede, ...ABOUT.body]}
               chips={["Design", "Integrate", "Connect", "Perform"]}
@@ -71,9 +73,9 @@ export default function BrandPage() {
               words={["Built", "around", { t: "how", grad: true }, { t: "customers", grad: true }, { t: "work.", grad: true }]}
             />
             <p className="lede">
-              MRAKEE Technologies solutions portfolios are developed around
-              Customers. How Customers work, how Customers learn, how Customers
-              communicate and how Customers engage.
+              MRakee Technologies solutions portfolios are developed around
+              customers — how customers work, how customers learn, how customers
+              communicate, and how customers engage.
             </p>
           </Reveal>
 
@@ -103,7 +105,7 @@ export default function BrandPage() {
       <section className="band band--rule" id="why">
         <div className="band__inner">
           <Reveal className="band__head">
-            <p className="eyebrow">Why MRAKEE Technologies</p>
+            <p className="eyebrow">Why MRakee Technologies</p>
             <SplitWords words={["We", "believe", "Solutions", "are", "just", "the", { t: "beginning.", grad: true }]} />
             <p className="lede">
               We understand the importance that choosing the right technology
@@ -123,7 +125,7 @@ export default function BrandPage() {
             <p className="eyebrow">Our Expertise</p>
             <SplitWords words={["Across", "the", "whole", { t: "project", grad: true }, { t: "life-cycle.", grad: true }]} />
             <p className="lede">
-              At MRAKEE TECHNOLOGIES our experts work closely with customers
+              At MRakee Technologies our experts work closely with customers
               throughout the project life-cycle, allowing customers to feel
               empowered to find the right solution for their business needs. The
               team uses the following matrix giving a personalised approach in
@@ -266,7 +268,7 @@ export default function BrandPage() {
           </div>
         </div>
         <div className="footer__bottom">
-          <span>© {new Date().getFullYear()} MRAKEE TECHNOLOGIES. All Rights Reserved.</span>
+          <span>© {new Date().getFullYear()} MRakee Technologies. All Rights Reserved.</span>
           <span>Privacy Policy · Terms &amp; Conditions</span>
         </div>
       </footer>
