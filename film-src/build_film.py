@@ -16,6 +16,9 @@ import cv2
 import imageio_ffmpeg
 from PIL import Image
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from overlay_hero_logo import overlay_logo
+
 EXE = imageio_ffmpeg.get_ffmpeg_exe()
 # Sources live in the project, not in Downloads. They used to be read
 # from C:/Users/ayush/Downloads/mrakee, and that folder was reorganised
@@ -211,6 +214,8 @@ def main():
         else:
             im = Image.open(item).convert("RGB")
         im = dewatermark(im)
+        if 213 <= idx <= 238:
+            im = overlay_logo(im, idx)
         im.save(os.path.join(OUTDIR, f"{idx:04d}.webp"), "WEBP", quality=QUALITY)
         im.close()
 
